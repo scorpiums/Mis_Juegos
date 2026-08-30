@@ -253,7 +253,7 @@
         document.getElementById('jugadores').value = json.jugadores || '';
         document.getElementById('instrucciones').value = json.instrucciones || '';
       } catch (err) {
-        alert("Error procesando la imagen con la IA.");
+        alert("Error IA: " + err.message);
       } finally {
         btnIA.innerText = "✨ Autocompletar IA";
         btnIA.disabled = false;
