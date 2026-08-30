@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mis Juegos y Juguetes</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .card-zoom { transition: transform 0.2s ease-in-out; }
+    .card-zoom:active { transform: scale(0.97); }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen pb-20">
+
+  <!-- Encabezado -->
+  <header class="bg-indigo-600 text-white p-4 shadow-md sticky top-0 z-30 flex justify-between items-center">
+    <h1 class="text-xl font-bold tracking-wide">🎲 Mis Juegos y Juguetes</h1>
+  </header>
+
+  <!-- Barra de Filtros y Búsqueda -->
+  <div class="p-4 max-w-4xl mx-auto space-y-3">
+    <div class="flex gap-2">
+      <input type="text" id="searchInput" oninput="filtrarJuegos()" placeholder="🔍 Buscar por nombre..." class="w-full p-2.5 rounded-xl border border-slate-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+      <button onclick="seleccionarAleatorio()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-4 py-2.5 rounded-xl shadow-md flex items-center gap-1 whitespace-nowrap card-zoom">
+        🎰 ¡Elegir!
+      </button>
+    </div>
+    
+    <div class="flex gap-2 overflow-x-auto pb-1 text-sm scrollbar-none" id="categoriasFiltro">
+      <button onclick="filtrarCategoria('Todas', event)" class="cat-btn bg-indigo-600 text-white px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Todas</button>
+      <button onclick="filtrarCategoria('Juego de Mesa', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Juegos de Mesa</button>
+      <button onclick="filtrarCategoria('Construcción', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Construcción</button>
+      <button onclick="filtrarCategoria('Exterior', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Exterior</button>
+      <button onclick="filtrarCategoria('Consola', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Consola</button>
+    </div>
+  </div>
+
+  <!-- Contenedor Principal de Tarjetas -->
+  <main class="p-4 max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-4" id="gridJuegos">
+    <div class="col-span-full text-center py-10 text-slate-400">Cargando colección desde la nube...</div>
+  </main>
+
+  <!-- Botón Flotante Añadir -->
+  <button onclick="abrirModalFormulario()" class="fixed bottom-6 right-6 bg-indigo-600 hover:bg-indigo-700 text-white p-4 rounded-full shadow-2xl z-40 text-2xl font-bold flex items-center justify-center w-14 h-14 card-zoom">
+    ＋
+  </button>
+
+  <!-- Modal Formulario (Añadir / Editar) -->
+  <div id="modalForm" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-md w-full p-5 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b pb-2">
+        <h3 class="text-lg font-bold text-slate-800" id="modalTitulo">Nuevo Juego / Juguete</h3>
+        <button onclick="cerrarModalFormulario()" class="text-slate-400 text-xl font-bold">✕</button>
+      </div>
+
+      <!-- Preview de Imagen + Captura -->
+      <div class="space-y-2">
+        <div id="imagePreview" class="w-full h-40 bg-slate-100 rounded-xl flex items-center justify-center border-2 border-dashed border-slate-300 overflow-hidden relative">
+          <span class="text-slate-400 text-sm">Sin fotografía</span>
+        </div>
+        <div class="flex gap-2">
+          <input type="file" id="inputFoto" accept="image/*" capture="environment" onchange="procesarFoto(event)" class="hidden">
+          <button onclick="document.getElementById('inputFoto').click()" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 rounded-xl text-sm flex items-center justify-center gap-2">
+            📷 Capturar / Subir Foto
+          </button>
+          <button onclick="analizarConIA()" id="btnIA" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-3 py-2 rounded-xl text-sm hidden">
+            ✨ Autocompletar IA
+          </button>
+        </div>
+      </div>
+
+      <form id="juegoForm" onsubmit="guardarJuego(event)" class="space-y-3">
+        <input type="hidden" id="juegoId">
+        <input type="hidden" id="juegoFotoBase64">
+
+        <div>
+          <label class="text-xs font-bold text-slate-500 uppercase">Nombre</label>
+          <input type="text" id="nombre" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="text-xs font-bold text-slate-500 uppercase">Categoría</label>
+            <select id="categoria" class="w-full p-2 border rounded-lg outline-none">
+              <option value="Juego de Mesa">Juego de Mesa</option>
+              <option value="Construcción">Construcción</option>
+              <option value="Exterior">Exterior</option>
+              <option value="Consola">Consola</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-bold text-slate-500 uppercase">Ubicación</label>
+            <input type="text" id="ubicacion" placeholder="Ej. Estantería Salón" class="w-full p-2 border rounded-lg outline-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="text-xs font-bold text-slate-500 uppercase">Edad Recomendada</label>
+            <input type="text" id="edad" placeholder="Ej. 6+" class="w-full p-2 border rounded-lg outline-none">
+          </div>
+          <div>
+            <label class="text-xs font-bold text-slate-500 uppercase">Jugadores</label>
+            <input type="text" id="jugadores" placeholder="Ej. 2-4" class="w-full p-2 border rounded-lg outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="text-xs font-bold text-slate-500 uppercase">Instrucciones / Reglas</label>
+          <textarea id="instrucciones" rows="3" placeholder="Resumen rápido de cómo se juega..." class="w-full p-2 border rounded-lg outline-none text-sm"></textarea>
+        </div>
+
+        <button type="submit" id="btnGuardar" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-lg">
+          Guardar en la Nube
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const WORKER_URL = "https://backend-juegos.pabgartov.workers.dev";
+    let juegosCache = [];
+    let categoriaActual = 'Todas';
+
+    window.onload = () => {
+      cargarJuegos();
+    };
+
+    async function cargarJuegos() {
+      try {
+        const res = await fetch(`${WORKER_URL}/api/juegos`);
+        juegosCache = await res.json();
+        renderizarTarjetas();
+      } catch (err) {
+        document.getElementById('gridJuegos').innerHTML = `<div class="col-span-full text-center py-10 text-rose-500">Error al conectar con la base de datos.</div>`;
+      }
+    }
+
+    function renderizarTarjetas() {
+      const grid = document.getElementById('gridJuegos');
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      grid.innerHTML = '';
+
+      const filtrados = juegosCache.filter(j => {
+        const coincideCat = categoriaActual === 'Todas' || j.categoria === categoriaActual;
+        const coincideNom = j.nombre.toLowerCase().includes(search);
+        return coincideCat && coincideNom;
+      });
+
+      if (filtrados.length === 0) {
+        grid.innerHTML = `<div class="col-span-full text-center py-10 text-slate-400">No hay juegos guardados.</div>`;
+        return;
+      }
+
+      filtrados.forEach(j => {
+        grid.innerHTML += `
+          <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between">
+            <div>
+              <div class="h-44 bg-slate-100 relative">
+                ${j.foto_url ? `<img src="${j.foto_url}" class="w-full h-full object-cover">` : '<div class="w-full h-full flex items-center justify-center text-slate-400">Sin Foto</div>'}
+                <span class="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-md backdrop-blur-md">${j.categoria}</span>
+              </div>
+              <div class="p-4 space-y-2">
+                <div class="flex justify-between items-start">
+                  <h4 class="font-bold text-lg text-slate-800">${j.nombre}</h4>
+                  <span class="text-xs bg-indigo-50 text-indigo-700 font-bold px-2 py-1 rounded-lg">🎮 ${j.veces_jugado || 0} usos</span>
+                </div>
+                <p class="text-xs text-slate-500">📍 <b>Ubicación:</b> ${j.ubicacion || 'Sin especificar'}</p>
+                <div class="flex gap-3 text-xs text-slate-600">
+                  <span>👶 ${j.edad || 'N/A'}</span>
+                  <span>👥 ${j.jugadores || 'N/A'}</span>
+                </div>
+                ${j.instrucciones ? `<details class="text-xs text-slate-600 bg-slate-50 p-2 rounded-lg"><summary class="font-bold cursor-pointer">Ver Reglas</summary><p class="mt-1">${j.instrucciones}</p></details>` : ''}
+              </div>
+            </div>
+            <div class="p-4 pt-0 flex gap-2">
+              <button onclick="registrarUso('${j.id}')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs card-zoom">
+                ¡Jugado Hoy!
+              </button>
+              <button onclick="borrarJuego('${j.id}')" class="bg-rose-50 text-rose-600 hover:bg-rose-100 p-2 rounded-xl text-xs">
+                🗑️
+              </button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function procesarFoto(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        document.getElementById('juegoFotoBase64').value = e.target.result;
+        document.getElementById('imagePreview').innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover">`;
+        document.getElementById('btnIA').classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function analizarConIA() {
+      const base64 = document.getElementById('juegoFotoBase64').value;
+      if (!base64) return alert("Por favor, sube primero una foto.");
+
+      const btnIA = document.getElementById('btnIA');
+      btnIA.innerText = "⏳ Analizando...";
+      btnIA.disabled = true;
+
+      try {
+        const response = await fetch(`${WORKER_URL}/api/analizar-imagen`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ foto_base64: base64 })
+        });
+        
+        const json = await response.json();
+        if (json.error) throw new Error(json.error);
+
+        document.getElementById('nombre').value = json.nombre || '';
+        document.getElementById('categoria').value = json.categoria || 'Otro';
+        document.getElementById('edad').value = json.edad || '';
+        document.getElementById('jugadores').value = json.jugadores || '';
+        document.getElementById('instrucciones').value = json.instrucciones || '';
+      } catch (err) {
+        alert("Error procesando la imagen con la IA.");
+      } finally {
+        btnIA.innerText = "✨ Autocompletar IA";
+        btnIA.disabled = false;
+      }
+    }
+
+    async function guardarJuego(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnGuardar');
+      btn.innerText = "Subiendo a la nube...";
+      btn.disabled = true;
+
+      const nuevoJuego = {
+        id: document.getElementById('juegoId').value || Date.now().toString(),
+        nombre: document.getElementById('nombre').value,
+        categoria: document.getElementById('categoria').value,
+        ubicacion: document.getElementById('ubicacion').value,
+        edad: document.getElementById('edad').value,
+        jugadores: document.getElementById('jugadores').value,
+        instrucciones: document.getElementById('instrucciones').value,
+        foto_base64: document.getElementById('juegoFotoBase64').value,
+        veces_jugado: 0
+      };
+
+      try {
+        await fetch(`${WORKER_URL}/api/juegos`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(nuevoJuego)
+        });
+        cerrarModalFormulario();
+        cargarJuegos();
+      } catch (err) {
+        alert("Error al guardar.");
+      } finally {
+        btn.innerText = "Guardar en la Nube";
+        btn.disabled = false;
+      }
+    }
+
+    async function registrarUso(juegoId) {
+      try {
+        await fetch(`${WORKER_URL}/api/partidas`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: Date.now().toString(),
+            juego_id: juegoId,
+            jugadores: "Familia",
+            ganador: "",
+            notas: "Partida rápida"
+          })
+        });
+        cargarJuegos();
+      } catch (err) {
+        alert("Error al registrar partida.");
+      }
+    }
+
+    async function borrarJuego(id) {
+      if (!confirm("¿Seguro que quieres borrar este juego?")) return;
+      await fetch(`${WORKER_URL}/api/juegos/${id}`, { method: 'DELETE' });
+      cargarJuegos();
+    }
+
+    function seleccionarAleatorio() {
+      if (juegosCache.length === 0) return alert("¡Añade primero algún juego!");
+      const seleccionado = juegosCache[Math.floor(Math.random() * juegosCache.length)];
+      alert(`🎉 ¡LA RULETA HA ELEGIDO!\n\n👉 ${seleccionado.nombre}\n📍 Ubicación: ${seleccionado.ubicacion || 'En su sitio'}`);
+    }
+
+    function filtrarCategoria(cat, event) {
+      categoriaActual = cat;
+      document.querySelectorAll('.cat-btn').forEach(b => {
+        b.classList.remove('bg-indigo-600', 'text-white');
+        b.classList.add('bg-white', 'text-slate-600');
+      });
+      event.target.classList.add('bg-indigo-600', 'text-white');
+      renderizarTarjetas();
+    }
+
+    function filtrarJuegos() { renderizarTarjetas(); }
+
+    function abrirModalFormulario() { document.getElementById('modalForm').classList.remove('hidden'); }
+    function cerrarModalFormulario() {
+      document.getElementById('modalForm').classList.add('hidden');
+      document.getElementById('juegoForm').reset();
+      document.getElementById('imagePreview').innerHTML = `<span class="text-slate-400 text-sm">Sin fotografía</span>`;
+      document.getElementById('juegoFotoBase64').value = '';
+    }
+  </script>
+</body>
+</html>
