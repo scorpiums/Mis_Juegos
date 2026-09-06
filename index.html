@@ -42,9 +42,6 @@
         <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl card-zoom">
           Entrar
         </button>
-        <button type="button" class="w-full border border-indigo-200 text-indigo-600 font-semibold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 opacity-50 cursor-not-allowed" title="Próximamente">
-          👆 Entrar con Huella / Face ID
-        </button>
         <p class="text-center text-xs text-slate-500 pt-2">
           ¿No tienes cuenta? <a href="#" onclick="toggleAuthMode('registro')" class="text-indigo-600 font-bold">Regístrate</a>
         </p>
@@ -89,9 +86,8 @@
 
   <!-- APLICACIÓN PRINCIPAL (Protegida) -->
   <div id="mainApp" class="hidden">
-    <!-- Encabezado con botón plano de salida -->
+    <!-- Encabezado -->
     <header class="bg-indigo-600 text-white px-2.5 py-2 shadow-md sticky top-0 z-30 flex justify-between items-center gap-1">
-      <!-- Logotipo -->
       <div class="flex items-center gap-1.5 shrink-0">
         <div class="w-8 h-8 bg-amber-400 rounded-lg border-2 border-black flex items-center justify-center shadow-md text-black font-black text-sm">🎮</div>
         <div class="leading-tight">
@@ -100,7 +96,6 @@
         </div>
       </div>
 
-      <!-- Zona de Usuario y Botón de Salida Plano -->
       <div class="flex items-center gap-2 shrink-0">
         <div id="userBadgeContainer"></div>
         <button onclick="cerrarSesion()" class="text-indigo-200 hover:text-white p-1.5 transition flex items-center justify-center card-zoom" title="Cerrar Sesión">
@@ -111,7 +106,7 @@
       </div>
     </header>
 
-    <!-- Barra de Búsqueda, Filtros y Selector de Vista -->
+    <!-- Barra de Búsqueda y Filtros -->
     <div class="p-4 max-w-4xl mx-auto space-y-3">
       <div class="flex gap-2">
         <input type="text" id="searchInput" oninput="filtrarJuegos()" placeholder="🔍 Buscar por nombre..." class="w-full p-2.5 rounded-xl border border-slate-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
@@ -121,16 +116,15 @@
       </div>
       
       <div class="flex justify-between items-center gap-2">
-        <!-- Filtros por categoría -->
         <div class="flex gap-1.5 overflow-x-auto pb-1 text-xs scrollbar-none flex-grow" id="categoriasFiltro">
           <button onclick="filtrarCategoria('Todas', event)" class="cat-btn bg-indigo-600 text-white px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Todas</button>
+          <button onclick="filtrarCategoria('Favoritos', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">❤️ Favoritos</button>
           <button onclick="filtrarCategoria('Juego de Mesa', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Mesa</button>
           <button onclick="filtrarCategoria('Construcción', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Construcción</button>
           <button onclick="filtrarCategoria('Exterior', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Exterior</button>
           <button onclick="filtrarCategoria('Consola', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Consola</button>
         </div>
 
-        <!-- Conmutador de Vista -->
         <div class="flex bg-slate-200 p-1 rounded-xl shrink-0">
           <button onclick="cambiarVista('grid')" id="btnGrid" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-indigo-600 shadow-sm transition">⊞</button>
           <button onclick="cambiarVista('compact')" id="btnCompact" class="px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 transition">☰</button>
@@ -138,7 +132,7 @@
       </div>
     </div>
 
-    <!-- Contenedor Principal de Tarjetas / Lista -->
+    <!-- Contenedor Principal -->
     <main class="p-4 max-w-4xl mx-auto" id="mainContainer">
       <div class="text-center py-10 text-slate-400">Cargando colección desde la nube...</div>
     </main>
@@ -149,12 +143,56 @@
     </button>
   </div>
 
-  <!-- MODAL ADMIN AVANZADO -->
+  <!-- MODAL PERFIL DE USUARIO -->
+  <div id="modalPerfil" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-md w-full p-5 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b pb-2">
+        <h3 class="font-bold text-lg text-slate-800">👤 Mi Perfil</h3>
+        <button onclick="cerrarPerfilModal()" class="text-slate-400 font-bold text-xl px-2">✕</button>
+      </div>
+
+      <div class="flex flex-col items-center space-y-2">
+        <div id="avatarPreview" class="w-24 h-24 bg-slate-200 rounded-full flex items-center justify-center border-2 border-indigo-500 overflow-hidden relative shadow-md">
+          <span class="text-slate-400 text-xs">Sin Foto</span>
+        </div>
+        <input type="file" id="inputAvatar" accept="image/*" onchange="procesarAvatar(event)" class="hidden">
+        <button type="button" onclick="document.getElementById('inputAvatar').click()" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-semibold px-3 py-1.5 rounded-lg">
+          📷 Cambiar Avatar
+        </button>
+      </div>
+
+      <form id="perfilForm" onsubmit="guardarPerfil(event)" class="space-y-3">
+        <input type="hidden" id="perfilAvatarBase64">
+        <div>
+          <label class="text-xs font-bold text-slate-500 uppercase">Nombre Completo</label>
+          <input type="text" id="perfilNombre" required class="w-full p-2.5 border rounded-xl outline-none text-sm">
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-500 uppercase">Bio / Datos Personales</label>
+          <textarea id="perfilBio" rows="2" placeholder="Escribe algo sobre ti..." class="w-full p-2 border rounded-xl outline-none text-sm"></textarea>
+        </div>
+
+        <div class="border-t pt-3 space-y-2">
+          <p class="text-xs font-bold text-indigo-600 uppercase">Cambiar Contraseña</p>
+          <input type="password" id="passActual" placeholder="Contraseña actual" class="w-full p-2 border rounded-xl outline-none text-sm">
+          <input type="password" id="passNueva" placeholder="Nueva contraseña" class="w-full p-2 border rounded-xl outline-none text-sm">
+        </div>
+
+        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-sm shadow-md">
+          Guardar Cambios
+        </button>
+      </form>
+
+      <div id="adminBotonContainer" class="pt-2"></div>
+    </div>
+  </div>
+
+  <!-- MODAL ADMIN -->
   <div id="modalAdmin" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-lg w-full p-5 space-y-4 shadow-xl max-h-[85vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b pb-3">
         <h3 class="font-bold text-lg text-slate-800">⚙️ Gestión Avanzada de Usuarios</h3>
-        <button onclick="cerrarAdminPanel()" class="text-slate-400 hover:text-slate-600 font-bold text-xl px-2">✕</button>
+        <button onclick="cerrarAdminPanel()" class="text-slate-400 font-bold text-xl px-2">✕</button>
       </div>
       <div id="listaUsuarios" class="space-y-3 text-sm"></div>
     </div>
@@ -242,6 +280,7 @@
   <script>
     const WORKER_URL = "https://backend-juegos.pabgartov.workers.dev";
     let juegosCache = [];
+    let favoritosCache = [];
     let categoriaActual = 'Todas';
     let vistaActual = 'grid'; 
     let currentUser = null;
@@ -269,26 +308,50 @@
       }
     };
 
-    function iniciarApp() {
+    async function iniciarApp() {
       document.getElementById('authScreen').classList.add('hidden');
       document.getElementById('mainApp').classList.remove('hidden');
       
       const userContainer = document.getElementById('userBadgeContainer');
-      if (currentUser.rol === 'ADMIN') {
-        userContainer.innerHTML = `
-          <button onclick="abrirAdminPanel()" class="bg-amber-400 hover:bg-amber-500 text-slate-900 font-bold text-[11px] sm:text-xs px-2.5 py-1.5 rounded-lg shadow-sm flex items-center gap-1 transition card-zoom truncate max-w-[120px] sm:max-w-none" title="Abrir panel de administración">
-            ⚙️ <span class="truncate">${currentUser.nick}</span>
-          </button>
-        `;
-      } else {
-        userContainer.innerHTML = `
-          <span class="text-[11px] sm:text-xs bg-indigo-700 px-2.5 py-1.5 rounded-lg font-medium text-indigo-100 truncate max-w-[100px] sm:max-w-none">
-            👤 ${currentUser.nick}
-          </span>
-        `;
-      }
+      const avatarHtml = currentUser.avatar_base64 
+        ? `<img src="${currentUser.avatar_base64}" class="w-7 h-7 rounded-full object-cover border border-amber-300">` 
+        : `👤`;
 
+      userContainer.innerHTML = `
+        <button onclick="abrirPerfilModal()" class="bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-[11px] sm:text-xs px-2.5 py-1.5 rounded-lg shadow-sm flex items-center gap-1.5 transition card-zoom truncate max-w-[130px] sm:max-w-none" title="Ver mi perfil">
+          ${avatarHtml} <span class="truncate">${currentUser.nick}</span>
+        </button>
+      `;
+
+      await cargarFavoritos();
       cargarJuegos();
+    }
+
+    async function cargarFavoritos() {
+      try {
+        const res = await fetchSeguro(`/api/favoritos`);
+        favoritosCache = await res.json();
+      } catch (e) {
+        favoritosCache = [];
+      }
+    }
+
+    async function toggleFavorito(juegoId) {
+      try {
+        const res = await fetchSeguro(`/api/favoritos`, {
+          method: 'POST',
+          body: JSON.stringify({ juego_id: juegoId })
+        });
+        const json = await res.json();
+        if (json.favorito) {
+          favoritosCache.push(juegoId);
+        } else {
+          favoritosCache = favoritosCache.filter(id => id !== juegoId);
+        }
+        renderizarTarjetas();
+      } catch (err) {
+        alert("Error al actualizar favoritos");
+      }
     }
 
     async function procesarLogin(e) {
@@ -332,7 +395,7 @@
         const json = await res.json();
         if (json.error) throw new Error(json.error);
 
-        alert(`Solicitud enviada con éxito.\n\nEl Administrador ya puede ver tu código de activación en su panel.`);
+        alert(`Solicitud enviada con éxito.\n\nCódigo de activación: ${json.codigo_simulado}`);
         document.getElementById('registroForm').classList.add('hidden');
         document.getElementById('codigoForm').classList.remove('hidden');
       } catch (err) {
@@ -353,7 +416,7 @@
         const json = await res.json();
         if (json.error) throw new Error(json.error);
 
-        alert("¡Cuenta activada con éxito! Ya puedes iniciar sesión.");
+        alert("¡Cuenta activada! Inicia sesión.");
         toggleAuthMode('login');
       } catch (err) {
         alert(err.message);
@@ -372,7 +435,103 @@
       location.reload();
     }
 
-    // --- PANEL ADMIN AVANZADO ---
+    // --- PERFIL DE USUARIO ---
+    async function abrirPerfilModal() {
+      document.getElementById('modalPerfil').classList.remove('hidden');
+      try {
+        const res = await fetchSeguro(`/api/usuario/perfil`);
+        const perfil = await res.json();
+        
+        document.getElementById('perfilNombre').value = perfil.nombre || '';
+        document.getElementById('perfilBio').value = perfil.bio || '';
+        document.getElementById('perfilAvatarBase64').value = perfil.avatar_base64 || '';
+
+        const preview = document.getElementById('avatarPreview');
+        if (perfil.avatar_base64) {
+          preview.innerHTML = `<img src="${perfil.avatar_base64}" class="w-full h-full object-cover">`;
+        } else {
+          preview.innerHTML = `<span class="text-slate-400 text-xs">Sin Foto</span>`;
+        }
+
+        const adminCont = document.getElementById('adminBotonContainer');
+        if (currentUser.rol === 'ADMIN') {
+          adminCont.innerHTML = `
+            <button type="button" onclick="cerrarPerfilModal(); abrirAdminPanel();" class="w-full bg-amber-400 hover:bg-amber-500 text-slate-900 font-bold py-2.5 rounded-xl text-sm shadow-md">
+              ⚙️ Abrir Panel de Gestión de Usuarios
+            </button>
+          `;
+        } else {
+          adminCont.innerHTML = '';
+        }
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    function cerrarPerfilModal() { document.getElementById('modalPerfil').classList.add('hidden'); }
+
+    function procesarAvatar(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const maxDim = 300;
+          let w = img.width, h = img.height;
+          if (w > h) { if (w > maxDim) { h = Math.round((h * maxDim) / w); w = maxDim; } }
+          else { if (h > maxDim) { w = Math.round((w * maxDim) / h); h = maxDim; } }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+
+          const base64 = canvas.toDataURL('image/jpeg', 0.8);
+          document.getElementById('perfilAvatarBase64').value = base64;
+          document.getElementById('avatarPreview').innerHTML = `<img src="${base64}" class="w-full h-full object-cover">`;
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function guardarPerfil(e) {
+      e.preventDefault();
+      const nombre = document.getElementById('perfilNombre').value;
+      const bio = document.getElementById('perfilBio').value;
+      const avatar_base64 = document.getElementById('perfilAvatarBase64').value;
+      const passActual = document.getElementById('passActual').value;
+      const passNueva = document.getElementById('passNueva').value;
+
+      try {
+        if (passNueva) {
+          if (!passActual) return alert("Introduce tu contraseña actual para cambiarla.");
+          await fetchSeguro(`/api/usuario/password`, {
+            method: 'PUT',
+            body: JSON.stringify({ passwordActual: passActual, passwordNueva: passNueva })
+          });
+        }
+
+        const res = await fetchSeguro(`/api/usuario/perfil`, {
+          method: 'PUT',
+          body: JSON.stringify({ nombre, bio, avatar_base64 })
+        });
+        const json = await res.json();
+        if (json.error) throw new Error(json.error);
+
+        currentUser = { ...currentUser, ...json.usuario };
+        localStorage.setItem('session_user', JSON.stringify(currentUser));
+        iniciarApp();
+        cerrarPerfilModal();
+        alert("¡Perfil actualizado con éxito!");
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    // --- PANEL ADMIN ---
     async function abrirAdminPanel() {
       document.getElementById('modalAdmin').classList.remove('hidden');
       try {
@@ -380,11 +539,6 @@
         const usuarios = await res.json();
         const cont = document.getElementById('listaUsuarios');
         cont.innerHTML = '';
-
-        if (!Array.isArray(usuarios) || usuarios.length === 0) {
-          cont.innerHTML = `<p class="text-center text-slate-400 py-4">No hay usuarios registrados.</p>`;
-          return;
-        }
 
         usuarios.forEach(u => {
           const esAdminRoot = u.id === 'admin-root';
@@ -406,8 +560,6 @@
                   </select>
                 </div>
               </div>
-
-              <!-- Botones de Acción de Administración -->
               ${!esAdminRoot ? `
               <div class="flex flex-wrap gap-1.5 pt-2 border-t border-slate-200">
                 <button onclick="cambiarEstado('${u.id}', '${u.estado === 'ACTIVO' ? 'PENDIENTE' : 'ACTIVO'}')" class="text-[11px] bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold px-2.5 py-1 rounded-lg">
@@ -419,7 +571,7 @@
                 <button onclick="borrarUsuario('${u.id}')" class="text-[11px] bg-rose-100 hover:bg-rose-200 text-rose-600 font-semibold px-2.5 py-1 rounded-lg ml-auto">
                   🗑️ Borrar
                 </button>
-              </div>` : '<div class="text-[11px] text-slate-400 italic pt-1 border-t">Cuenta de sistema principal</div>'}
+              </div>` : ''}
             </div>
           `;
         });
@@ -429,55 +581,31 @@
     }
 
     async function cambiarRol(id, nuevoRol) {
-      try {
-        await fetchSeguro(`/api/admin/usuarios/${id}/rol`, {
-          method: 'PUT',
-          body: JSON.stringify({ rol: nuevoRol })
-        });
-        abrirAdminPanel();
-      } catch (err) {
-        alert(err.message);
-      }
+      await fetchSeguro(`/api/admin/usuarios/${id}/rol`, { method: 'PUT', body: JSON.stringify({ rol: nuevoRol }) });
+      abrirAdminPanel();
     }
 
     async function cambiarEstado(id, nuevoEstado) {
-      try {
-        await fetchSeguro(`/api/admin/usuarios/${id}/estado`, {
-          method: 'PUT',
-          body: JSON.stringify({ estado: nuevoEstado })
-        });
-        abrirAdminPanel();
-      } catch (err) {
-        alert(err.message);
-      }
+      await fetchSeguro(`/api/admin/usuarios/${id}/estado`, { method: 'PUT', body: JSON.stringify({ estado: nuevoEstado }) });
+      abrirAdminPanel();
     }
 
     async function generarPasswordTemporal(id, nick) {
       if (!confirm(`¿Generar contraseña temporal para @${nick}?`)) return;
-      try {
-        const res = await fetchSeguro(`/api/admin/usuarios/${id}/password-temporal`, { method: 'PUT' });
-        const json = await res.json();
-        if (json.error) throw new Error(json.error);
-
-        prompt(`Contraseña temporal generada con éxito para @${nick}.\n\nCópiala y comunícasela al usuario:`, json.password_temporal);
-      } catch (err) {
-        alert(err.message);
-      }
+      const res = await fetchSeguro(`/api/admin/usuarios/${id}/password-temporal`, { method: 'PUT' });
+      const json = await res.json();
+      prompt(`Contraseña temporal generada para @${nick}:`, json.password_temporal);
     }
 
     async function borrarUsuario(id) {
-      if (!confirm("¿Estás seguro de eliminar permanentemente este usuario?")) return;
-      try {
-        await fetchSeguro(`/api/admin/usuarios/${id}`, { method: 'DELETE' });
-        abrirAdminPanel();
-      } catch (err) {
-        alert(err.message);
-      }
+      if (!confirm("¿Eliminar usuario permanentemente?")) return;
+      await fetchSeguro(`/api/admin/usuarios/${id}`, { method: 'DELETE' });
+      abrirAdminPanel();
     }
 
     function cerrarAdminPanel() { document.getElementById('modalAdmin').classList.add('hidden'); }
 
-    // --- LÓGICA DE JUEGOS ---
+    // --- JUEGOS ---
     async function cargarJuegos() {
       try {
         const res = await fetchSeguro(`/api/juegos`); 
@@ -501,13 +629,18 @@
       container.innerHTML = '';
 
       const filtrados = juegosCache.filter(j => {
-        const coincideCat = categoriaActual === 'Todas' || j.categoria === categoriaActual;
+        let coincideCat = true;
+        if (categoriaActual === 'Favoritos') {
+          coincideCat = favoritosCache.includes(j.id);
+        } else if (categoriaActual !== 'Todas') {
+          coincideCat = j.categoria === categoriaActual;
+        }
         const coincideNom = j.nombre.toLowerCase().includes(search);
         return coincideCat && coincideNom;
       });
 
       if (filtrados.length === 0) {
-        container.innerHTML = `<div class="text-center py-10 text-slate-400">Colección vacía o sin resultados.</div>`;
+        container.innerHTML = `<div class="text-center py-10 text-slate-400">No hay juegos que mostrar aquí.</div>`;
         return;
       }
 
@@ -516,9 +649,15 @@
         filtrados.forEach(j => {
           const imagenSrc = j.foto_url || j.foto_base64 || '';
           const tieneImagen = imagenSrc && imagenSrc.trim().length > 0;
+          const esFav = favoritosCache.includes(j.id);
 
           gridHTML += `
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between relative">
+              <!-- Botón Favorito Corazón -->
+              <button onclick="toggleFavorito('${j.id}')" class="absolute top-2 left-2 w-9 h-9 bg-black/60 hover:bg-black/80 rounded-full flex items-center justify-center text-xl z-20 backdrop-blur-md card-zoom shadow-md" title="Marcar favorito">
+                ${esFav ? '❤️' : '🤍'}
+              </button>
+
               <div>
                 <div class="h-52 bg-slate-900 relative flex items-center justify-center overflow-hidden">
                   ${tieneImagen ? `
@@ -560,10 +699,12 @@
         filtrados.forEach(j => {
           const imagenSrc = j.foto_url || j.foto_base64 || '';
           const tieneImagen = imagenSrc && imagenSrc.trim().length > 0;
+          const esFav = favoritosCache.includes(j.id);
 
           listHTML += `
             <div class="p-3 flex items-center justify-between gap-3 hover:bg-slate-50 transition">
               <div class="flex items-center gap-3 min-w-0">
+                <button onclick="toggleFavorito('${j.id}')" class="text-lg shrink-0">${esFav ? '❤️' : '🤍'}</button>
                 <div class="w-12 h-12 bg-slate-900 rounded-xl overflow-hidden shrink-0 flex items-center justify-center relative">
                   ${tieneImagen ? `<img src="${imagenSrc}" class="w-full h-full object-cover">` : '<span class="text-[10px] text-slate-400">Foto</span>'}
                 </div>
@@ -598,23 +739,16 @@
         const img = new Image();
         img.onload = () => {
           const maxDim = 1024;
-          let width = img.width;
-          let height = img.height;
-
-          if (width > height) {
-            if (width > maxDim) { height = Math.round((height * maxDim) / width); width = maxDim; }
-          } else {
-            if (height > maxDim) { width = Math.round((width * maxDim) / height); height = maxDim; }
-          }
+          let width = img.width, height = img.height;
+          if (width > height) { if (width > maxDim) { height = Math.round((height * maxDim) / width); width = maxDim; } }
+          else { if (height > maxDim) { width = Math.round((width * maxDim) / height); height = maxDim; } }
 
           const canvas = document.createElement('canvas');
-          canvas.width = width;
-          canvas.height = height;
+          canvas.width = width; canvas.height = height;
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, width, height);
 
           const resizedBase64 = canvas.toDataURL('image/jpeg', 0.75);
-
           document.getElementById('juegoFotoBase64').value = resizedBase64;
           document.getElementById('imagePreview').innerHTML = `<img src="${resizedBase64}" class="w-full h-full object-contain">`;
           document.getElementById('btnIA').classList.remove('hidden');
@@ -637,7 +771,6 @@
           method: 'POST',
           body: JSON.stringify({ foto_base64: base64 })
         });
-        
         const json = await response.json();
         if (json.error) throw new Error(json.error);
 
@@ -673,10 +806,7 @@
       };
 
       try {
-        await fetchSeguro(`/api/juegos`, {
-          method: 'POST',
-          body: JSON.stringify(nuevoJuego)
-        });
+        await fetchSeguro(`/api/juegos`, { method: 'POST', body: JSON.stringify(nuevoJuego) });
         cerrarModalFormulario();
         cargarJuegos();
       } catch (err) {
