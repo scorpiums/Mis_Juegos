@@ -18,7 +18,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen pb-20">
 
-  <!-- PANTALLA DE AUTENTICACIÓN (LOGIN / REGISTRO) -->
+  <!-- PANTALLA DE AUTENTICACIÓN -->
   <div id="authScreen" class="fixed inset-0 bg-indigo-900 z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4">
       <div class="text-center space-y-1">
@@ -49,7 +49,6 @@
 
       <!-- Formulario Registro con Protección Antiautocompletado -->
       <form id="registroForm" onsubmit="procesarRegistro(event)" class="space-y-3 hidden" autocomplete="off">
-        <!-- Campos trampa invisibles para desviar el autocompletado de los navegadores -->
         <input type="text" style="display:none" name="fakeusernameremembered">
         <input type="password" style="display:none" name="fakepasswordremembered">
 
@@ -88,9 +87,8 @@
     </div>
   </div>
 
-  <!-- APLICACIÓN PRINCIPAL (Protegida) -->
+  <!-- APLICACIÓN PRINCIPAL -->
   <div id="mainApp" class="hidden">
-    <!-- Encabezado -->
     <header class="bg-indigo-600 text-white px-2.5 py-2 shadow-md sticky top-0 z-30 flex justify-between items-center gap-1">
       <div class="flex items-center gap-1.5 shrink-0">
         <div class="w-8 h-8 bg-amber-400 rounded-lg border-2 border-black flex items-center justify-center shadow-md text-black font-black text-sm">🎮</div>
@@ -147,16 +145,16 @@
     </button>
   </div>
 
-  <!-- MODAL PERFIL DE USUARIO -->
+  <!-- MODAL PERFIL DE USUARIO & ESTADÍSTICAS -->
   <div id="modalPerfil" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
-    <div class="bg-white rounded-2xl max-w-md w-full p-5 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-5 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b pb-2">
-        <h3 class="font-bold text-lg text-slate-800">👤 Mi Perfil</h3>
+        <h3 class="font-bold text-lg text-slate-800">👤 Mi Perfil y Actividad</h3>
         <button onclick="cerrarPerfilModal()" class="text-slate-400 font-bold text-xl px-2">✕</button>
       </div>
 
       <div class="flex flex-col items-center space-y-2">
-        <div id="avatarPreview" class="w-24 h-24 bg-slate-200 rounded-full flex items-center justify-center border-2 border-indigo-500 overflow-hidden relative shadow-md">
+        <div id="avatarPreview" class="w-20 h-20 bg-slate-200 rounded-full flex items-center justify-center border-2 border-indigo-500 overflow-hidden relative shadow-md">
           <span class="text-slate-400 text-xs">Sin Foto</span>
         </div>
         <input type="file" id="inputAvatar" accept="image/*" onchange="procesarAvatar(event)" class="hidden">
@@ -165,29 +163,75 @@
         </button>
       </div>
 
-      <form id="perfilForm" onsubmit="guardarPerfil(event)" class="space-y-3">
-        <input type="hidden" id="perfilAvatarBase64">
-        <div>
-          <label class="text-xs font-bold text-slate-500 uppercase">Nombre Completo</label>
-          <input type="text" id="perfilNombre" required class="w-full p-2.5 border rounded-xl outline-none text-sm">
-        </div>
-        <div>
-          <label class="text-xs font-bold text-slate-500 uppercase">Bio / Datos Personales</label>
-          <textarea id="perfilBio" rows="2" placeholder="Escribe algo sobre ti..." class="w-full p-2 border rounded-xl outline-none text-sm"></textarea>
-        </div>
+      <!-- Navegación por pestañas del perfil -->
+      <div class="flex bg-slate-100 p-1 rounded-xl text-xs font-bold text-slate-600">
+        <button onclick="cambiarTabPerfil('datos')" id="tabDatosBtn" class="flex-1 py-2 rounded-lg bg-white text-indigo-700 shadow-sm transition">Mis Datos</button>
+        <button onclick="cambiarTabPerfil('juegos')" id="tabJuegosBtn" class="flex-1 py-2 rounded-lg transition">Juegos Añadidos</button>
+        <button onclick="cambiarTabPerfil('historial')" id="tabHistorialBtn" class="flex-1 py-2 rounded-lg transition">Historial Partidas</button>
+      </div>
 
-        <div class="border-t pt-3 space-y-2">
-          <p class="text-xs font-bold text-indigo-600 uppercase">Cambiar Contraseña</p>
-          <input type="password" id="passActual" placeholder="Contraseña actual" class="w-full p-2 border rounded-xl outline-none text-sm">
-          <input type="password" id="passNueva" placeholder="Nueva contraseña" class="w-full p-2 border rounded-xl outline-none text-sm">
-        </div>
+      <!-- Contenido Solapa 1: Datos y Contraseña -->
+      <div id="tabDatosContent" class="space-y-3">
+        <form id="perfilForm" onsubmit="guardarPerfil(event)" class="space-y-3">
+          <input type="hidden" id="perfilAvatarBase64">
+          <div>
+            <label class="text-xs font-bold text-slate-500 uppercase">Nombre Completo</label>
+            <input type="text" id="perfilNombre" required class="w-full p-2.5 border rounded-xl outline-none text-sm">
+          </div>
+          <div>
+            <label class="text-xs font-bold text-slate-500 uppercase">Bio / Datos Personales</label>
+            <textarea id="perfilBio" rows="2" placeholder="Escribe algo sobre ti..." class="w-full p-2 border rounded-xl outline-none text-sm"></textarea>
+          </div>
 
-        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-sm shadow-md">
-          Guardar Cambios
+          <div class="border-t pt-3 space-y-2">
+            <p class="text-xs font-bold text-indigo-600 uppercase">Cambiar Contraseña</p>
+            <input type="password" id="passActual" placeholder="Contraseña actual" class="w-full p-2 border rounded-xl outline-none text-sm">
+            <input type="password" id="passNueva" placeholder="Nueva contraseña" class="w-full p-2 border rounded-xl outline-none text-sm">
+            <input type="password" id="passConfirmar" placeholder="Repetir nueva contraseña" class="w-full p-2 border rounded-xl outline-none text-sm">
+          </div>
+
+          <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-sm shadow-md">
+            Guardar Cambios
+          </button>
+        </form>
+        <div id="adminBotonContainer" class="pt-2"></div>
+      </div>
+
+      <!-- Contenido Solapa 2: Juegos Añadidos por el usuario -->
+      <div id="tabJuegosContent" class="space-y-2 hidden max-h-60 overflow-y-auto">
+        <div id="misJuegosLista" class="space-y-2 text-xs"></div>
+      </div>
+
+      <!-- Contenido Solapa 3: Historial de Partidas -->
+      <div id="tabHistorialContent" class="space-y-2 hidden max-h-60 overflow-y-auto">
+        <div id="miHistorialLista" class="space-y-2 text-xs"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL REGISTRO DE PARTIDA ("¡JUGADO HOY!") -->
+  <div id="modalPartida" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 space-y-4 shadow-xl">
+      <div class="flex justify-between items-center border-b pb-2">
+        <h3 class="font-bold text-base text-slate-800">🎲 Registrar Partida</h3>
+        <button onclick="cerrarModalPartida()" class="text-slate-400 font-bold text-xl px-2">✕</button>
+      </div>
+
+      <input type="hidden" id="partidaJuegoId">
+      <div class="space-y-3 text-sm">
+        <p class="font-bold text-indigo-700" id="partidaJuegoNombre">Nombre del juego</p>
+        <div>
+          <label class="text-xs font-bold text-slate-500 uppercase">Participantes (Nombres)</label>
+          <input type="text" id="partidaParticipantes" placeholder="Ej. Papá, Mamá, Rubén y Marco" class="w-full p-2 border rounded-xl outline-none text-xs">
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-500 uppercase">Ganador (Opcional)</label>
+          <input type="text" id="partidaGanador" placeholder="Ej. Rubén" class="w-full p-2 border rounded-xl outline-none text-xs">
+        </div>
+        <button type="button" onclick="enviarRegistroPartida()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md">
+          Guardar Partida y Estadísticas
         </button>
-      </form>
-
-      <div id="adminBotonContainer" class="pt-2"></div>
+      </div>
     </div>
   </div>
 
@@ -440,9 +484,10 @@
       location.reload();
     }
 
-    // --- PERFIL DE USUARIO ---
+    // --- PERFIL Y PESTAÑAS DE ACTIVIDAD ---
     async function abrirPerfilModal() {
       document.getElementById('modalPerfil').classList.remove('hidden');
+      cambiarTabPerfil('datos');
       try {
         const res = await fetchSeguro(`/api/usuario/perfil`);
         const perfil = await res.json();
@@ -458,6 +503,46 @@
           preview.innerHTML = `<span class="text-slate-400 text-xs">Sin Foto</span>`;
         }
 
+        // Renderizar Mis Juegos Añadidos
+        const misJuegosCont = document.getElementById('misJuegosLista');
+        misJuegosCont.innerHTML = '';
+        if (perfil.misJuegos && perfil.misJuegos.length > 0) {
+          perfil.misJuegos.forEach(j => {
+            misJuegosCont.innerHTML += `
+              <div class="bg-slate-50 p-2.5 rounded-xl border flex justify-between items-center">
+                <div>
+                  <p class="font-bold text-slate-800">${j.nombre}</p>
+                  <p class="text-[10px] text-slate-500">📍 ${j.ubicacion || 'Sin ubícación'} • 🕹️ ${j.categoria}</p>
+                </div>
+                <span class="bg-indigo-50 text-indigo-700 font-semibold px-2 py-1 rounded">Añadido</span>
+              </div>
+            `;
+          });
+        } else {
+          misJuegosCont.innerHTML = `<p class="text-center text-slate-400 py-4">Aún no has añadido ningún juego.</p>`;
+        }
+
+        // Renderizar Historial de Partidas
+        const historialCont = document.getElementById('miHistorialLista');
+        historialCont.innerHTML = '';
+        if (perfil.misPartidas && perfil.misPartidas.length > 0) {
+          perfil.misPartidas.forEach(p => {
+            const fechaFormateada = new Date(p.fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+            historialCont.innerHTML += `
+              <div class="bg-slate-50 p-2.5 rounded-xl border space-y-1">
+                <div class="flex justify-between items-center">
+                  <span class="font-bold text-indigo-700">${p.juego_nombre}</span>
+                  <span class="text-[10px] text-slate-400">${fechaFormateada}</span>
+                </div>
+                <p class="text-[11px] text-slate-600">👥 <b>Jugadores:</b> ${p.participantes}</p>
+                <p class="text-[11px] text-emerald-700 font-bold">🏆 Ganador: ${p.ganador}</p>
+              </div>
+            `;
+          });
+        } else {
+          historialCont.innerHTML = `<p class="text-center text-slate-400 py-4">No hay partidas registradas.</p>`;
+        }
+
         const adminCont = document.getElementById('adminBotonContainer');
         if (currentUser.rol === 'ADMIN') {
           adminCont.innerHTML = `
@@ -471,6 +556,16 @@
       } catch (err) {
         alert(err.message);
       }
+    }
+
+    function cambiarTabPerfil(tab) {
+      document.getElementById('tabDatosContent').classList.toggle('hidden', tab !== 'datos');
+      document.getElementById('tabJuegosContent').classList.toggle('hidden', tab !== 'juegos');
+      document.getElementById('tabHistorialContent').classList.toggle('hidden', tab !== 'historial');
+
+      document.getElementById('tabDatosBtn').className = tab === 'datos' ? 'flex-1 py-2 rounded-lg bg-white text-indigo-700 shadow-sm transition font-bold' : 'flex-1 py-2 rounded-lg transition';
+      document.getElementById('tabJuegosBtn').className = tab === 'juegos' ? 'flex-1 py-2 rounded-lg bg-white text-indigo-700 shadow-sm transition font-bold' : 'flex-1 py-2 rounded-lg transition';
+      document.getElementById('tabHistorialBtn').className = tab === 'historial' ? 'flex-1 py-2 rounded-lg bg-white text-indigo-700 shadow-sm transition font-bold' : 'flex-1 py-2 rounded-lg transition';
     }
 
     function cerrarPerfilModal() { document.getElementById('modalPerfil').classList.add('hidden'); }
@@ -509,10 +604,12 @@
       const avatar_base64 = document.getElementById('perfilAvatarBase64').value;
       const passActual = document.getElementById('passActual').value;
       const passNueva = document.getElementById('passNueva').value;
+      const passConfirmar = document.getElementById('passConfirmar').value;
 
       try {
         if (passNueva) {
-          if (!passActual) return alert("Introduce tu contraseña actual para cambiarla.");
+          if (!passActual) return alert("Introduce tu contraseña actual.");
+          if (passNueva !== passConfirmar) return alert("La nueva contraseña y su confirmación no coinciden.");
           await fetchSeguro(`/api/usuario/password`, {
             method: 'PUT',
             body: JSON.stringify({ passwordActual: passActual, passwordNueva: passNueva })
@@ -531,6 +628,42 @@
         iniciarApp();
         cerrarPerfilModal();
         alert("¡Perfil actualizado con éxito!");
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    // --- REGISTRO DE PARTIDA ---
+    function abrirModalPartida(juegoId, juegoNombre) {
+      document.getElementById('partidaJuegoId').value = juegoId;
+      document.getElementById('partidaJuegoNombre').innerText = juegoNombre;
+      document.getElementById('partidaParticipantes').value = currentUser.nombre || currentUser.nick;
+      document.getElementById('partidaGanador').value = '';
+      document.getElementById('modalPartida').classList.remove('hidden');
+    }
+
+    function cerrarModalPartida() {
+      document.getElementById('modalPartida').classList.add('hidden');
+    }
+
+    async function enviarRegistroPartida() {
+      const juego_id = document.getElementById('partidaJuegoId').value;
+      const participantes = document.getElementById('partidaParticipantes').value;
+      const ganador = document.getElementById('partidaGanador').value;
+
+      if (!participantes) return alert("Indica al menos un participante.");
+
+      try {
+        const res = await fetchSeguro(`/api/partidas`, {
+          method: 'POST',
+          body: JSON.stringify({ juego_id, participantes, ganador })
+        });
+        const json = await res.json();
+        if (json.error) throw new Error(json.error);
+
+        cerrarModalPartida();
+        alert("¡Partida registrada y estadísticas actualizadas!");
+        cargarJuegos();
       } catch (err) {
         alert(err.message);
       }
@@ -610,7 +743,7 @@
 
     function cerrarAdminPanel() { document.getElementById('modalAdmin').classList.add('hidden'); }
 
-    // --- JUEGOS ---
+    // --- JUEGOS Y TARJETAS CON AUDITORÍA ---
     async function cargarJuegos() {
       try {
         const res = await fetchSeguro(`/api/juegos`); 
@@ -655,6 +788,10 @@
           const imagenSrc = j.foto_url || j.foto_base64 || '';
           const tieneImagen = imagenSrc && imagenSrc.trim().length > 0;
           const esFav = favoritosCache.includes(j.id);
+          const fechaCreacionStr = j.fecha_creacion ? new Date(j.fecha_creacion).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }) : 'N/A';
+          const ultimaPartidaStr = j.ultima_partida_fecha ? new Date(j.ultima_partida_fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Ninguna';
+          
+          const puedeBorrar = currentUser.rol === 'ADMIN' || currentUser.id === j.creador_id;
 
           gridHTML += `
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between relative">
@@ -670,24 +807,31 @@
                   ` : '<div class="text-slate-400 text-xs">Sin Foto</div>'}
                   <span class="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded-md backdrop-blur-md z-20">${j.categoria}</span>
                 </div>
+
                 <div class="p-4 space-y-2">
                   <div class="flex justify-between items-start">
                     <h4 class="font-bold text-lg text-slate-800 leading-tight">${j.nombre}</h4>
-                    <span class="text-xs bg-indigo-50 text-indigo-700 font-bold px-2 py-1 rounded-lg shrink-0">🎮 ${j.veces_jugado || 0}</span>
+                    <span class="text-xs bg-indigo-50 text-indigo-700 font-bold px-2 py-1 rounded-lg shrink-0">🎮 ${j.veces_jugado || 0} p.</span>
                   </div>
+
                   <p class="text-xs text-slate-500">📍 <b>Ubicación:</b> ${j.ubicacion || 'Sin especificar'}</p>
-                  <div class="flex gap-3 text-xs text-slate-600">
-                    <span>👶 ${j.edad || 'N/A'}</span>
-                    <span>👥 ${j.jugadores || 'N/A'}</span>
+                  
+                  <div class="grid grid-cols-2 gap-1 text-[11px] text-slate-600 bg-slate-50 p-2 rounded-xl">
+                    <span>👶 <b>Edad:</b> ${j.edad || 'N/A'}</span>
+                    <span>👥 <b>Jugadores:</b> ${j.jugadores || 'N/A'}</span>
+                    <span class="col-span-2 text-indigo-900">👤 <b>Añadido por:</b> @${j.creador_nick || 'Sistema'} (${fechaCreacionStr})</span>
+                    <span class="col-span-2 text-emerald-800">🕒 <b>Última vez:</b> ${ultimaPartidaStr} ${j.ultima_partida_ganador ? `(🏆 ${j.ultima_partida_ganador})` : ''}</span>
                   </div>
+
                   ${j.instrucciones ? `<details class="text-xs text-slate-600 bg-slate-50 p-2 rounded-lg"><summary class="font-bold cursor-pointer">Ver Reglas</summary><p class="mt-1">${j.instrucciones}</p></details>` : ''}
                 </div>
               </div>
+
               <div class="p-4 pt-0 flex gap-2">
-                <button onclick="registrarUso('${j.id}')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs card-zoom">
+                <button onclick="abrirModalPartida('${j.id}', '${j.nombre.replace(/'/g, "\\'")}')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs card-zoom">
                   ¡Jugado Hoy!
                 </button>
-                ${currentUser && currentUser.rol === 'ADMIN' ? `
+                ${puedeBorrar ? `
                 <button onclick="borrarJuego('${j.id}')" class="bg-rose-50 text-rose-600 hover:bg-rose-100 p-2 rounded-xl text-xs" title="Borrar juego">
                   🗑️
                 </button>` : ''}
@@ -704,6 +848,7 @@
           const imagenSrc = j.foto_url || j.foto_base64 || '';
           const tieneImagen = imagenSrc && imagenSrc.trim().length > 0;
           const esFav = favoritosCache.includes(j.id);
+          const puedeBorrar = currentUser.rol === 'ADMIN' || currentUser.id === j.creador_id;
 
           listHTML += `
             <div class="p-3 flex items-center justify-between gap-3 hover:bg-slate-50 transition">
@@ -714,14 +859,14 @@
                 </div>
                 <div class="min-w-0">
                   <h4 class="font-bold text-slate-800 text-sm truncate">${j.nombre}</h4>
-                  <p class="text-[11px] text-slate-500 truncate">📍 ${j.ubicacion || 'Sin sitio'} • <span class="text-indigo-600 font-semibold">${j.categoria}</span></p>
+                  <p class="text-[11px] text-slate-500 truncate">📍 ${j.ubicacion || 'Sin sitio'} • 🕹️ ${j.veces_jugado || 0} partidas</p>
                 </div>
               </div>
               <div class="flex items-center gap-2 shrink-0">
-                <button onclick="registrarUso('${j.id}')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-3 py-1.5 rounded-lg text-xs card-zoom">
+                <button onclick="abrirModalPartida('${j.id}', '${j.nombre.replace(/'/g, "\\'")}')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-3 py-1.5 rounded-lg text-xs card-zoom">
                   +1 🎮
                 </button>
-                ${currentUser && currentUser.rol === 'ADMIN' ? `
+                ${puedeBorrar ? `
                 <button onclick="borrarJuego('${j.id}')" class="bg-rose-50 text-rose-600 hover:bg-rose-100 p-2 rounded-lg text-xs" title="Borrar">
                   🗑️
                 </button>` : ''}
@@ -805,8 +950,7 @@
         edad: document.getElementById('edad').value,
         jugadores: document.getElementById('jugadores').value,
         instrucciones: document.getElementById('instrucciones').value,
-        foto_base64: document.getElementById('juegoFotoBase64').value,
-        veces_jugado: 0
+        foto_base64: document.getElementById('juegoFotoBase64').value
       };
 
       try {
@@ -820,8 +964,6 @@
         btn.disabled = false;
       }
     }
-
-    async function registrarUso(juegoId) { alert("Función de registro en desarrollo."); }
 
     async function borrarJuego(id) {
       if (!confirm("¿Borrar juego de forma permanente?")) return;
