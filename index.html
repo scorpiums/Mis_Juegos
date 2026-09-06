@@ -47,23 +47,27 @@
         </p>
       </form>
 
-      <!-- Formulario Registro -->
-      <form id="registroForm" onsubmit="procesarRegistro(event)" class="space-y-3 hidden">
+      <!-- Formulario Registro con Protección Antiautocompletado -->
+      <form id="registroForm" onsubmit="procesarRegistro(event)" class="space-y-3 hidden" autocomplete="off">
+        <!-- Campos trampa invisibles para desviar el autocompletado de los navegadores -->
+        <input type="text" style="display:none" name="fakeusernameremembered">
+        <input type="password" style="display:none" name="fakepasswordremembered">
+
         <div>
           <label class="text-xs font-bold text-slate-500 uppercase">Nombre Completo</label>
-          <input type="text" id="regNombre" required class="w-full p-2.5 border rounded-xl outline-none">
+          <input type="text" id="regNombre" required autocomplete="off" class="w-full p-2.5 border rounded-xl outline-none">
         </div>
         <div>
           <label class="text-xs font-bold text-slate-500 uppercase">Nick de Usuario</label>
-          <input type="text" id="regNick" required class="w-full p-2.5 border rounded-xl outline-none">
+          <input type="text" id="regNick" required autocomplete="new-username" class="w-full p-2.5 border rounded-xl outline-none">
         </div>
         <div>
           <label class="text-xs font-bold text-slate-500 uppercase">Contraseña</label>
-          <input type="password" id="regPass1" required class="w-full p-2.5 border rounded-xl outline-none">
+          <input type="password" id="regPass1" required autocomplete="new-password" class="w-full p-2.5 border rounded-xl outline-none">
         </div>
         <div>
           <label class="text-xs font-bold text-slate-500 uppercase">Repetir Contraseña</label>
-          <input type="password" id="regPass2" required class="w-full p-2.5 border rounded-xl outline-none">
+          <input type="password" id="regPass2" required autocomplete="new-password" class="w-full p-2.5 border rounded-xl outline-none">
         </div>
         <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl card-zoom">
           Solicitar Cuenta
