@@ -210,16 +210,38 @@
     </div>
   </div>
 
-  <script>
+<script>
     const WORKER_URL = "https://backend-juegos.pabgartov.workers.dev";
     let juegosCache = [];
     let categoriaActual = 'Todas';
     let currentUser = null;
 
-    // --- LOGICA DE AUTENTICACIÓN ---
+    // --- FUNCIÓN NÚCLEO DE SEGURIDAD ---
+    // Envolveremos todas las peticiones a la API (salvo login) en esta función
+    async function fetchSeguro(ruta, opciones = {}) {
+      const token = localStorage.getItem('auth_token');
+      
+      const headers = {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      };
+
+      const res = await fetch(`${WORKER_URL}${ruta}`, { ...opciones, headers });
+      
+      // Si el Worker detecta que el token no es válido o somos intrusos, nos echa.
+      if (res.status === 401 || res.status === 403) {
+        cerrarSesion();
+        throw new Error("Sesión caducada o acceso denegado. Vuelve a iniciar sesión.");
+      }
+      
+      return res;
+    }
+
+    // --- LÓGICA DE AUTENTICACIÓN ---
     window.onload = () => {
       const savedUser = localStorage.getItem('session_user');
-      if (savedUser) {
+      const savedToken = localStorage.getItem('auth_token');
+      if (savedUser && savedToken) {
         currentUser = JSON.parse(savedUser);
         iniciarApp();
       }
@@ -251,6 +273,7 @@
 
         currentUser = json.usuario;
         localStorage.setItem('session_user', JSON.stringify(currentUser));
+        localStorage.setItem('auth_token', json.token); // Guardamos el pase de seguridad
         iniciarApp();
       } catch (err) {
         alert(err.message);
@@ -275,7 +298,7 @@
         const json = await res.json();
         if (json.error) throw new Error(json.error);
 
-        alert(`Solicitud enviada.\n\nCódigo de activación: ${json.codigo_simulado}`);
+        alert(`Solicitud enviada.\n\nCódigo de activación simulado: ${json.codigo_simulado}`);
         document.getElementById('registroForm').classList.add('hidden');
         document.getElementById('codigoForm').classList.remove('hidden');
       } catch (err) {
@@ -296,7 +319,7 @@
         const json = await res.json();
         if (json.error) throw new Error(json.error);
 
-        alert("¡Cuenta activada con éxito! Ahora puedes iniciar sesión.");
+        alert("¡Cuenta activada! Inicia sesión.");
         toggleAuthMode('login');
       } catch (err) {
         alert(err.message);
@@ -311,6 +334,7 @@
 
     function cerrarSesion() {
       localStorage.removeItem('session_user');
+      localStorage.removeItem('auth_token'); // Destruimos el pase
       location.reload();
     }
 
@@ -318,7 +342,7 @@
     async function abrirAdminPanel() {
       document.getElementById('modalAdmin').classList.remove('hidden');
       try {
-        const res = await fetch(`${WORKER_URL}/api/admin/usuarios`);
+        const res = await fetchSeguro(`/api/admin/usuarios`); // Usamos fetchSeguro
         const usuarios = await res.json();
         const cont = document.getElementById('listaUsuarios');
         cont.innerHTML = '';
@@ -340,26 +364,26 @@
           `;
         });
       } catch (err) {
-        alert("Error cargando usuarios: " + err.message);
+        alert(err.message);
       }
     }
 
     async function borrarUsuario(id) {
-      if (!confirm("¿Eliminar usuario del sistema?")) return;
-      await fetch(`${WORKER_URL}/api/admin/usuarios/${id}`, { method: 'DELETE' });
+      if (!confirm("¿Eliminar usuario?")) return;
+      await fetchSeguro(`/api/admin/usuarios/${id}`, { method: 'DELETE' });
       abrirAdminPanel();
     }
 
     function cerrarAdminPanel() { document.getElementById('modalAdmin').classList.add('hidden'); }
 
-    // --- LOGICA DE JUEGOS ---
+    // --- LÓGICA DE JUEGOS ---
     async function cargarJuegos() {
       try {
-        const res = await fetch(`${WORKER_URL}/api/juegos`);
+        const res = await fetchSeguro(`/api/juegos`); // Usamos fetchSeguro
         juegosCache = await res.json();
         renderizarTarjetas();
       } catch (err) {
-        document.getElementById('gridJuegos').innerHTML = `<div class="col-span-full text-center py-10 text-rose-500">Error al conectar con la base de datos.</div>`;
+        document.getElementById('gridJuegos').innerHTML = `<div class="col-span-full text-center py-10 text-rose-500">${err.message}</div>`;
       }
     }
 
@@ -375,12 +399,11 @@
       });
 
       if (filtrados.length === 0) {
-        grid.innerHTML = `<div class="col-span-full text-center py-10 text-slate-400">No hay juegos que coincidan.</div>`;
+        grid.innerHTML = `<div class="col-span-full text-center py-10 text-slate-400">Colección vacía o sin resultados.</div>`;
         return;
       }
 
       filtrados.forEach(j => {
-        // Compatibilidad de imagen (foto_url o foto_base64)
         const imagenSrc = j.foto_url || j.foto_base64 || '';
         const tieneImagen = imagenSrc && imagenSrc.trim().length > 0;
 
@@ -431,15 +454,9 @@
           let height = img.height;
 
           if (width > height) {
-            if (width > maxDim) {
-              height = Math.round((height * maxDim) / width);
-              width = maxDim;
-            }
+            if (width > maxDim) { height = Math.round((height * maxDim) / width); width = maxDim; }
           } else {
-            if (height > maxDim) {
-              width = Math.round((width * maxDim) / height);
-              height = maxDim;
-            }
+            if (height > maxDim) { width = Math.round((width * maxDim) / height); height = maxDim; }
           }
 
           const canvas = document.createElement('canvas');
@@ -461,16 +478,15 @@
 
     async function analizarConIA() {
       const base64 = document.getElementById('juegoFotoBase64').value;
-      if (!base64) return alert("Por favor, sube primero una foto.");
+      if (!base64) return alert("Sube primero una foto.");
 
       const btnIA = document.getElementById('btnIA');
       btnIA.innerText = "⏳ Analizando...";
       btnIA.disabled = true;
 
       try {
-        const response = await fetch(`${WORKER_URL}/api/analizar-imagen`, {
+        const response = await fetchSeguro(`/api/analizar-imagen`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ foto_base64: base64 })
         });
         
@@ -483,7 +499,7 @@
         document.getElementById('jugadores').value = json.jugadores || '';
         document.getElementById('instrucciones').value = json.instrucciones || '';
       } catch (err) {
-        alert("Error IA: " + err.message);
+        alert(err.message);
       } finally {
         btnIA.innerText = "✨ Autocompletar IA";
         btnIA.disabled = false;
@@ -493,7 +509,7 @@
     async function guardarJuego(e) {
       e.preventDefault();
       const btn = document.getElementById('btnGuardar');
-      btn.innerText = "Subiendo a la nube...";
+      btn.innerText = "Subiendo...";
       btn.disabled = true;
 
       const nuevoJuego = {
@@ -509,29 +525,30 @@
       };
 
       try {
-        await fetch(`${WORKER_URL}/api/juegos`, {
+        await fetchSeguro(`/api/juegos`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(nuevoJuego)
         });
         cerrarModalFormulario();
         cargarJuegos();
       } catch (err) {
-        alert("Error al guardar.");
+        alert(err.message);
       } finally {
         btn.innerText = "Guardar en la Nube";
         btn.disabled = false;
       }
     }
 
-    async function registrarUso(juegoId) {
-      alert("Función de registro de uso en desarrollo.");
-    }
+    async function registrarUso(juegoId) { alert("Función de registro en desarrollo."); }
 
     async function borrarJuego(id) {
-      if (!confirm("Como administrador, ¿seguro que quieres borrar este juego de forma permanente?")) return;
-      await fetch(`${WORKER_URL}/api/juegos/${id}`, { method: 'DELETE' });
-      cargarJuegos();
+      if (!confirm("¿Borrar juego de forma permanente?")) return;
+      try {
+        await fetchSeguro(`/api/juegos/${id}`, { method: 'DELETE' });
+        cargarJuegos();
+      } catch (err) {
+        alert(err.message);
+      }
     }
 
     function seleccionarAleatorio() {
@@ -551,7 +568,6 @@
     }
 
     function filtrarJuegos() { renderizarTarjetas(); }
-
     function abrirModalFormulario() { document.getElementById('modalForm').classList.remove('hidden'); }
     function cerrarModalFormulario() {
       document.getElementById('modalForm').classList.add('hidden');
