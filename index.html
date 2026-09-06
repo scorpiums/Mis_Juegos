@@ -104,7 +104,6 @@
       <div class="flex items-center gap-2 shrink-0">
         <div id="userBadgeContainer"></div>
         <button onclick="cerrarSesion()" class="text-indigo-200 hover:text-white p-1.5 transition flex items-center justify-center card-zoom" title="Cerrar Sesión">
-          <!-- Icono SVG plano estilo botón (puerta con flecha) -->
           <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 3H7a2 2 0 00-2 2v14a2 2 0 002 2h8m4-10l-4-4m4 4l-4 4m4-4H9"></path>
           </svg>
@@ -131,7 +130,7 @@
           <button onclick="filtrarCategoria('Consola', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Consola</button>
         </div>
 
-        <!-- Conmutador de Vista (Cuadrícula vs Compacto) -->
+        <!-- Conmutador de Vista -->
         <div class="flex bg-slate-200 p-1 rounded-xl shrink-0">
           <button onclick="cambiarVista('grid')" id="btnGrid" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-indigo-600 shadow-sm transition">⊞</button>
           <button onclick="cambiarVista('compact')" id="btnCompact" class="px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 transition">☰</button>
@@ -150,14 +149,14 @@
     </button>
   </div>
 
-  <!-- MODAL ADMIN -->
+  <!-- MODAL ADMIN AVANZADO -->
   <div id="modalAdmin" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-5 space-y-4 shadow-xl max-h-[80vh] overflow-y-auto">
-      <div class="flex justify-between items-center border-b pb-2">
-        <h3 class="font-bold text-lg text-slate-800">⚙️ Gestión de Usuarios</h3>
+    <div class="bg-white rounded-2xl max-w-lg w-full p-5 space-y-4 shadow-xl max-h-[85vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="font-bold text-lg text-slate-800">⚙️ Gestión Avanzada de Usuarios</h3>
         <button onclick="cerrarAdminPanel()" class="text-slate-400 hover:text-slate-600 font-bold text-xl px-2">✕</button>
       </div>
-      <div id="listaUsuarios" class="space-y-2 text-sm"></div>
+      <div id="listaUsuarios" class="space-y-3 text-sm"></div>
     </div>
   </div>
 
@@ -277,13 +276,13 @@
       const userContainer = document.getElementById('userBadgeContainer');
       if (currentUser.rol === 'ADMIN') {
         userContainer.innerHTML = `
-          <button onclick="abrirAdminPanel()" class="bg-amber-400 hover:bg-amber-500 text-slate-900 font-bold text-[11px] sm:text-xs px-2 py-1.5 rounded-lg shadow-sm flex items-center gap-1 transition card-zoom truncate max-w-[100px] sm:max-w-none" title="Abrir panel de administración">
+          <button onclick="abrirAdminPanel()" class="bg-amber-400 hover:bg-amber-500 text-slate-900 font-bold text-[11px] sm:text-xs px-2.5 py-1.5 rounded-lg shadow-sm flex items-center gap-1 transition card-zoom truncate max-w-[120px] sm:max-w-none" title="Abrir panel de administración">
             ⚙️ <span class="truncate">${currentUser.nick}</span>
           </button>
         `;
       } else {
         userContainer.innerHTML = `
-          <span class="text-[11px] sm:text-xs bg-indigo-700 px-2 py-1.5 rounded-lg font-medium text-indigo-100 truncate max-w-[90px] sm:max-w-none">
+          <span class="text-[11px] sm:text-xs bg-indigo-700 px-2.5 py-1.5 rounded-lg font-medium text-indigo-100 truncate max-w-[100px] sm:max-w-none">
             👤 ${currentUser.nick}
           </span>
         `;
@@ -333,7 +332,7 @@
         const json = await res.json();
         if (json.error) throw new Error(json.error);
 
-        alert(`Solicitud enviada.\n\nCódigo de activación: ${json.codigo_simulado}`);
+        alert(`Solicitud enviada con éxito.\n\nEl Administrador ya puede ver tu código de activación en su panel.`);
         document.getElementById('registroForm').classList.add('hidden');
         document.getElementById('codigoForm').classList.remove('hidden');
       } catch (err) {
@@ -354,7 +353,7 @@
         const json = await res.json();
         if (json.error) throw new Error(json.error);
 
-        alert("¡Cuenta activada! Inicia sesión.");
+        alert("¡Cuenta activada con éxito! Ya puedes iniciar sesión.");
         toggleAuthMode('login');
       } catch (err) {
         alert(err.message);
@@ -373,6 +372,7 @@
       location.reload();
     }
 
+    // --- PANEL ADMIN AVANZADO ---
     async function abrirAdminPanel() {
       document.getElementById('modalAdmin').classList.remove('hidden');
       try {
@@ -382,18 +382,44 @@
         cont.innerHTML = '';
 
         if (!Array.isArray(usuarios) || usuarios.length === 0) {
-          cont.innerHTML = `<p class="text-center text-slate-400 py-4">No hay otros usuarios registrados.</p>`;
+          cont.innerHTML = `<p class="text-center text-slate-400 py-4">No hay usuarios registrados.</p>`;
           return;
         }
 
         usuarios.forEach(u => {
+          const esAdminRoot = u.id === 'admin-root';
+          const badgeEstado = u.estado === 'ACTIVO' 
+            ? '<span class="text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded">ACTIVO</span>' 
+            : `<span class="text-amber-600 font-bold bg-amber-50 px-2 py-0.5 rounded">PENDIENTE</span> <br><small class="text-indigo-600 font-mono font-bold">Código: ${u.codigo_verificacion || 'N/A'}</small>`;
+
           cont.innerHTML += `
-            <div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl border">
-              <div>
-                <p class="font-bold text-slate-800">${u.nombre} <span class="text-xs text-slate-500">(@${u.nick})</span></p>
-                <p class="text-xs text-slate-500">Rol: <b>${u.rol}</b> | Estado: <b class="${u.estado==='ACTIVO'?'text-emerald-600':'text-amber-600'}">${u.estado}</b></p>
+            <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="font-bold text-slate-800 text-sm">${u.nombre} <span class="text-xs text-slate-500 font-normal">(@${u.nick})</span></p>
+                  <p class="text-xs text-slate-500 mt-0.5">Estado: ${badgeEstado}</p>
+                </div>
+                <div>
+                  <select onchange="cambiarRol('${u.id}', this.value)" ${esAdminRoot ? 'disabled' : ''} class="text-xs font-bold p-1 border rounded-lg bg-white text-indigo-700 outline-none">
+                    <option value="JUGADOR" ${u.rol==='JUGADOR'?'selected':''}>Jugador</option>
+                    <option value="ADMIN" ${u.rol==='ADMIN'?'selected':''}>Admin</option>
+                  </select>
+                </div>
               </div>
-              ${u.rol !== 'ADMIN' ? `<button onclick="borrarUsuario('${u.id}')" class="text-xs bg-rose-100 hover:bg-rose-200 text-rose-600 p-2 rounded-lg font-bold">🗑️ Borrar</button>` : '<span class="text-xs text-slate-400 italic">Admin</span>'}
+
+              <!-- Botones de Acción de Administración -->
+              ${!esAdminRoot ? `
+              <div class="flex flex-wrap gap-1.5 pt-2 border-t border-slate-200">
+                <button onclick="cambiarEstado('${u.id}', '${u.estado === 'ACTIVO' ? 'PENDIENTE' : 'ACTIVO'}')" class="text-[11px] bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold px-2.5 py-1 rounded-lg">
+                  ${u.estado === 'ACTIVO' ? '🔒 Desactivar' : '✅ Activar'}
+                </button>
+                <button onclick="generarPasswordTemporal('${u.id}', '${u.nick}')" class="text-[11px] bg-amber-100 hover:bg-amber-200 text-amber-700 font-semibold px-2.5 py-1 rounded-lg">
+                  🔑 Pass Temporal
+                </button>
+                <button onclick="borrarUsuario('${u.id}')" class="text-[11px] bg-rose-100 hover:bg-rose-200 text-rose-600 font-semibold px-2.5 py-1 rounded-lg ml-auto">
+                  🗑️ Borrar
+                </button>
+              </div>` : '<div class="text-[11px] text-slate-400 italic pt-1 border-t">Cuenta de sistema principal</div>'}
             </div>
           `;
         });
@@ -402,14 +428,56 @@
       }
     }
 
+    async function cambiarRol(id, nuevoRol) {
+      try {
+        await fetchSeguro(`/api/admin/usuarios/${id}/rol`, {
+          method: 'PUT',
+          body: JSON.stringify({ rol: nuevoRol })
+        });
+        abrirAdminPanel();
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    async function cambiarEstado(id, nuevoEstado) {
+      try {
+        await fetchSeguro(`/api/admin/usuarios/${id}/estado`, {
+          method: 'PUT',
+          body: JSON.stringify({ estado: nuevoEstado })
+        });
+        abrirAdminPanel();
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    async function generarPasswordTemporal(id, nick) {
+      if (!confirm(`¿Generar contraseña temporal para @${nick}?`)) return;
+      try {
+        const res = await fetchSeguro(`/api/admin/usuarios/${id}/password-temporal`, { method: 'PUT' });
+        const json = await res.json();
+        if (json.error) throw new Error(json.error);
+
+        prompt(`Contraseña temporal generada con éxito para @${nick}.\n\nCópiala y comunícasela al usuario:`, json.password_temporal);
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
     async function borrarUsuario(id) {
-      if (!confirm("¿Eliminar usuario?")) return;
-      await fetchSeguro(`/api/admin/usuarios/${id}`, { method: 'DELETE' });
-      abrirAdminPanel();
+      if (!confirm("¿Estás seguro de eliminar permanentemente este usuario?")) return;
+      try {
+        await fetchSeguro(`/api/admin/usuarios/${id}`, { method: 'DELETE' });
+        abrirAdminPanel();
+      } catch (err) {
+        alert(err.message);
+      }
     }
 
     function cerrarAdminPanel() { document.getElementById('modalAdmin').classList.add('hidden'); }
 
+    // --- LÓGICA DE JUEGOS ---
     async function cargarJuegos() {
       try {
         const res = await fetchSeguro(`/api/juegos`); 
