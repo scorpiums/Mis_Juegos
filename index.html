@@ -395,7 +395,8 @@
         const json = await res.json();
         if (json.error) throw new Error(json.error);
 
-        alert(`Solicitud enviada con éxito.\n\nCódigo de activación: ${json.codigo_simulado}`);
+        alert("¡Solicitud enviada con éxito!\n\nTu cuenta se encuentra pendiente de aprobación. Por favor, ponte en contacto con el Administrador para que te proporcione el código de activación.");
+        
         document.getElementById('registroForm').classList.add('hidden');
         document.getElementById('codigoForm').classList.remove('hidden');
       } catch (err) {
@@ -653,7 +654,6 @@
 
           gridHTML += `
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between relative">
-              <!-- Botón Favorito Corazón -->
               <button onclick="toggleFavorito('${j.id}')" class="absolute top-2 left-2 w-9 h-9 bg-black/60 hover:bg-black/80 rounded-full flex items-center justify-center text-xl z-20 backdrop-blur-md card-zoom shadow-md" title="Marcar favorito">
                 ${esFav ? '❤️' : '🤍'}
               </button>
