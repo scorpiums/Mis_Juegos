@@ -210,14 +210,13 @@
     </div>
   </div>
 
-<script>
+  <script>
     const WORKER_URL = "https://backend-juegos.pabgartov.workers.dev";
     let juegosCache = [];
     let categoriaActual = 'Todas';
     let currentUser = null;
 
     // --- FUNCIÓN NÚCLEO DE SEGURIDAD ---
-    // Envolveremos todas las peticiones a la API (salvo login) en esta función
     async function fetchSeguro(ruta, opciones = {}) {
       const token = localStorage.getItem('auth_token');
       
@@ -228,7 +227,6 @@
 
       const res = await fetch(`${WORKER_URL}${ruta}`, { ...opciones, headers });
       
-      // Si el Worker detecta que el token no es válido o somos intrusos, nos echa.
       if (res.status === 401 || res.status === 403) {
         cerrarSesion();
         throw new Error("Sesión caducada o acceso denegado. Vuelve a iniciar sesión.");
@@ -273,7 +271,7 @@
 
         currentUser = json.usuario;
         localStorage.setItem('session_user', JSON.stringify(currentUser));
-        localStorage.setItem('auth_token', json.token); // Guardamos el pase de seguridad
+        localStorage.setItem('auth_token', json.token); 
         iniciarApp();
       } catch (err) {
         alert(err.message);
@@ -334,7 +332,7 @@
 
     function cerrarSesion() {
       localStorage.removeItem('session_user');
-      localStorage.removeItem('auth_token'); // Destruimos el pase
+      localStorage.removeItem('auth_token'); 
       location.reload();
     }
 
@@ -342,7 +340,7 @@
     async function abrirAdminPanel() {
       document.getElementById('modalAdmin').classList.remove('hidden');
       try {
-        const res = await fetchSeguro(`/api/admin/usuarios`); // Usamos fetchSeguro
+        const res = await fetchSeguro(`/api/admin/usuarios`); 
         const usuarios = await res.json();
         const cont = document.getElementById('listaUsuarios');
         cont.innerHTML = '';
@@ -379,7 +377,7 @@
     // --- LÓGICA DE JUEGOS ---
     async function cargarJuegos() {
       try {
-        const res = await fetchSeguro(`/api/juegos`); // Usamos fetchSeguro
+        const res = await fetchSeguro(`/api/juegos`); 
         juegosCache = await res.json();
         renderizarTarjetas();
       } catch (err) {
