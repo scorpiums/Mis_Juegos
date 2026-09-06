@@ -89,7 +89,7 @@
 
   <!-- APLICACIÓN PRINCIPAL (Protegida) -->
   <div id="mainApp" class="hidden">
-    <!-- Encabezado con distribución flexible robusta para móvil -->
+    <!-- Encabezado con botón plano de salida -->
     <header class="bg-indigo-600 text-white px-2.5 py-2 shadow-md sticky top-0 z-30 flex justify-between items-center gap-1">
       <!-- Logotipo -->
       <div class="flex items-center gap-1.5 shrink-0">
@@ -100,11 +100,14 @@
         </div>
       </div>
 
-      <!-- Zona de Usuario y Botón Puerta de Salida -->
-      <div class="flex items-center gap-1.5 shrink-0">
+      <!-- Zona de Usuario y Botón de Salida Plano -->
+      <div class="flex items-center gap-2 shrink-0">
         <div id="userBadgeContainer"></div>
-        <button onclick="cerrarSesion()" class="bg-indigo-800 hover:bg-indigo-900 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-sm shrink-0" title="Cerrar Sesión">
-          🚪 <span class="hidden sm:inline">Salir</span>
+        <button onclick="cerrarSesion()" class="text-indigo-200 hover:text-white p-1.5 transition flex items-center justify-center card-zoom" title="Cerrar Sesión">
+          <!-- Icono SVG plano estilo botón (puerta con flecha) -->
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 3H7a2 2 0 00-2 2v14a2 2 0 002 2h8m4-10l-4-4m4 4l-4 4m4-4H9"></path>
+          </svg>
         </button>
       </div>
     </header>
