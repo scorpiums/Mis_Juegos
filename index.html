@@ -143,7 +143,10 @@
   <div id="modalPerfil" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
     <div class="bg-white rounded-2xl max-w-lg w-full p-5 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b pb-2">
-        <h3 class="font-bold text-lg text-slate-800">👤 Mi Perfil y Actividad</h3>
+        <div class="flex items-center gap-2">
+          <h3 class="font-bold text-lg text-slate-800">👤 Mi Perfil y Actividad</h3>
+          <div id="adminIconContainer"></div>
+        </div>
         <button onclick="cerrarPerfilModal()" class="text-slate-400 font-bold text-xl px-2">✕</button>
       </div>
 
@@ -157,13 +160,25 @@
         </button>
       </div>
 
-      <div class="flex bg-slate-100 p-1 rounded-xl text-xs font-bold text-slate-600">
-        <button onclick="cambiarTabPerfil('datos')" id="tabDatosBtn" class="flex-1 py-2 rounded-lg bg-white text-indigo-700 shadow-sm transition">Mis Datos</button>
-        <button onclick="cambiarTabPerfil('juegos')" id="tabJuegosBtn" class="flex-1 py-2 rounded-lg transition">Juegos Añadidos</button>
-        <button onclick="cambiarTabPerfil('historial')" id="tabHistorialBtn" class="flex-1 py-2 rounded-lg transition">Historial Partidas</button>
+      <!-- Pestañas ordenadas: Historial, Juegos, Mis Datos (con ancho adaptable) -->
+      <div class="flex bg-slate-100 p-1 rounded-xl text-xs font-bold text-slate-600 justify-center gap-1">
+        <button onclick="cambiarTabPerfil('historial')" id="tabHistorialBtn" class="px-4 py-2 rounded-lg bg-white text-indigo-700 shadow-sm transition">Historial Partidas</button>
+        <button onclick="cambiarTabPerfil('juegos')" id="tabJuegosBtn" class="px-4 py-2 rounded-lg transition">Juegos Añadidos</button>
+        <button onclick="cambiarTabPerfil('datos')" id="tabDatosBtn" class="px-4 py-2 rounded-lg transition">Mis Datos</button>
       </div>
 
-      <div id="tabDatosContent" class="space-y-3">
+      <!-- Contenido Solapa 1: Historial Partidas -->
+      <div id="tabHistorialContent" class="space-y-2 max-h-60 overflow-y-auto">
+        <div id="miHistorialLista" class="space-y-2 text-xs"></div>
+      </div>
+
+      <!-- Contenido Solapa 2: Juegos Añadidos -->
+      <div id="tabJuegosContent" class="space-y-2 hidden max-h-60 overflow-y-auto">
+        <div id="misJuegosLista" class="space-y-2 text-xs"></div>
+      </div>
+
+      <!-- Contenido Solapa 3: Mis Datos -->
+      <div id="tabDatosContent" class="space-y-3 hidden">
         <form id="perfilForm" onsubmit="guardarPerfil(event)" class="space-y-3">
           <input type="hidden" id="perfilAvatarBase64">
           <div>
@@ -190,20 +205,11 @@
             Guardar Cambios
           </button>
         </form>
-        <div id="adminBotonContainer" class="pt-2"></div>
-      </div>
-
-      <div id="tabJuegosContent" class="space-y-2 hidden max-h-60 overflow-y-auto">
-        <div id="misJuegosLista" class="space-y-2 text-xs"></div>
-      </div>
-
-      <div id="tabHistorialContent" class="space-y-2 hidden max-h-60 overflow-y-auto">
-        <div id="miHistorialLista" class="space-y-2 text-xs"></div>
       </div>
     </div>
   </div>
 
-  <!-- MODAL ¡VAMOS A JUGAR! (NUEVO SISTEMA) -->
+  <!-- MODAL ¡VAMOS A JUGAR! -->
   <div id="modalPartida" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-md w-full p-5 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b pb-2">
@@ -214,7 +220,6 @@
       <input type="hidden" id="partidaJuegoId">
       <p class="font-bold text-indigo-700 text-sm text-center" id="partidaJuegoNombre">Juego</p>
 
-      <!-- Paso 1: Elección de Modo -->
       <div id="pasoModoSelector" class="space-y-3">
         <div class="grid grid-cols-2 gap-3">
           <button type="button" onclick="elegirModoPartida('ahora')" class="bg-indigo-50 hover:bg-indigo-100 border-2 border-indigo-500 text-indigo-900 p-4 rounded-2xl font-bold text-center card-zoom">
@@ -228,7 +233,6 @@
         </div>
       </div>
 
-      <!-- Paso 2: Selección de Jugadores (Común) -->
       <div id="pasoJugadoresSelector" class="space-y-3 hidden">
         <div class="flex justify-between items-center">
           <label class="text-xs font-bold text-slate-500 uppercase">Selecciona los participantes:</label>
@@ -236,9 +240,7 @@
             ＋ Añadir invitado
           </button>
         </div>
-        <div id="checkboxesJugadores" class="grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded-xl border max-h-40 overflow-y-auto text-xs">
-          <!-- Dinámico -->
-        </div>
+        <div id="checkboxesJugadores" class="grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded-xl border max-h-40 overflow-y-auto text-xs"></div>
 
         <div class="flex gap-2 pt-2">
           <button type="button" onclick="volverSeleccionModo()" class="w-1/3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2.5 rounded-xl text-xs">Volver</button>
@@ -246,7 +248,6 @@
         </div>
       </div>
 
-      <!-- Paso 3A: Modo Cronómetro Activo ("¡Jugar Ahora!") -->
       <div id="pasoCronometroActivo" class="space-y-4 text-center hidden py-4">
         <div class="bg-slate-900 text-amber-400 font-mono text-4xl font-black py-6 rounded-2xl tracking-widest shadow-inner" id="cronometroDisplay">
           00:00
@@ -257,16 +258,13 @@
         </button>
       </div>
 
-      <!-- Paso 3B: Formulario de Resultados (Número de partidas y Ganadores) -->
       <div id="pasoResultadosFinales" class="space-y-3 hidden text-xs">
         <div>
           <label class="font-bold text-slate-600 uppercase">¿Cuántas partidas se han jugado?</label>
           <input type="number" id="inputNumPartidas" value="1" min="1" onchange="generarSelectoresGanadores()" class="w-full p-2 border rounded-xl outline-none font-bold text-sm mt-1">
         </div>
 
-        <div id="contenedorGanadoresPartidas" class="space-y-2 max-h-40 overflow-y-auto">
-          <!-- Selectores de ganadores por cada partida -->
-        </div>
+        <div id="contenedorGanadoresPartidas" class="space-y-2 max-h-40 overflow-y-auto"></div>
 
         <div id="campoDuracionManualContainer">
           <label class="font-bold text-slate-600 uppercase">Duración total (opcional, en minutos)</label>
@@ -532,184 +530,22 @@
       location.reload();
     }
 
-    // --- FLUJO PARTIDA MEJORADO ---
-    async function abrirModalPartida(juegoId, juegoNombre) {
-      document.getElementById('partidaJuegoId').value = juegoId;
-      document.getElementById('partidaJuegoNombre').innerText = juegoNombre;
-      
-      // Resetear vistas del modal
-      document.getElementById('pasoModoSelector').classList.remove('hidden');
-      document.getElementById('pasoJugadoresSelector').classList.add('hidden');
-      document.getElementById('pasoCronometroActivo').classList.add('hidden');
-      document.getElementById('pasoResultadosFinales').classList.add('hidden');
-
-      document.getElementById('modalPartida').classList.remove('hidden');
-      await cargarJugadoresDisponibles();
-    }
-
-    async function cargarJugadoresDisponibles() {
-      try {
-        const res = await fetchSeguro(`/api/jugadores-disponibles`);
-        jugadoresDisponiblesCache = await res.json();
-        
-        const contenedor = document.getElementById('checkboxesJugadores');
-        contenedor.innerHTML = '';
-        jugadoresDisponiblesCache.forEach(j => {
-          const marcado = (j === currentUser.nombre || j === currentUser.nick) ? 'checked' : '';
-          contenedor.innerHTML += `
-            <label class="flex items-center gap-2 p-1.5 bg-white rounded-lg border cursor-pointer hover:bg-slate-100">
-              <input type="checkbox" name="jugadorCheck" value="${j}" ${marcado} class="rounded text-indigo-600">
-              <span class="truncate font-medium text-slate-700">${j}</span>
-            </label>
-          `;
-        });
-      } catch (e) {
-        console.error(e);
-      }
-    }
-
-    async function abrirPromptInvitado() {
-      const nombreInv = prompt("Introduce el nombre del nuevo jugador invitado:");
-      if (!nombreInv || !nombreInv.trim()) return;
-
-      try {
-        const res = await fetchSeguro(`/api/invidados`, {
-          method: 'POST',
-          body: JSON.stringify({ nombre: nombreInv.trim() })
-        });
-        const json = await res.json();
-        if (json.error) throw new Error(json.error);
-
-        await cargarJugadoresDisponibles();
-      } catch (err) {
-        alert(err.message);
-      }
-    }
-
-    function elegirModoPartida(modo) {
-      modoPartidaActual = modo;
-      document.getElementById('pasoModoSelector').classList.add('hidden');
-      document.getElementById('pasoJugadoresSelector').classList.remove('hidden');
-    }
-
-    function volverSeleccionModo() {
-      document.getElementById('pasoJugadoresSelector').classList.add('hidden');
-      document.getElementById('pasoModoSelector').classList.remove('hidden');
-    }
-
-    function avanzarAFormularioFinal() {
-      const seleccionados = Array.from(document.querySelectorAll('input[name="jugadorCheck"]:checked')).map(el => el.value);
-      if (seleccionados.length === 0) return alert("Selecciona al menos un jugador participante.");
-
-      document.getElementById('pasoJugadoresSelector').classList.add('hidden');
-
-      if (modoPartidaActual === 'ahora') {
-        // Iniciar Cronómetro
-        document.getElementById('pasoCronometroActivo').classList.remove('hidden');
-        segundosTranscurridos = 0;
-        document.getElementById('cronometroDisplay').innerText = "00:00";
-        if (cronometroInterval) clearInterval(cronometroInterval);
-        
-        cronometroInterval = setInterval(() => {
-          segundosTranscurridos++;
-          const mins = Math.floor(segundosTranscurridos / 60).toString().padStart(2, '0');
-          const secs = (segundosTranscurridos % 60).toString().padStart(2, '0');
-          document.getElementById('cronometroDisplay').innerText = `${mins}:${secs}`;
-        }, 1000);
-      } else {
-        // Modo pasado / manual
-        document.getElementById('campoDuracionManualContainer').classList.remove('hidden');
-        document.getElementById('pasoResultadosFinales').classList.remove('hidden');
-        document.getElementById('inputNumPartidas').value = 1;
-        generarSelectoresGanadores();
-      }
-    }
-
-    function detenerCronometroYFinalizar() {
-      clearInterval(cronometroInterval);
-      document.getElementById('pasoCronometroActivo').classList.add('hidden');
-      document.getElementById('campoDuracionManualContainer').classList.add('hidden'); // Ocultar campo manual ya que tenemos cronómetro real
-      document.getElementById('pasoResultadosFinales').classList.remove('hidden');
-      document.getElementById('inputNumPartidas').value = 1;
-      generarSelectoresGanadores();
-    }
-
-    function generarSelectoresGanadores() {
-      const numPartidas = parseInt(document.getElementById('inputNumPartidas').value) || 1;
-      const seleccionados = Array.from(document.querySelectorAll('input[name="jugadorCheck"]:checked')).map(el => el.value);
-      const contenedor = document.getElementById('contenedorGanadoresPartidas');
-      contenedor.innerHTML = '';
-
-      for (let i = 1; i <= numPartidas; i++) {
-        let opcionesHtml = `<option value="Empate / Sin ganador">Empate / Sin ganador</option>`;
-        seleccionados.forEach(j => {
-          opcionesHtml += `<option value="${j}">${j}</option>`;
-        });
-
-        contenedor.innerHTML += `
-          <div class="p-2 bg-slate-50 rounded-xl border flex items-center justify-between gap-2">
-            <span class="font-bold text-slate-700">🏆 Ganador Partida ${i}:</span>
-            <select id="ganadorPartida_${i}" class="p-1 border rounded-lg bg-white outline-none font-semibold text-indigo-700">
-              ${opcionesHtml}
-            </select>
-          </div>
-        `;
-      }
-    }
-
-    async function guardarPartidaFinal() {
-      const juego_id = document.getElementById('partidaJuegoId').value;
-      const seleccionados = Array.from(document.querySelectorAll('input[name="jugadorCheck"]:checked')).map(el => el.value);
-      const participantesStr = seleccionados.join(', ');
-      const numPartidas = parseInt(document.getElementById('inputNumPartidas').value) || 1;
-
-      // Recopilar ganadores de cada ronda
-      let ganadoresList = [];
-      for (let i = 1; i <= numPartidas; i++) {
-        const g = document.getElementById(`ganadorPartida_${i}`).value;
-        ganadoresList.push(`P${i}: ${g}`);
-      }
-      const ganadorFinalResumen = ganadoresList.join(' | ');
-
-      let duracionTotalSegs = 0;
-      if (modoPartidaActual === 'ahora') {
-        duracionTotalSegs = segundosTranscurridos;
-      } else {
-        const minsManual = parseInt(document.getElementById('inputDuracionMinutos').value) || 0;
-        duracionTotalSegs = minsManual * 60;
-      }
-
-      try {
-        const res = await fetchSeguro(`/api/partidas`, {
-          method: 'POST',
-          body: JSON.stringify({
-            juego_id,
-            participantes: participantesStr,
-            ganador: ganadorFinalResumen,
-            num_partidas: numPartidas,
-            duracion_total_segundos: duracionTotalSegs
-          })
-        });
-        const json = await res.json();
-        if (json.error) throw new Error(json.error);
-
-        cerrarModalPartida();
-        alert("¡Partida registrada y estadísticas actualizadas con éxito!");
-        cargarJuegos();
-      } catch (err) {
-        alert(err.message);
-      }
-    }
-
-    function cerrarModalPartida() {
-      if (cronometroInterval) clearInterval(cronometroInterval);
-      document.getElementById('modalPartida').classList.add('hidden');
-    }
-
-    // --- PERFIL Y PESTAÑAS ---
+    // --- PERFIL Y PESTAÑAS (Ordenadas: Historial, Juegos, Mis Datos) ---
     async function abrirPerfilModal() {
       document.getElementById('modalPerfil').classList.remove('hidden');
-      cambiarTabPerfil('datos');
+      cambiarTabPerfil('historial');
+      
+      const adminIconCont = document.getElementById('adminIconContainer');
+      if (currentUser.rol === 'ADMIN') {
+        adminIconCont.innerHTML = `
+          <button type="button" onclick="cerrarPerfilModal(); abrirAdminPanel();" class="text-amber-600 bg-amber-50 hover:bg-amber-100 font-bold px-2 py-1 rounded-lg text-xs flex items-center gap-1 card-zoom" title="Panel de Gestión de Usuarios">
+            ⚙️ Gestión
+          </button>
+        `;
+      } else {
+        adminIconCont.innerHTML = '';
+      }
+
       try {
         const res = await fetchSeguro(`/api/usuario/perfil`);
         const perfil = await res.json();
@@ -726,6 +562,7 @@
           preview.innerHTML = `<span class="text-slate-400 text-xs">Sin Foto</span>`;
         }
 
+        // Juegos Añadidos
         const misJuegosCont = document.getElementById('misJuegosLista');
         misJuegosCont.innerHTML = '';
         if (perfil.misJuegos && perfil.misJuegos.length > 0) {
@@ -744,6 +581,7 @@
           misJuegosCont.innerHTML = `<p class="text-center text-slate-400 py-4">Aún no has subido ningún juego.</p>`;
         }
 
+        // Historial Partidas Global (participante)
         const historialCont = document.getElementById('miHistorialLista');
         historialCont.innerHTML = '';
         if (perfil.misPartidas && perfil.misPartidas.length > 0) {
@@ -765,30 +603,19 @@
         } else {
           historialCont.innerHTML = `<p class="text-center text-slate-400 py-4">No hay partidas registradas.</p>`;
         }
-
-        const adminCont = document.getElementById('adminBotonContainer');
-        if (currentUser.rol === 'ADMIN') {
-          adminCont.innerHTML = `
-            <button type="button" onclick="cerrarPerfilModal(); abrirAdminPanel();" class="w-full bg-amber-400 hover:bg-amber-500 text-slate-900 font-bold py-2.5 rounded-xl text-sm shadow-md">
-              ⚙️ Abrir Panel de Gestión de Usuarios
-            </button>
-          `;
-        } else {
-          adminCont.innerHTML = '';
-        }
       } catch (err) {
         alert(err.message);
       }
     }
 
     function cambiarTabPerfil(tab) {
-      document.getElementById('tabDatosContent').classList.toggle('hidden', tab !== 'datos');
-      document.getElementById('tabJuegosContent').classList.toggle('hidden', tab !== 'juegos');
       document.getElementById('tabHistorialContent').classList.toggle('hidden', tab !== 'historial');
+      document.getElementById('tabJuegosContent').classList.toggle('hidden', tab !== 'juegos');
+      document.getElementById('tabDatosContent').classList.toggle('hidden', tab !== 'datos');
 
-      document.getElementById('tabDatosBtn').className = tab === 'datos' ? 'flex-1 py-2 rounded-lg bg-white text-indigo-700 shadow-sm transition font-bold' : 'flex-1 py-2 rounded-lg transition';
-      document.getElementById('tabJuegosBtn').className = tab === 'juegos' ? 'flex-1 py-2 rounded-lg bg-white text-indigo-700 shadow-sm transition font-bold' : 'flex-1 py-2 rounded-lg transition';
-      document.getElementById('tabHistorialBtn').className = tab === 'historial' ? 'flex-1 py-2 rounded-lg bg-white text-indigo-700 shadow-sm transition font-bold' : 'flex-1 py-2 rounded-lg transition';
+      document.getElementById('tabHistorialBtn').className = tab === 'historial' ? 'px-4 py-2 rounded-lg bg-white text-indigo-700 shadow-sm transition font-bold' : 'px-4 py-2 rounded-lg transition';
+      document.getElementById('tabJuegosBtn').className = tab === 'juegos' ? 'px-4 py-2 rounded-lg bg-white text-indigo-700 shadow-sm transition font-bold' : 'px-4 py-2 rounded-lg transition';
+      document.getElementById('tabDatosBtn').className = tab === 'datos' ? 'px-4 py-2 rounded-lg bg-white text-indigo-700 shadow-sm transition font-bold' : 'px-4 py-2 rounded-lg transition';
     }
 
     function cerrarPerfilModal() { document.getElementById('modalPerfil').classList.add('hidden'); }
@@ -855,6 +682,176 @@
       } catch (err) {
         alert(err.message);
       }
+    }
+
+    // --- FLUJO PARTIDA MEJORADO ---
+    async function abrirModalPartida(juegoId, juegoNombre) {
+      document.getElementById('partidaJuegoId').value = juegoId;
+      document.getElementById('partidaJuegoNombre').innerText = juegoNombre;
+      
+      document.getElementById('pasoModoSelector').classList.remove('hidden');
+      document.getElementById('pasoJugadoresSelector').classList.add('hidden');
+      document.getElementById('pasoCronometroActivo').classList.add('hidden');
+      document.getElementById('pasoResultadosFinales').classList.add('hidden');
+
+      document.getElementById('modalPartida').classList.remove('hidden');
+      await cargarJugadoresDisponibles();
+    }
+
+    async function cargarJugadoresDisponibles() {
+      try {
+        const res = await fetchSeguro(`/api/jugadores-disponibles`);
+        jugadoresDisponiblesCache = await res.json();
+        
+        const contenedor = document.getElementById('checkboxesJugadores');
+        contenedor.innerHTML = '';
+        jugadoresDisponiblesCache.forEach(j => {
+          const marcado = (j === currentUser.nombre || j === currentUser.nick) ? 'checked' : '';
+          contenedor.innerHTML += `
+            <label class="flex items-center gap-2 p-1.5 bg-white rounded-lg border cursor-pointer hover:bg-slate-100">
+              <input type="checkbox" name="jugadorCheck" value="${j}" ${marcado} class="rounded text-indigo-600">
+              <span class="truncate font-medium text-slate-700">${j}</span>
+            </label>
+          `;
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function abrirPromptInvitado() {
+      const nombreInv = prompt("Introduce el nombre del nuevo jugador invitado:");
+      if (!nombreInv || !nombreInv.trim()) return;
+
+      try {
+        const res = await fetchSeguro(`/api/invidados`, {
+          method: 'POST',
+          body: JSON.stringify({ nombre: nombreInv.trim() })
+        });
+        const json = await res.json();
+        if (json.error) throw new Error(json.error);
+
+        await cargarJugadoresDisponibles();
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    function elegirModoPartida(modo) {
+      modoPartidaActual = modo;
+      document.getElementById('pasoModoSelector').classList.add('hidden');
+      document.getElementById('pasoJugadoresSelector').classList.remove('hidden');
+    }
+
+    function volverSeleccionModo() {
+      document.getElementById('pasoJugadoresSelector').classList.add('hidden');
+      document.getElementById('pasoModoSelector').classList.remove('hidden');
+    }
+
+    function avanzarAFormularioFinal() {
+      const seleccionados = Array.from(document.querySelectorAll('input[name="jugadorCheck"]:checked')).map(el => el.value);
+      if (seleccionados.length === 0) return alert("Selecciona al menos un jugador participante.");
+
+      document.getElementById('pasoJugadoresSelector').classList.add('hidden');
+
+      if (modoPartidaActual === 'ahora') {
+        document.getElementById('pasoCronometroActivo').classList.remove('hidden');
+        segundosTranscurridos = 0;
+        document.getElementById('cronometroDisplay').innerText = "00:00";
+        if (cronometroInterval) clearInterval(cronometroInterval);
+        
+        cronometroInterval = setInterval(() => {
+          segundosTranscurridos++;
+          const mins = Math.floor(segundosTranscurridos / 60).toString().padStart(2, '0');
+          const secs = (segundosTranscurridos % 60).toString().padStart(2, '0');
+          document.getElementById('cronometroDisplay').innerText = `${mins}:${secs}`;
+        }, 1000);
+      } else {
+        document.getElementById('campoDuracionManualContainer').classList.remove('hidden');
+        document.getElementById('pasoResultadosFinales').classList.remove('hidden');
+        document.getElementById('inputNumPartidas').value = 1;
+        generarSelectoresGanadores();
+      }
+    }
+
+    function detenerCronometroYFinalizar() {
+      clearInterval(cronometroInterval);
+      document.getElementById('pasoCronometroActivo').classList.add('hidden');
+      document.getElementById('campoDuracionManualContainer').classList.add('hidden');
+      document.getElementById('pasoResultadosFinales').classList.remove('hidden');
+      document.getElementById('inputNumPartidas').value = 1;
+      generarSelectoresGanadores();
+    }
+
+    function generarSelectoresGanadores() {
+      const numPartidas = parseInt(document.getElementById('inputNumPartidas').value) || 1;
+      const seleccionados = Array.from(document.querySelectorAll('input[name="jugadorCheck"]:checked')).map(el => el.value);
+      const contenedor = document.getElementById('contenedorGanadoresPartidas');
+      contenedor.innerHTML = '';
+
+      for (let i = 1; i <= numPartidas; i++) {
+        let opcionesHtml = `<option value="Empate / Sin ganador">Empate / Sin ganador</option>`;
+        seleccionados.forEach(j => {
+          opcionesHtml += `<option value="${j}">${j}</option>`;
+        });
+
+        contenedor.innerHTML += `
+          <div class="p-2 bg-slate-50 rounded-xl border flex items-center justify-between gap-2">
+            <span class="font-bold text-slate-700">🏆 Ganador Partida ${i}:</span>
+            <select id="ganadorPartida_${i}" class="p-1 border rounded-lg bg-white outline-none font-semibold text-indigo-700">
+              ${opcionesHtml}
+            </select>
+          </div>
+        `;
+      }
+    }
+
+    async function guardarPartidaFinal() {
+      const juego_id = document.getElementById('partidaJuegoId').value;
+      const seleccionados = Array.from(document.querySelectorAll('input[name="jugadorCheck"]:checked')).map(el => el.value);
+      const participantesStr = seleccionados.join(', ');
+      const numPartidas = parseInt(document.getElementById('inputNumPartidas').value) || 1;
+
+      let ganadoresList = [];
+      for (let i = 1; i <= numPartidas; i++) {
+        const g = document.getElementById(`ganadorPartida_${i}`).value;
+        ganadoresList.push(`P${i}: ${g}`);
+      }
+      const ganadorFinalResumen = ganadoresList.join(' | ');
+
+      let duracionTotalSegs = 0;
+      if (modoPartidaActual === 'ahora') {
+        duracionTotalSegs = segundosTranscurridos;
+      } else {
+        const minsManual = parseInt(document.getElementById('inputDuracionMinutos').value) || 0;
+        duracionTotalSegs = minsManual * 60;
+      }
+
+      try {
+        const res = await fetchSeguro(`/api/partidas`, {
+          method: 'POST',
+          body: JSON.stringify({
+            juego_id,
+            participantes: participantesStr,
+            ganador: ganadorFinalResumen,
+            num_partidas: numPartidas,
+            duracion_total_segundos: duracionTotalSegs
+          })
+        });
+        const json = await res.json();
+        if (json.error) throw new Error(json.error);
+
+        cerrarModalPartida();
+        alert("¡Partida registrada y estadísticas actualizadas con éxito!");
+        cargarJuegos();
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    function cerrarModalPartida() {
+      if (cronometroInterval) clearInterval(cronometroInterval);
+      document.getElementById('modalPartida').classList.add('hidden');
     }
 
     // --- PANEL ADMIN ---
