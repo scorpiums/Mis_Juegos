@@ -8,44 +8,130 @@
   <style>
     .card-zoom { transition: transform 0.2s ease-in-out; }
     .card-zoom:active { transform: scale(0.97); }
+    .scrollbar-none::-webkit-scrollbar { display: none; }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen pb-20">
 
-  <!-- Encabezado -->
-  <header class="bg-indigo-600 text-white p-4 shadow-md sticky top-0 z-30 flex justify-between items-center">
-    <h1 class="text-xl font-bold tracking-wide">🎲 Mis Juegos y Juguetes</h1>
-  </header>
+  <!-- PANTALLA DE AUTENTICACIÓN (LOGIN / REGISTRO) -->
+  <div id="authScreen" class="fixed inset-0 bg-indigo-900 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4">
+      <div class="text-center space-y-1">
+        <h2 class="text-2xl font-bold text-slate-800">🎲 Mis Juegos</h2>
+        <p class="text-xs text-slate-500" id="authSubtitulo">Inicia sesión para entrar a la colección</p>
+      </div>
 
-  <!-- Barra de Filtros y Búsqueda -->
-  <div class="p-4 max-w-4xl mx-auto space-y-3">
-    <div class="flex gap-2">
-      <input type="text" id="searchInput" oninput="filtrarJuegos()" placeholder="🔍 Buscar por nombre..." class="w-full p-2.5 rounded-xl border border-slate-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-      <button onclick="seleccionarAleatorio()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-4 py-2.5 rounded-xl shadow-md flex items-center gap-1 whitespace-nowrap card-zoom">
-        🎰 ¡Elegir!
-      </button>
-    </div>
-    
-    <div class="flex gap-2 overflow-x-auto pb-1 text-sm scrollbar-none" id="categoriasFiltro">
-      <button onclick="filtrarCategoria('Todas', event)" class="cat-btn bg-indigo-600 text-white px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Todas</button>
-      <button onclick="filtrarCategoria('Juego de Mesa', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Juegos de Mesa</button>
-      <button onclick="filtrarCategoria('Construcción', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Construcción</button>
-      <button onclick="filtrarCategoria('Exterior', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Exterior</button>
-      <button onclick="filtrarCategoria('Consola', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Consola</button>
+      <!-- Formulario Login -->
+      <form id="loginForm" onsubmit="procesarLogin(event)" class="space-y-3">
+        <div>
+          <label class="text-xs font-bold text-slate-500 uppercase">Usuario / Nick</label>
+          <input type="text" id="loginNick" required class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-500 uppercase">Contraseña</label>
+          <input type="password" id="loginPassword" required class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl card-zoom">
+          Entrar
+        </button>
+        <button type="button" class="w-full border border-indigo-200 text-indigo-600 font-semibold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 opacity-50 cursor-not-allowed" title="Próximamente">
+          👆 Entrar con Huella / Face ID
+        </button>
+        <p class="text-center text-xs text-slate-500 pt-2">
+          ¿No tienes cuenta? <a href="#" onclick="toggleAuthMode('registro')" class="text-indigo-600 font-bold">Regístrate</a>
+        </p>
+      </form>
+
+      <!-- Formulario Registro -->
+      <form id="registroForm" onsubmit="procesarRegistro(event)" class="space-y-3 hidden">
+        <div>
+          <label class="text-xs font-bold text-slate-500 uppercase">Nombre Completo</label>
+          <input type="text" id="regNombre" required class="w-full p-2.5 border rounded-xl outline-none">
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-500 uppercase">Nick de Usuario</label>
+          <input type="text" id="regNick" required class="w-full p-2.5 border rounded-xl outline-none">
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-500 uppercase">Contraseña</label>
+          <input type="password" id="regPass1" required class="w-full p-2.5 border rounded-xl outline-none">
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-500 uppercase">Repetir Contraseña</label>
+          <input type="password" id="regPass2" required class="w-full p-2.5 border rounded-xl outline-none">
+        </div>
+        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl card-zoom">
+          Solicitar Cuenta
+        </button>
+        <p class="text-center text-xs text-slate-500 pt-1">
+          ¿Ya tienes cuenta? <a href="#" onclick="toggleAuthMode('login')" class="text-indigo-600 font-bold">Inicia Sesión</a>
+        </p>
+      </form>
+
+      <!-- Pantalla Validación Código -->
+      <div id="codigoForm" class="space-y-3 hidden">
+        <p class="text-xs text-slate-600 text-center">Introduce el código de 6 dígitos proporcionado por el Administrador:</p>
+        <input type="text" id="valCodigo" placeholder="000000" maxlength="6" class="w-full p-3 border text-center font-bold text-xl tracking-widest rounded-xl outline-none">
+        <button type="button" onclick="validarCodigoAcceso()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl">
+          Validar y Activar
+        </button>
+      </div>
     </div>
   </div>
 
-  <!-- Contenedor Principal de Tarjetas -->
-  <main class="p-4 max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-4" id="gridJuegos">
-    <div class="col-span-full text-center py-10 text-slate-400">Cargando colección desde la nube...</div>
-  </main>
+  <!-- APLICACIÓN PRINCIPAL (Protegida) -->
+  <div id="mainApp" class="hidden">
+    <!-- Encabezado -->
+    <header class="bg-indigo-600 text-white p-4 shadow-md sticky top-0 z-30 flex justify-between items-center">
+      <h1 class="text-xl font-bold tracking-wide">🎲 Mis Juegos</h1>
+      <div class="flex items-center gap-2">
+        <span id="userInfo" class="text-xs bg-indigo-700 px-2.5 py-1 rounded-full font-medium"></span>
+        <button id="btnAdminPanel" onclick="abrirAdminPanel()" class="hidden bg-amber-400 text-slate-900 font-bold text-xs px-2.5 py-1 rounded-full">⚙️ Admin</button>
+        <button onclick="cerrarSesion()" class="text-xs bg-indigo-800 hover:bg-indigo-900 px-2 py-1 rounded-lg">Salir</button>
+      </div>
+    </header>
 
-  <!-- Botón Flotante Añadir -->
-  <button onclick="abrirModalFormulario()" class="fixed bottom-6 right-6 bg-indigo-600 hover:bg-indigo-700 text-white p-4 rounded-full shadow-2xl z-40 text-2xl font-bold flex items-center justify-center w-14 h-14 card-zoom">
-    ＋
-  </button>
+    <!-- Barra de Filtros y Búsqueda -->
+    <div class="p-4 max-w-4xl mx-auto space-y-3">
+      <div class="flex gap-2">
+        <input type="text" id="searchInput" oninput="filtrarJuegos()" placeholder="🔍 Buscar por nombre..." class="w-full p-2.5 rounded-xl border border-slate-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <button onclick="seleccionarAleatorio()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-4 py-2.5 rounded-xl shadow-md flex items-center gap-1 whitespace-nowrap card-zoom">
+          🎰 ¡Elegir!
+        </button>
+      </div>
+      
+      <div class="flex gap-2 overflow-x-auto pb-1 text-sm scrollbar-none" id="categoriasFiltro">
+        <button onclick="filtrarCategoria('Todas', event)" class="cat-btn bg-indigo-600 text-white px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Todas</button>
+        <button onclick="filtrarCategoria('Juego de Mesa', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Juegos de Mesa</button>
+        <button onclick="filtrarCategoria('Construcción', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Construcción</button>
+        <button onclick="filtrarCategoria('Exterior', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Exterior</button>
+        <button onclick="filtrarCategoria('Consola', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Consola</button>
+      </div>
+    </div>
 
-  <!-- Modal Formulario (Añadir / Editar) -->
+    <!-- Contenedor Principal de Tarjetas -->
+    <main class="p-4 max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-4" id="gridJuegos">
+      <div class="col-span-full text-center py-10 text-slate-400">Cargando colección desde la nube...</div>
+    </main>
+
+    <!-- Botón Flotante Añadir -->
+    <button onclick="abrirModalFormulario()" class="fixed bottom-6 right-6 bg-indigo-600 hover:bg-indigo-700 text-white p-4 rounded-full shadow-2xl z-40 text-2xl font-bold flex items-center justify-center w-14 h-14 card-zoom">
+      ＋
+    </button>
+  </div>
+
+  <!-- MODAL ADMIN -->
+  <div id="modalAdmin" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-5 space-y-4 shadow-xl max-h-[80vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b pb-2">
+        <h3 class="font-bold text-lg">⚙️ Gestión de Usuarios</h3>
+        <button onclick="cerrarAdminPanel()" class="text-slate-400 font-bold text-xl">✕</button>
+      </div>
+      <div id="listaUsuarios" class="space-y-2 text-sm"></div>
+    </div>
+  </div>
+
+  <!-- MODAL FORMULARIO JUEGO -->
   <div id="modalForm" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
     <div class="bg-white rounded-2xl max-w-md w-full p-5 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b pb-2">
@@ -53,13 +139,11 @@
         <button onclick="cerrarModalFormulario()" class="text-slate-400 text-xl font-bold">✕</button>
       </div>
 
-      <!-- Preview de Imagen + Botones de Entrada -->
       <div class="space-y-2">
         <div id="imagePreview" class="w-full h-40 bg-slate-100 rounded-xl flex items-center justify-center border-2 border-dashed border-slate-300 overflow-hidden relative">
           <span class="text-slate-400 text-sm">Sin fotografía</span>
         </div>
 
-        <!-- Inputs ocultos: uno con capture y otro sin él -->
         <input type="file" id="inputCamara" accept="image/*" capture="environment" onchange="procesarFoto(event)" class="hidden">
         <input type="file" id="inputGaleria" accept="image/*" onchange="procesarFoto(event)" class="hidden">
 
@@ -130,11 +214,136 @@
     const WORKER_URL = "https://backend-juegos.pabgartov.workers.dev";
     let juegosCache = [];
     let categoriaActual = 'Todas';
+    let currentUser = null;
 
+    // --- LOGICA DE AUTENTICACIÓN ---
     window.onload = () => {
-      cargarJuegos();
+      const savedUser = localStorage.getItem('session_user');
+      if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        iniciarApp();
+      }
     };
 
+    function iniciarApp() {
+      document.getElementById('authScreen').classList.add('hidden');
+      document.getElementById('mainApp').classList.remove('hidden');
+      document.getElementById('userInfo').innerText = `${currentUser.nick} (${currentUser.rol})`;
+      if (currentUser.rol === 'ADMIN') {
+        document.getElementById('btnAdminPanel').classList.remove('hidden');
+      }
+      cargarJuegos();
+    }
+
+    async function procesarLogin(e) {
+      e.preventDefault();
+      const nick = document.getElementById('loginNick').value;
+      const password = document.getElementById('loginPassword').value;
+
+      try {
+        const res = await fetch(`${WORKER_URL}/api/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nick, password })
+        });
+        const json = await res.json();
+        if (json.error) throw new Error(json.error);
+
+        currentUser = json.usuario;
+        localStorage.setItem('session_user', JSON.stringify(currentUser));
+        iniciarApp();
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    async function procesarRegistro(e) {
+      e.preventDefault();
+      const nombre = document.getElementById('regNombre').value;
+      const nick = document.getElementById('regNick').value;
+      const pass1 = document.getElementById('regPass1').value;
+      const pass2 = document.getElementById('regPass2').value;
+
+      if (pass1 !== pass2) return alert("Las contraseñas no coinciden");
+
+      try {
+        const res = await fetch(`${WORKER_URL}/api/registro`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nombre, nick, password: pass1 })
+        });
+        const json = await res.json();
+        if (json.error) throw new Error(json.error);
+
+        alert(`Solicitud enviada.\n\nSimulación de Email a Admin:\nCódigo de activación: ${json.codigo_simulado}`);
+        document.getElementById('registroForm').classList.add('hidden');
+        document.getElementById('codigoForm').classList.remove('hidden');
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    async function validarCodigoAcceso() {
+      const nick = document.getElementById('regNick').value;
+      const codigo = document.getElementById('valCodigo').value;
+
+      try {
+        const res = await fetch(`${WORKER_URL}/api/activar-usuario`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nick, codigo })
+        });
+        const json = await res.json();
+        if (json.error) throw new Error(json.error);
+
+        alert("¡Cuenta activada con éxito! Ahora puedes iniciar sesión.");
+        toggleAuthMode('login');
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    function toggleAuthMode(mode) {
+      document.getElementById('loginForm').classList.toggle('hidden', mode !== 'login');
+      document.getElementById('registroForm').classList.toggle('hidden', mode !== 'registro');
+      document.getElementById('codigoForm').classList.add('hidden');
+    }
+
+    function cerrarSesion() {
+      localStorage.removeItem('session_user');
+      location.reload();
+    }
+
+    // --- PANEL ADMIN ---
+    async function abrirAdminPanel() {
+      document.getElementById('modalAdmin').classList.remove('hidden');
+      const res = await fetch(`${WORKER_URL}/api/admin/usuarios`);
+      const usuarios = await res.json();
+      const cont = document.getElementById('listaUsuarios');
+      cont.innerHTML = '';
+
+      usuarios.forEach(u => {
+        cont.innerHTML += `
+          <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border">
+            <div>
+              <p class="font-bold text-slate-800">${u.nombre} <span class="text-xs text-slate-500">(@${u.nick})</span></p>
+              <p class="text-xs text-slate-500">Rol: ${u.rol} | Estado: <b class="${u.estado==='ACTIVO'?'text-emerald-600':'text-amber-600'}">${u.estado}</b></p>
+            </div>
+            ${u.rol !== 'ADMIN' ? `<button onclick="borrarUsuario('${u.id}')" class="text-xs bg-rose-100 text-rose-600 p-1.5 rounded-lg">🗑️</button>` : ''}
+          </div>
+        `;
+      });
+    }
+
+    async function borrarUsuario(id) {
+      if (!confirm("¿Eliminar usuario del sistema?")) return;
+      await fetch(`${WORKER_URL}/api/admin/usuarios/${id}`, { method: 'DELETE' });
+      abrirAdminPanel();
+    }
+
+    function cerrarAdminPanel() { document.getElementById('modalAdmin').classList.add('hidden'); }
+
+    // --- LOGICA DE JUEGOS ---
     async function cargarJuegos() {
       try {
         const res = await fetch(`${WORKER_URL}/api/juegos`);
@@ -157,7 +366,7 @@
       });
 
       if (filtrados.length === 0) {
-        grid.innerHTML = `<div class="col-span-full text-center py-10 text-slate-400">No hay juegos guardados.</div>`;
+        grid.innerHTML = `<div class="col-span-full text-center py-10 text-slate-400">No hay juegos que coincidan.</div>`;
         return;
       }
 
@@ -186,9 +395,10 @@
               <button onclick="registrarUso('${j.id}')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs card-zoom">
                 ¡Jugado Hoy!
               </button>
+              ${currentUser && currentUser.rol === 'ADMIN' ? `
               <button onclick="borrarJuego('${j.id}')" class="bg-rose-50 text-rose-600 hover:bg-rose-100 p-2 rounded-xl text-xs">
                 🗑️
-              </button>
+              </button>` : ''}
             </div>
           </div>
         `;
@@ -302,26 +512,12 @@
     }
 
     async function registrarUso(juegoId) {
-      try {
-        await fetch(`${WORKER_URL}/api/partidas`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            id: Date.now().toString(),
-            juego_id: juegoId,
-            jugadores: "Familia",
-            ganador: "",
-            notas: "Partida rápida"
-          })
-        });
-        cargarJuegos();
-      } catch (err) {
-        alert("Error al registrar partida.");
-      }
+      // Endpoint pendiente de crear en Worker para partidas. Sumaremos +1 localmente por ahora.
+      alert("Función de registro detallado en desarrollo.");
     }
 
     async function borrarJuego(id) {
-      if (!confirm("¿Seguro que quieres borrar este juego?")) return;
+      if (!confirm("Como administrador, ¿seguro que quieres borrar este juego de forma permanente?")) return;
       await fetch(`${WORKER_URL}/api/juegos/${id}`, { method: 'DELETE' });
       cargarJuegos();
     }
