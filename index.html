@@ -29,7 +29,6 @@
         <p class="text-xs text-slate-500">Inicia sesión para entrar a la colección</p>
       </div>
 
-      <!-- Formulario Login -->
       <form id="loginForm" onsubmit="procesarLogin(event)" class="space-y-3">
         <div>
           <label class="text-xs font-bold text-slate-500 uppercase">Usuario / Nick</label>
@@ -47,7 +46,6 @@
         </p>
       </form>
 
-      <!-- Formulario Registro con Protección Antiautocompletado -->
       <form id="registroForm" onsubmit="procesarRegistro(event)" class="space-y-3 hidden" autocomplete="off">
         <input type="text" style="display:none" name="fakeusernameremembered">
         <input type="password" style="display:none" name="fakepasswordremembered">
@@ -76,7 +74,6 @@
         </p>
       </form>
 
-      <!-- Pantalla Validación Código -->
       <div id="codigoForm" class="space-y-3 hidden">
         <p class="text-xs text-slate-600 text-center">Introduce el código de 6 dígitos proporcionado por el Administrador:</p>
         <input type="text" id="valCodigo" placeholder="000000" maxlength="6" class="w-full p-3 border text-center font-bold text-xl tracking-widest rounded-xl outline-none">
@@ -108,7 +105,6 @@
       </div>
     </header>
 
-    <!-- Barra de Búsqueda y Filtros -->
     <div class="p-4 max-w-4xl mx-auto space-y-3">
       <div class="flex gap-2">
         <input type="text" id="searchInput" oninput="filtrarJuegos()" placeholder="🔍 Buscar por nombre..." class="w-full p-2.5 rounded-xl border border-slate-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
@@ -134,18 +130,16 @@
       </div>
     </div>
 
-    <!-- Contenedor Principal -->
     <main class="p-4 max-w-4xl mx-auto" id="mainContainer">
       <div class="text-center py-10 text-slate-400">Cargando colección desde la nube...</div>
     </main>
 
-    <!-- Botón Flotante Añadir -->
     <button onclick="abrirModalFormulario()" class="fixed bottom-6 right-6 bg-indigo-600 hover:bg-indigo-700 text-white p-4 rounded-full shadow-2xl z-40 text-2xl font-bold flex items-center justify-center w-14 h-14 card-zoom">
       ＋
     </button>
   </div>
 
-  <!-- MODAL PERFIL DE USUARIO & ESTADÍSTICAS -->
+  <!-- MODAL PERFIL DE USUARIO -->
   <div id="modalPerfil" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
     <div class="bg-white rounded-2xl max-w-lg w-full p-5 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b pb-2">
@@ -209,27 +203,78 @@
     </div>
   </div>
 
-  <!-- MODAL REGISTRO DE PARTIDA -->
+  <!-- MODAL ¡VAMOS A JUGAR! (NUEVO SISTEMA) -->
   <div id="modalPartida" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-sm w-full p-5 space-y-4 shadow-xl">
+    <div class="bg-white rounded-2xl max-w-md w-full p-5 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b pb-2">
-        <h3 class="font-bold text-base text-slate-800">🎲 Registrar Partida</h3>
+        <h3 class="font-bold text-base text-slate-800">🎲 ¡Vamos a Jugar!</h3>
         <button onclick="cerrarModalPartida()" class="text-slate-400 font-bold text-xl px-2">✕</button>
       </div>
 
       <input type="hidden" id="partidaJuegoId">
-      <div class="space-y-3 text-sm">
-        <p class="font-bold text-indigo-700" id="partidaJuegoNombre">Nombre del juego</p>
-        <div>
-          <label class="text-xs font-bold text-slate-500 uppercase">Participantes (Nombres)</label>
-          <input type="text" id="partidaParticipantes" placeholder="Ej. Papá, Mamá, Rubén y Marco" class="w-full p-2 border rounded-xl outline-none text-xs">
+      <p class="font-bold text-indigo-700 text-sm text-center" id="partidaJuegoNombre">Juego</p>
+
+      <!-- Paso 1: Elección de Modo -->
+      <div id="pasoModoSelector" class="space-y-3">
+        <div class="grid grid-cols-2 gap-3">
+          <button type="button" onclick="elegirModoPartida('ahora')" class="bg-indigo-50 hover:bg-indigo-100 border-2 border-indigo-500 text-indigo-900 p-4 rounded-2xl font-bold text-center card-zoom">
+            ⏱️ <br>¡Jugar Ahora!
+            <span class="block text-[10px] font-normal text-slate-500 mt-1">Con cronómetro en directo</span>
+          </button>
+          <button type="button" onclick="elegirModoPartida('pasado')" class="bg-slate-50 hover:bg-slate-100 border-2 border-slate-300 text-slate-800 p-4 rounded-2xl font-bold text-center card-zoom">
+            📝 <br>Ya hemos jugado
+            <span class="block text-[10px] font-normal text-slate-500 mt-1">Introducir datos a mano</span>
+          </button>
         </div>
-        <div>
-          <label class="text-xs font-bold text-slate-500 uppercase">Ganador (Opcional)</label>
-          <input type="text" id="partidaGanador" placeholder="Ej. Rubén" class="w-full p-2 border rounded-xl outline-none text-xs">
+      </div>
+
+      <!-- Paso 2: Selección de Jugadores (Común) -->
+      <div id="pasoJugadoresSelector" class="space-y-3 hidden">
+        <div class="flex justify-between items-center">
+          <label class="text-xs font-bold text-slate-500 uppercase">Selecciona los participantes:</label>
+          <button type="button" onclick="abrirPromptInvitado()" class="text-xs bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold px-2 py-1 rounded-lg">
+            ＋ Añadir invitado
+          </button>
         </div>
-        <button type="button" onclick="enviarRegistroPartida()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md">
-          Guardar Partida y Estadísticas
+        <div id="checkboxesJugadores" class="grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded-xl border max-h-40 overflow-y-auto text-xs">
+          <!-- Dinámico -->
+        </div>
+
+        <div class="flex gap-2 pt-2">
+          <button type="button" onclick="volverSeleccionModo()" class="w-1/3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2.5 rounded-xl text-xs">Volver</button>
+          <button type="button" onclick="avanzarAFormularioFinal()" class="w-2/3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md">Siguiente ➔</button>
+        </div>
+      </div>
+
+      <!-- Paso 3A: Modo Cronómetro Activo ("¡Jugar Ahora!") -->
+      <div id="pasoCronometroActivo" class="space-y-4 text-center hidden py-4">
+        <div class="bg-slate-900 text-amber-400 font-mono text-4xl font-black py-6 rounded-2xl tracking-widest shadow-inner" id="cronometroDisplay">
+          00:00
+        </div>
+        <p class="text-xs text-slate-500 animate-pulse">Partida en curso... ¡Diviérteos!</p>
+        <button type="button" onclick="detenerCronometroYFinalizar()" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 rounded-xl text-sm shadow-lg card-zoom">
+          ⏹️ Terminar Partida
+        </button>
+      </div>
+
+      <!-- Paso 3B: Formulario de Resultados (Número de partidas y Ganadores) -->
+      <div id="pasoResultadosFinales" class="space-y-3 hidden text-xs">
+        <div>
+          <label class="font-bold text-slate-600 uppercase">¿Cuántas partidas se han jugado?</label>
+          <input type="number" id="inputNumPartidas" value="1" min="1" onchange="generarSelectoresGanadores()" class="w-full p-2 border rounded-xl outline-none font-bold text-sm mt-1">
+        </div>
+
+        <div id="contenedorGanadoresPartidas" class="space-y-2 max-h-40 overflow-y-auto">
+          <!-- Selectores de ganadores por cada partida -->
+        </div>
+
+        <div id="campoDuracionManualContainer">
+          <label class="font-bold text-slate-600 uppercase">Duración total (opcional, en minutos)</label>
+          <input type="number" id="inputDuracionMinutos" placeholder="Ej. 30" class="w-full p-2 border rounded-xl outline-none mt-1">
+        </div>
+
+        <button type="button" onclick="guardarPartidaFinal()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-xs shadow-md card-zoom">
+          💾 Guardar Partida y Estadísticas
         </button>
       </div>
     </div>
@@ -332,6 +377,10 @@
     let categoriaActual = 'Todas';
     let vistaActual = 'grid'; 
     let currentUser = null;
+    let cronometroInterval = null;
+    let segundosTranscurridos = 0;
+    let modoPartidaActual = '';
+    let jugadoresDisponiblesCache = [];
 
     async function fetchSeguro(ruta, opciones = {}) {
       const token = localStorage.getItem('auth_token');
@@ -443,8 +492,7 @@
         const json = await res.json();
         if (json.error) throw new Error(json.error);
 
-        alert("¡Solicitud enviada con éxito!\n\nTu cuenta se encuentra pendiente de aprobación. Por favor, ponte en contacto con el Administrador para que te proporcione el código de activación.");
-        
+        alert("¡Solicitud enviada con éxito!\n\nTu cuenta se encuentra pendiente de aprobación por el Administrador.");
         document.getElementById('registroForm').classList.add('hidden');
         document.getElementById('codigoForm').classList.remove('hidden');
       } catch (err) {
@@ -484,6 +532,181 @@
       location.reload();
     }
 
+    // --- FLUJO PARTIDA MEJORADO ---
+    async function abrirModalPartida(juegoId, juegoNombre) {
+      document.getElementById('partidaJuegoId').value = juegoId;
+      document.getElementById('partidaJuegoNombre').innerText = juegoNombre;
+      
+      // Resetear vistas del modal
+      document.getElementById('pasoModoSelector').classList.remove('hidden');
+      document.getElementById('pasoJugadoresSelector').classList.add('hidden');
+      document.getElementById('pasoCronometroActivo').classList.add('hidden');
+      document.getElementById('pasoResultadosFinales').classList.add('hidden');
+
+      document.getElementById('modalPartida').classList.remove('hidden');
+      await cargarJugadoresDisponibles();
+    }
+
+    async function cargarJugadoresDisponibles() {
+      try {
+        const res = await fetchSeguro(`/api/jugadores-disponibles`);
+        jugadoresDisponiblesCache = await res.json();
+        
+        const contenedor = document.getElementById('checkboxesJugadores');
+        contenedor.innerHTML = '';
+        jugadoresDisponiblesCache.forEach(j => {
+          const marcado = (j === currentUser.nombre || j === currentUser.nick) ? 'checked' : '';
+          contenedor.innerHTML += `
+            <label class="flex items-center gap-2 p-1.5 bg-white rounded-lg border cursor-pointer hover:bg-slate-100">
+              <input type="checkbox" name="jugadorCheck" value="${j}" ${marcado} class="rounded text-indigo-600">
+              <span class="truncate font-medium text-slate-700">${j}</span>
+            </label>
+          `;
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function abrirPromptInvitado() {
+      const nombreInv = prompt("Introduce el nombre del nuevo jugador invitado:");
+      if (!nombreInv || !nombreInv.trim()) return;
+
+      try {
+        const res = await fetchSeguro(`/api/invidados`, {
+          method: 'POST',
+          body: JSON.stringify({ nombre: nombreInv.trim() })
+        });
+        const json = await res.json();
+        if (json.error) throw new Error(json.error);
+
+        await cargarJugadoresDisponibles();
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    function elegirModoPartida(modo) {
+      modoPartidaActual = modo;
+      document.getElementById('pasoModoSelector').classList.add('hidden');
+      document.getElementById('pasoJugadoresSelector').classList.remove('hidden');
+    }
+
+    function volverSeleccionModo() {
+      document.getElementById('pasoJugadoresSelector').classList.add('hidden');
+      document.getElementById('pasoModoSelector').classList.remove('hidden');
+    }
+
+    function avanzarAFormularioFinal() {
+      const seleccionados = Array.from(document.querySelectorAll('input[name="jugadorCheck"]:checked')).map(el => el.value);
+      if (seleccionados.length === 0) return alert("Selecciona al menos un jugador participante.");
+
+      document.getElementById('pasoJugadoresSelector').classList.add('hidden');
+
+      if (modoPartidaActual === 'ahora') {
+        // Iniciar Cronómetro
+        document.getElementById('pasoCronometroActivo').classList.remove('hidden');
+        segundosTranscurridos = 0;
+        document.getElementById('cronometroDisplay').innerText = "00:00";
+        if (cronometroInterval) clearInterval(cronometroInterval);
+        
+        cronometroInterval = setInterval(() => {
+          segundosTranscurridos++;
+          const mins = Math.floor(segundosTranscurridos / 60).toString().padStart(2, '0');
+          const secs = (segundosTranscurridos % 60).toString().padStart(2, '0');
+          document.getElementById('cronometroDisplay').innerText = `${mins}:${secs}`;
+        }, 1000);
+      } else {
+        // Modo pasado / manual
+        document.getElementById('campoDuracionManualContainer').classList.remove('hidden');
+        document.getElementById('pasoResultadosFinales').classList.remove('hidden');
+        document.getElementById('inputNumPartidas').value = 1;
+        generarSelectoresGanadores();
+      }
+    }
+
+    function detenerCronometroYFinalizar() {
+      clearInterval(cronometroInterval);
+      document.getElementById('pasoCronometroActivo').classList.add('hidden');
+      document.getElementById('campoDuracionManualContainer').classList.add('hidden'); // Ocultar campo manual ya que tenemos cronómetro real
+      document.getElementById('pasoResultadosFinales').classList.remove('hidden');
+      document.getElementById('inputNumPartidas').value = 1;
+      generarSelectoresGanadores();
+    }
+
+    function generarSelectoresGanadores() {
+      const numPartidas = parseInt(document.getElementById('inputNumPartidas').value) || 1;
+      const seleccionados = Array.from(document.querySelectorAll('input[name="jugadorCheck"]:checked')).map(el => el.value);
+      const contenedor = document.getElementById('contenedorGanadoresPartidas');
+      contenedor.innerHTML = '';
+
+      for (let i = 1; i <= numPartidas; i++) {
+        let opcionesHtml = `<option value="Empate / Sin ganador">Empate / Sin ganador</option>`;
+        seleccionados.forEach(j => {
+          opcionesHtml += `<option value="${j}">${j}</option>`;
+        });
+
+        contenedor.innerHTML += `
+          <div class="p-2 bg-slate-50 rounded-xl border flex items-center justify-between gap-2">
+            <span class="font-bold text-slate-700">🏆 Ganador Partida ${i}:</span>
+            <select id="ganadorPartida_${i}" class="p-1 border rounded-lg bg-white outline-none font-semibold text-indigo-700">
+              ${opcionesHtml}
+            </select>
+          </div>
+        `;
+      }
+    }
+
+    async function guardarPartidaFinal() {
+      const juego_id = document.getElementById('partidaJuegoId').value;
+      const seleccionados = Array.from(document.querySelectorAll('input[name="jugadorCheck"]:checked')).map(el => el.value);
+      const participantesStr = seleccionados.join(', ');
+      const numPartidas = parseInt(document.getElementById('inputNumPartidas').value) || 1;
+
+      // Recopilar ganadores de cada ronda
+      let ganadoresList = [];
+      for (let i = 1; i <= numPartidas; i++) {
+        const g = document.getElementById(`ganadorPartida_${i}`).value;
+        ganadoresList.push(`P${i}: ${g}`);
+      }
+      const ganadorFinalResumen = ganadoresList.join(' | ');
+
+      let duracionTotalSegs = 0;
+      if (modoPartidaActual === 'ahora') {
+        duracionTotalSegs = segundosTranscurridos;
+      } else {
+        const minsManual = parseInt(document.getElementById('inputDuracionMinutos').value) || 0;
+        duracionTotalSegs = minsManual * 60;
+      }
+
+      try {
+        const res = await fetchSeguro(`/api/partidas`, {
+          method: 'POST',
+          body: JSON.stringify({
+            juego_id,
+            participantes: participantesStr,
+            ganador: ganadorFinalResumen,
+            num_partidas: numPartidas,
+            duracion_total_segundos: duracionTotalSegs
+          })
+        });
+        const json = await res.json();
+        if (json.error) throw new Error(json.error);
+
+        cerrarModalPartida();
+        alert("¡Partida registrada y estadísticas actualizadas con éxito!");
+        cargarJuegos();
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    function cerrarModalPartida() {
+      if (cronometroInterval) clearInterval(cronometroInterval);
+      document.getElementById('modalPartida').classList.add('hidden');
+    }
+
+    // --- PERFIL Y PESTAÑAS ---
     async function abrirPerfilModal() {
       document.getElementById('modalPerfil').classList.remove('hidden');
       cambiarTabPerfil('datos');
@@ -511,7 +734,7 @@
               <div class="bg-slate-50 p-2.5 rounded-xl border flex justify-between items-center">
                 <div>
                   <p class="font-bold text-slate-800">${j.nombre}</p>
-                  <p class="text-[10px] text-slate-500">📍 ${j.ubicacion || 'Sin ubícación'} • 🕹️ ${j.categoria}</p>
+                  <p class="text-[10px] text-slate-500">📍 ${j.ubicacion || 'Sin ubicación'} • 🕹️ ${j.categoria}</p>
                 </div>
                 <span class="bg-indigo-50 text-indigo-700 font-semibold px-2 py-1 rounded">Subido</span>
               </div>
@@ -526,14 +749,16 @@
         if (perfil.misPartidas && perfil.misPartidas.length > 0) {
           perfil.misPartidas.forEach(p => {
             const fechaFormateada = new Date(p.fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+            const duracionMin = p.duracion_total_segundos ? Math.round(p.duracion_total_segundos / 60) : 0;
             historialCont.innerHTML += `
               <div class="bg-slate-50 p-2.5 rounded-xl border space-y-1">
                 <div class="flex justify-between items-center">
-                  <span class="font-bold text-indigo-700">${p.juego_nombre}</span>
+                  <span class="font-bold text-indigo-700">${p.juego_nombre} (${p.num_partidas || 1} part.)</span>
                   <span class="text-[10px] text-slate-400">${fechaFormateada}</span>
                 </div>
                 <p class="text-[11px] text-slate-600">👥 <b>Jugadores:</b> ${p.participantes}</p>
-                <p class="text-[11px] text-emerald-700 font-bold">🏆 Ganador: ${p.ganador}</p>
+                <p class="text-[11px] text-emerald-700 font-bold">🏆 ${p.ganador}</p>
+                ${duracionMin > 0 ? `<p class="text-[10px] text-slate-500">⏱️ Duración: ~${duracionMin} min</p>` : ''}
               </div>
             `;
           });
@@ -632,41 +857,7 @@
       }
     }
 
-    function abrirModalPartida(juegoId, juegoNombre) {
-      document.getElementById('partidaJuegoId').value = juegoId;
-      document.getElementById('partidaJuegoNombre').innerText = juegoNombre;
-      document.getElementById('partidaParticipantes').value = currentUser.nombre || currentUser.nick;
-      document.getElementById('partidaGanador').value = '';
-      document.getElementById('modalPartida').classList.remove('hidden');
-    }
-
-    function cerrarModalPartida() {
-      document.getElementById('modalPartida').classList.add('hidden');
-    }
-
-    async function enviarRegistroPartida() {
-      const juego_id = document.getElementById('partidaJuegoId').value;
-      const participantes = document.getElementById('partidaParticipantes').value;
-      const ganador = document.getElementById('partidaGanador').value;
-
-      if (!participantes) return alert("Indica al menos un participante.");
-
-      try {
-        const res = await fetchSeguro(`/api/partidas`, {
-          method: 'POST',
-          body: JSON.stringify({ juego_id, participantes, ganador })
-        });
-        const json = await res.json();
-        if (json.error) throw new Error(json.error);
-
-        cerrarModalPartida();
-        alert("¡Partida registrada y estadísticas actualizadas!");
-        cargarJuegos();
-      } catch (err) {
-        alert(err.message);
-      }
-    }
-
+    // --- PANEL ADMIN ---
     async function abrirAdminPanel() {
       document.getElementById('modalAdmin').classList.remove('hidden');
       try {
@@ -740,6 +931,7 @@
 
     function cerrarAdminPanel() { document.getElementById('modalAdmin').classList.add('hidden'); }
 
+    // --- RENDERIZAR JUEGOS Y TARJETAS ---
     async function cargarJuegos() {
       try {
         const res = await fetchSeguro(`/api/juegos`); 
@@ -786,6 +978,7 @@
           const esFav = favoritosCache.includes(j.id);
           const fechaCreacionStr = j.fecha_creacion ? new Date(j.fecha_creacion).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }) : 'N/A';
           const ultimaPartidaStr = j.ultima_partida_fecha ? new Date(j.ultima_partida_fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Ninguna';
+          const tiempoMedioMin = j.tiempo_medio_segundos ? Math.round(j.tiempo_medio_segundos / 60) : 0;
           
           const puedeBorrar = currentUser.rol === 'ADMIN' || currentUser.id === j.creador_id;
 
@@ -815,6 +1008,7 @@
                   <div class="grid grid-cols-2 gap-1 text-[11px] text-slate-600 bg-slate-50 p-2 rounded-xl">
                     <span>👶 <b>Edad:</b> ${j.edad || 'N/A'}</span>
                     <span>👥 <b>Jugadores:</b> ${j.jugadores || 'N/A'}</span>
+                    ${tiempoMedioMin > 0 ? `<span class="col-span-2 text-amber-800">⏱️ <b>Tiempo medio/partida:</b> ~${tiempoMedioMin} min</span>` : ''}
                     <span class="col-span-2 text-indigo-900">👤 <b>Subido por:</b> @${j.creador_nick || 'Sistema'} (${fechaCreacionStr})</span>
                     <span class="col-span-2 text-emerald-800">🕒 <b>Última vez:</b> ${ultimaPartidaStr} ${j.ultima_partida_ganador ? `(🏆 ${j.ultima_partida_ganador})` : ''}</span>
                   </div>
@@ -825,7 +1019,7 @@
 
               <div class="p-4 pt-0 flex gap-2">
                 <button onclick="abrirModalPartida('${j.id}', '${j.nombre.replace(/'/g, "\\'")}')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs card-zoom">
-                  ¡Jugado Hoy!
+                  ¡Vamos a jugar!
                 </button>
                 ${puedeBorrar ? `
                 <button onclick="borrarJuego('${j.id}')" class="bg-rose-50 text-rose-600 hover:bg-rose-100 p-2 rounded-xl text-xs" title="Borrar juego">
@@ -860,7 +1054,7 @@
               </div>
               <div class="flex items-center gap-2 shrink-0">
                 <button onclick="abrirModalPartida('${j.id}', '${j.nombre.replace(/'/g, "\\'")}')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-3 py-1.5 rounded-lg text-xs card-zoom">
-                  +1 🎮
+                  ¡Vamos a jugar!
                 </button>
                 ${puedeBorrar ? `
                 <button onclick="borrarJuego('${j.id}')" class="bg-rose-50 text-rose-600 hover:bg-rose-100 p-2 rounded-lg text-xs" title="Borrar">
