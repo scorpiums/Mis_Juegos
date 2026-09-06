@@ -86,8 +86,8 @@
       <h1 class="text-xl font-bold tracking-wide">🎲 Mis Juegos</h1>
       <div class="flex items-center gap-2">
         <span id="userInfo" class="text-xs bg-indigo-700 px-2.5 py-1 rounded-full font-medium"></span>
-        <button id="btnAdminPanel" onclick="abrirAdminPanel()" class="hidden bg-amber-400 text-slate-900 font-bold text-xs px-2.5 py-1 rounded-full">⚙️ Admin</button>
-        <button onclick="cerrarSesion()" class="text-xs bg-indigo-800 hover:bg-indigo-900 px-2 py-1 rounded-lg">Salir</button>
+        <button id="btnAdminPanel" onclick="abrirAdminPanel()" class="hidden bg-amber-400 hover:bg-amber-500 text-slate-900 font-bold text-xs px-3 py-1.5 rounded-full shadow-md cursor-pointer card-zoom">⚙️ Admin</button>
+        <button onclick="cerrarSesion()" class="text-xs bg-indigo-800 hover:bg-indigo-900 px-2.5 py-1.5 rounded-lg">Salir</button>
       </div>
     </header>
 
@@ -124,8 +124,8 @@
   <div id="modalAdmin" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-md w-full p-5 space-y-4 shadow-xl max-h-[80vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b pb-2">
-        <h3 class="font-bold text-lg">⚙️ Gestión de Usuarios</h3>
-        <button onclick="cerrarAdminPanel()" class="text-slate-400 font-bold text-xl">✕</button>
+        <h3 class="font-bold text-lg text-slate-800">⚙️ Gestión de Usuarios</h3>
+        <button onclick="cerrarAdminPanel()" class="text-slate-400 hover:text-slate-600 font-bold text-xl px-2">✕</button>
       </div>
       <div id="listaUsuarios" class="space-y-2 text-sm"></div>
     </div>
@@ -275,7 +275,7 @@
         const json = await res.json();
         if (json.error) throw new Error(json.error);
 
-        alert(`Solicitud enviada.\n\nSimulación de Email a Admin:\nCódigo de activación: ${json.codigo_simulado}`);
+        alert(`Solicitud enviada.\n\nCódigo de activación: ${json.codigo_simulado}`);
         document.getElementById('registroForm').classList.add('hidden');
         document.getElementById('codigoForm').classList.remove('hidden');
       } catch (err) {
@@ -317,22 +317,31 @@
     // --- PANEL ADMIN ---
     async function abrirAdminPanel() {
       document.getElementById('modalAdmin').classList.remove('hidden');
-      const res = await fetch(`${WORKER_URL}/api/admin/usuarios`);
-      const usuarios = await res.json();
-      const cont = document.getElementById('listaUsuarios');
-      cont.innerHTML = '';
+      try {
+        const res = await fetch(`${WORKER_URL}/api/admin/usuarios`);
+        const usuarios = await res.json();
+        const cont = document.getElementById('listaUsuarios');
+        cont.innerHTML = '';
 
-      usuarios.forEach(u => {
-        cont.innerHTML += `
-          <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border">
-            <div>
-              <p class="font-bold text-slate-800">${u.nombre} <span class="text-xs text-slate-500">(@${u.nick})</span></p>
-              <p class="text-xs text-slate-500">Rol: ${u.rol} | Estado: <b class="${u.estado==='ACTIVO'?'text-emerald-600':'text-amber-600'}">${u.estado}</b></p>
+        if (!Array.isArray(usuarios) || usuarios.length === 0) {
+          cont.innerHTML = `<p class="text-center text-slate-400 py-4">No hay otros usuarios registrados.</p>`;
+          return;
+        }
+
+        usuarios.forEach(u => {
+          cont.innerHTML += `
+            <div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl border">
+              <div>
+                <p class="font-bold text-slate-800">${u.nombre} <span class="text-xs text-slate-500">(@${u.nick})</span></p>
+                <p class="text-xs text-slate-500">Rol: <b>${u.rol}</b> | Estado: <b class="${u.estado==='ACTIVO'?'text-emerald-600':'text-amber-600'}">${u.estado}</b></p>
+              </div>
+              ${u.rol !== 'ADMIN' ? `<button onclick="borrarUsuario('${u.id}')" class="text-xs bg-rose-100 hover:bg-rose-200 text-rose-600 p-2 rounded-lg font-bold">🗑️ Borrar</button>` : '<span class="text-xs text-slate-400 italic">Admin</span>'}
             </div>
-            ${u.rol !== 'ADMIN' ? `<button onclick="borrarUsuario('${u.id}')" class="text-xs bg-rose-100 text-rose-600 p-1.5 rounded-lg">🗑️</button>` : ''}
-          </div>
-        `;
-      });
+          `;
+        });
+      } catch (err) {
+        alert("Error cargando usuarios: " + err.message);
+      }
     }
 
     async function borrarUsuario(id) {
@@ -371,11 +380,15 @@
       }
 
       filtrados.forEach(j => {
+        // Compatibilidad de imagen (foto_url o foto_base64)
+        const imagenSrc = j.foto_url || j.foto_base64 || '';
+        const tieneImagen = imagenSrc && imagenSrc.trim().length > 0;
+
         grid.innerHTML += `
           <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between">
             <div>
               <div class="h-44 bg-slate-100 relative">
-                ${j.foto_url ? `<img src="${j.foto_url}" class="w-full h-full object-cover">` : '<div class="w-full h-full flex items-center justify-center text-slate-400">Sin Foto</div>'}
+                ${tieneImagen ? `<img src="${imagenSrc}" class="w-full h-full object-cover">` : '<div class="w-full h-full flex items-center justify-center text-slate-400">Sin Foto</div>'}
                 <span class="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-md backdrop-blur-md">${j.categoria}</span>
               </div>
               <div class="p-4 space-y-2">
@@ -512,8 +525,7 @@
     }
 
     async function registrarUso(juegoId) {
-      // Endpoint pendiente de crear en Worker para partidas. Sumaremos +1 localmente por ahora.
-      alert("Función de registro detallado en desarrollo.");
+      alert("Función de registro de uso en desarrollo.");
     }
 
     async function borrarJuego(id) {
