@@ -9,6 +9,12 @@
     .card-zoom { transition: transform 0.2s ease-in-out; }
     .card-zoom:active { transform: scale(0.97); }
     .scrollbar-none::-webkit-scrollbar { display: none; }
+    /* Estilo moderno gaming para el logotipo superior */
+    .logo-gaming {
+      font-family: 'Impact', sans-serif;
+      letter-spacing: -1px;
+      text-shadow: 2px 2px 0px #000, -1px -1px 0px #000, 1px -1px 0px #000, -1px 1px 0px #000;
+    }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen pb-20">
@@ -17,8 +23,11 @@
   <div id="authScreen" class="fixed inset-0 bg-indigo-900 z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4">
       <div class="text-center space-y-1">
-        <h2 class="text-2xl font-bold text-slate-800">🎲 Mis Juegos</h2>
-        <p class="text-xs text-slate-500" id="authSubtitulo">Inicia sesión para entrar a la colección</p>
+        <div class="flex justify-center items-center gap-2 mb-2">
+          <div class="w-10 h-10 bg-amber-400 rounded-xl border-2 border-black flex items-center justify-center shadow-md font-bold text-black">🎮</div>
+          <h2 class="text-2xl font-black text-indigo-900 tracking-tight">MIS JUEGOS</h2>
+        </div>
+        <p class="text-xs text-slate-500">Inicia sesión para entrar a la colección</p>
       </div>
 
       <!-- Formulario Login -->
@@ -81,37 +90,56 @@
 
   <!-- APLICACIÓN PRINCIPAL (Protegida) -->
   <div id="mainApp" class="hidden">
-    <!-- Encabezado -->
-    <header class="bg-indigo-600 text-white p-4 shadow-md sticky top-0 z-30 flex justify-between items-center">
-      <h1 class="text-xl font-bold tracking-wide">🎲 Mis Juegos</h1>
+    <!-- Encabezado Rediseñado Compacto para Móvil -->
+    <header class="bg-indigo-600 text-white px-3 py-2.5 shadow-md sticky top-0 z-30 flex justify-between items-center">
+      <!-- Logotipo moderno estilo gamer -->
       <div class="flex items-center gap-2">
-        <span id="userInfo" class="text-xs bg-indigo-700 px-2.5 py-1 rounded-full font-medium"></span>
-        <button id="btnAdminPanel" onclick="abrirAdminPanel()" class="hidden bg-amber-400 hover:bg-amber-500 text-slate-900 font-bold text-xs px-3 py-1.5 rounded-full shadow-md cursor-pointer card-zoom">⚙️ Admin</button>
-        <button onclick="cerrarSesion()" class="text-xs bg-indigo-800 hover:bg-indigo-900 px-2.5 py-1.5 rounded-lg">Salir</button>
+        <div class="w-9 h-9 bg-amber-400 rounded-lg border-2 border-black flex items-center justify-center shadow-md text-black font-black text-sm">🎮</div>
+        <div class="leading-tight">
+          <span class="text-amber-300 font-black text-base logo-gaming tracking-wider">MIS JUEGOS</span>
+          <span class="block text-[9px] text-indigo-200 uppercase font-semibold">Colección Familiar</span>
+        </div>
+      </div>
+
+      <!-- Zona de Usuario y Botones Compactos -->
+      <div class="flex items-center gap-1.5">
+        <div id="userBadgeContainer"></div>
+        <button onclick="cerrarSesion()" class="bg-indigo-800 hover:bg-indigo-900 text-indigo-100 p-2 rounded-lg text-sm transition" title="Cerrar Sesión">
+          ⏻
+        </button>
       </div>
     </header>
 
-    <!-- Barra de Filtros y Búsqueda -->
+    <!-- Barra de Búsqueda, Filtros y Selector de Vista -->
     <div class="p-4 max-w-4xl mx-auto space-y-3">
       <div class="flex gap-2">
-        <input type="text" id="searchInput" oninput="filtrarJuegos()" placeholder="🔍 Buscar por nombre..." class="w-full p-2.5 rounded-xl border border-slate-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-        <button onclick="seleccionarAleatorio()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-4 py-2.5 rounded-xl shadow-md flex items-center gap-1 whitespace-nowrap card-zoom">
+        <input type="text" id="searchInput" oninput="filtrarJuegos()" placeholder="🔍 Buscar por nombre..." class="w-full p-2.5 rounded-xl border border-slate-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+        <button onclick="seleccionarAleatorio()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-3.5 py-2.5 rounded-xl shadow-md flex items-center gap-1 whitespace-nowrap card-zoom text-sm">
           🎰 ¡Elegir!
         </button>
       </div>
       
-      <div class="flex gap-2 overflow-x-auto pb-1 text-sm scrollbar-none" id="categoriasFiltro">
-        <button onclick="filtrarCategoria('Todas', event)" class="cat-btn bg-indigo-600 text-white px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Todas</button>
-        <button onclick="filtrarCategoria('Juego de Mesa', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Juegos de Mesa</button>
-        <button onclick="filtrarCategoria('Construcción', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Construcción</button>
-        <button onclick="filtrarCategoria('Exterior', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Exterior</button>
-        <button onclick="filtrarCategoria('Consola', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Consola</button>
+      <div class="flex justify-between items-center gap-2">
+        <!-- Filtros por categoría -->
+        <div class="flex gap-1.5 overflow-x-auto pb-1 text-xs scrollbar-none flex-grow" id="categoriasFiltro">
+          <button onclick="filtrarCategoria('Todas', event)" class="cat-btn bg-indigo-600 text-white px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Todas</button>
+          <button onclick="filtrarCategoria('Juego de Mesa', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Mesa</button>
+          <button onclick="filtrarCategoria('Construcción', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Construcción</button>
+          <button onclick="filtrarCategoria('Exterior', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Exterior</button>
+          <button onclick="filtrarCategoria('Consola', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Consola</button>
+        </div>
+
+        <!-- Conmutador de Vista (Cuadrícula vs Compacto) -->
+        <div class="flex bg-slate-200 p-1 rounded-xl shrink-0">
+          <button onclick="cambiarVista('grid')" id="btnGrid" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-indigo-600 shadow-sm transition">⊞</button>
+          <button onclick="cambiarVista('compact')" id="btnCompact" class="px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 transition">☰</button>
+        </div>
       </div>
     </div>
 
-    <!-- Contenedor Principal de Tarjetas -->
-    <main class="p-4 max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-4" id="gridJuegos">
-      <div class="col-span-full text-center py-10 text-slate-400">Cargando colección desde la nube...</div>
+    <!-- Contenedor Principal de Tarjetas / Lista -->
+    <main class="p-4 max-w-4xl mx-auto" id="mainContainer">
+      <div class="text-center py-10 text-slate-400">Cargando colección desde la nube...</div>
     </main>
 
     <!-- Botón Flotante Añadir -->
@@ -140,7 +168,7 @@
       </div>
 
       <div class="space-y-2">
-        <div id="imagePreview" class="w-full h-40 bg-slate-100 rounded-xl flex items-center justify-center border-2 border-dashed border-slate-300 overflow-hidden relative">
+        <div id="imagePreview" class="w-full h-40 bg-slate-900 rounded-xl flex items-center justify-center border-2 border-dashed border-slate-300 overflow-hidden relative">
           <span class="text-slate-400 text-sm">Sin fotografía</span>
         </div>
 
@@ -214,28 +242,23 @@
     const WORKER_URL = "https://backend-juegos.pabgartov.workers.dev";
     let juegosCache = [];
     let categoriaActual = 'Todas';
+    let vistaActual = 'grid'; // 'grid' o 'compact'
     let currentUser = null;
 
-    // --- FUNCIÓN NÚCLEO DE SEGURIDAD ---
     async function fetchSeguro(ruta, opciones = {}) {
       const token = localStorage.getItem('auth_token');
-      
       const headers = {
         'Content-Type': 'application/json',
         ...(token ? { 'Authorization': `Bearer ${token}` } : {})
       };
-
       const res = await fetch(`${WORKER_URL}${ruta}`, { ...opciones, headers });
-      
       if (res.status === 401 || res.status === 403) {
         cerrarSesion();
-        throw new Error("Sesión caducada o acceso denegado. Vuelve a iniciar sesión.");
+        throw new Error("Sesión caducada o acceso denegado.");
       }
-      
       return res;
     }
 
-    // --- LÓGICA DE AUTENTICACIÓN ---
     window.onload = () => {
       const savedUser = localStorage.getItem('session_user');
       const savedToken = localStorage.getItem('auth_token');
@@ -248,10 +271,23 @@
     function iniciarApp() {
       document.getElementById('authScreen').classList.add('hidden');
       document.getElementById('mainApp').classList.remove('hidden');
-      document.getElementById('userInfo').innerText = `${currentUser.nick} (${currentUser.rol})`;
+      
+      // Renderizar el bloque de usuario de forma limpia y integrada
+      const userContainer = document.getElementById('userBadgeContainer');
       if (currentUser.rol === 'ADMIN') {
-        document.getElementById('btnAdminPanel').classList.remove('hidden');
+        userContainer.innerHTML = `
+          <button onclick="abrirAdminPanel()" class="bg-amber-400 hover:bg-amber-500 text-slate-900 font-bold text-xs px-2.5 py-1.5 rounded-lg shadow-sm flex items-center gap-1 transition card-zoom" title="Abrir panel de administración">
+            ⚙️ <span class="underline">${currentUser.nick}</span> <span class="text-[10px] bg-black/10 px-1 rounded">ADMIN</span>
+          </button>
+        `;
+      } else {
+        userContainer.innerHTML = `
+          <span class="text-xs bg-indigo-700 px-2.5 py-1.5 rounded-lg font-medium text-indigo-100">
+            👤 ${currentUser.nick}
+          </span>
+        `;
       }
+
       cargarJuegos();
     }
 
@@ -296,7 +332,7 @@
         const json = await res.json();
         if (json.error) throw new Error(json.error);
 
-        alert(`Solicitud enviada.\n\nCódigo de activación simulado: ${json.codigo_simulado}`);
+        alert(`Solicitud enviada.\n\nCódigo de activación: ${json.codigo_simulado}`);
         document.getElementById('registroForm').classList.add('hidden');
         document.getElementById('codigoForm').classList.remove('hidden');
       } catch (err) {
@@ -336,7 +372,6 @@
       location.reload();
     }
 
-    // --- PANEL ADMIN ---
     async function abrirAdminPanel() {
       document.getElementById('modalAdmin').classList.remove('hidden');
       try {
@@ -374,21 +409,27 @@
 
     function cerrarAdminPanel() { document.getElementById('modalAdmin').classList.add('hidden'); }
 
-    // --- LÓGICA DE JUEGOS ---
     async function cargarJuegos() {
       try {
         const res = await fetchSeguro(`/api/juegos`); 
         juegosCache = await res.json();
         renderizarTarjetas();
       } catch (err) {
-        document.getElementById('gridJuegos').innerHTML = `<div class="col-span-full text-center py-10 text-rose-500">${err.message}</div>`;
+        document.getElementById('mainContainer').innerHTML = `<div class="text-center py-10 text-rose-500">${err.message}</div>`;
       }
     }
 
+    function cambiarVista(tipo) {
+      vistaActual = tipo;
+      document.getElementById('btnGrid').className = tipo === 'grid' ? 'px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-indigo-600 shadow-sm transition' : 'px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 transition';
+      document.getElementById('btnCompact').className = tipo === 'compact' ? 'px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-indigo-600 shadow-sm transition' : 'px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 transition';
+      renderizarTarjetas();
+    }
+
     function renderizarTarjetas() {
-      const grid = document.getElementById('gridJuegos');
+      const container = document.getElementById('mainContainer');
       const search = document.getElementById('searchInput').value.toLowerCase();
-      grid.innerHTML = '';
+      container.innerHTML = '';
 
       const filtrados = juegosCache.filter(j => {
         const coincideCat = categoriaActual === 'Todas' || j.categoria === categoriaActual;
@@ -397,46 +438,89 @@
       });
 
       if (filtrados.length === 0) {
-        grid.innerHTML = `<div class="col-span-full text-center py-10 text-slate-400">Colección vacía o sin resultados.</div>`;
+        container.innerHTML = `<div class="text-center py-10 text-slate-400">Colección vacía o sin resultados.</div>`;
         return;
       }
 
-      filtrados.forEach(j => {
-        const imagenSrc = j.foto_url || j.foto_base64 || '';
-        const tieneImagen = imagenSrc && imagenSrc.trim().length > 0;
+      if (vistaActual === 'grid') {
+        // VISTA CUADRÍCULA (Con fondo inteligente adaptado para fotos verticales)
+        let gridHTML = '<div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="gridJuegos">';
+        filtrados.forEach(j => {
+          const imagenSrc = j.foto_url || j.foto_base64 || '';
+          const tieneImagen = imagenSrc && imagenSrc.trim().length > 0;
 
-        grid.innerHTML += `
-          <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between">
-            <div>
-              <div class="h-44 bg-slate-100 relative">
-                ${tieneImagen ? `<img src="${imagenSrc}" class="w-full h-full object-cover">` : '<div class="w-full h-full flex items-center justify-center text-slate-400">Sin Foto</div>'}
-                <span class="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-md backdrop-blur-md">${j.categoria}</span>
+          gridHTML += `
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between">
+              <div>
+                <!-- Contenedor con fondo oscuro difuminado para que las fotos verticales u horizontales encajen sin recortes forzados -->
+                <div class="h-52 bg-slate-900 relative flex items-center justify-center overflow-hidden">
+                  ${tieneImagen ? `
+                    <div class="absolute inset-0 bg-cover bg-center filter blur-md opacity-40 scale-110" style="background-image: url('${imagenSrc}')"></div>
+                    <img src="${imagenSrc}" class="w-full h-full object-contain relative z-10 p-1">
+                  ` : '<div class="text-slate-400 text-xs">Sin Foto</div>'}
+                  <span class="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded-md backdrop-blur-md z-20">${j.categoria}</span>
+                </div>
+                <div class="p-4 space-y-2">
+                  <div class="flex justify-between items-start">
+                    <h4 class="font-bold text-lg text-slate-800 leading-tight">${j.nombre}</h4>
+                    <span class="text-xs bg-indigo-50 text-indigo-700 font-bold px-2 py-1 rounded-lg shrink-0">🎮 ${j.veces_jugado || 0}</span>
+                  </div>
+                  <p class="text-xs text-slate-500">📍 <b>Ubicación:</b> ${j.ubicacion || 'Sin especificar'}</p>
+                  <div class="flex gap-3 text-xs text-slate-600">
+                    <span>👶 ${j.edad || 'N/A'}</span>
+                    <span>👥 ${j.jugadores || 'N/A'}</span>
+                  </div>
+                  ${j.instrucciones ? `<details class="text-xs text-slate-600 bg-slate-50 p-2 rounded-lg"><summary class="font-bold cursor-pointer">Ver Reglas</summary><p class="mt-1">${j.instrucciones}</p></details>` : ''}
+                </div>
               </div>
-              <div class="p-4 space-y-2">
-                <div class="flex justify-between items-start">
-                  <h4 class="font-bold text-lg text-slate-800">${j.nombre}</h4>
-                  <span class="text-xs bg-indigo-50 text-indigo-700 font-bold px-2 py-1 rounded-lg">🎮 ${j.veces_jugado || 0} usos</span>
-                </div>
-                <p class="text-xs text-slate-500">📍 <b>Ubicación:</b> ${j.ubicacion || 'Sin especificar'}</p>
-                <div class="flex gap-3 text-xs text-slate-600">
-                  <span>👶 ${j.edad || 'N/A'}</span>
-                  <span>👥 ${j.jugadores || 'N/A'}</span>
-                </div>
-                ${j.instrucciones ? `<details class="text-xs text-slate-600 bg-slate-50 p-2 rounded-lg"><summary class="font-bold cursor-pointer">Ver Reglas</summary><p class="mt-1">${j.instrucciones}</p></details>` : ''}
+              <div class="p-4 pt-0 flex gap-2">
+                <button onclick="registrarUso('${j.id}')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs card-zoom">
+                  ¡Jugado Hoy!
+                </button>
+                ${currentUser && currentUser.rol === 'ADMIN' ? `
+                <button onclick="borrarJuego('${j.id}')" class="bg-rose-50 text-rose-600 hover:bg-rose-100 p-2 rounded-xl text-xs" title="Borrar juego">
+                  🗑️
+                </button>` : ''}
               </div>
             </div>
-            <div class="p-4 pt-0 flex gap-2">
-              <button onclick="registrarUso('${j.id}')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs card-zoom">
-                ¡Jugado Hoy!
-              </button>
-              ${currentUser && currentUser.rol === 'ADMIN' ? `
-              <button onclick="borrarJuego('${j.id}')" class="bg-rose-50 text-rose-600 hover:bg-rose-100 p-2 rounded-xl text-xs">
-                🗑️
-              </button>` : ''}
+          `;
+        });
+        gridHTML += '</div>';
+        container.innerHTML = gridHTML;
+
+      } else {
+        // VISTA COMPACTA (Lista densa para ver muchos juegos de un vistazo)
+        let listHTML = '<div class="space-y-2 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden divide-y divide-slate-100">';
+        filtrados.forEach(j => {
+          const imagenSrc = j.foto_url || j.foto_base64 || '';
+          const tieneImagen = imagenSrc && imagenSrc.trim().length > 0;
+
+          listHTML += `
+            <div class="p-3 flex items-center justify-between gap-3 hover:bg-slate-50 transition">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-12 h-12 bg-slate-900 rounded-xl overflow-hidden shrink-0 flex items-center justify-center relative">
+                  ${tieneImagen ? `<img src="${imagenSrc}" class="w-full h-full object-cover">` : '<span class="text-[10px] text-slate-400">Foto</span>'}
+                </div>
+                <div class="min-w-0">
+                  <h4 class="font-bold text-slate-800 text-sm truncate">${j.nombre}</h4>
+                  <p class="text-[11px] text-slate-500 truncate">📍 ${j.ubicacion || 'Sin sitio'} • <span class="text-indigo-600 font-semibold">${j.categoria}</span></p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 shrink-0">
+                <button onclick="registrarUso('${j.id}')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-3 py-1.5 rounded-lg text-xs card-zoom">
+                  +1 🎮
+                </button>
+                ${currentUser && currentUser.rol === 'ADMIN' ? `
+                <button onclick="borrarJuego('${j.id}')" class="bg-rose-50 text-rose-600 hover:bg-rose-100 p-2 rounded-lg text-xs" title="Borrar">
+                  🗑️
+                </button>` : ''}
+              </div>
             </div>
-          </div>
-        `;
-      });
+          `;
+        });
+        listHTML += '</div>';
+        container.innerHTML = listHTML;
+      }
     }
 
     function procesarFoto(event) {
@@ -466,7 +550,7 @@
           const resizedBase64 = canvas.toDataURL('image/jpeg', 0.75);
 
           document.getElementById('juegoFotoBase64').value = resizedBase64;
-          document.getElementById('imagePreview').innerHTML = `<img src="${resizedBase64}" class="w-full h-full object-cover">`;
+          document.getElementById('imagePreview').innerHTML = `<img src="${resizedBase64}" class="w-full h-full object-contain">`;
           document.getElementById('btnIA').classList.remove('hidden');
         };
         img.src = e.target.result;
