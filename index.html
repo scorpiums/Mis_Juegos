@@ -177,6 +177,10 @@
             <input type="text" id="perfilNombre" required class="w-full p-2.5 border rounded-xl outline-none text-sm">
           </div>
           <div>
+            <label class="text-xs font-bold text-slate-500 uppercase">Nick de Usuario</label>
+            <input type="text" id="perfilNick" required class="w-full p-2.5 border rounded-xl outline-none text-sm">
+          </div>
+          <div>
             <label class="text-xs font-bold text-slate-500 uppercase">Bio / Datos Personales</label>
             <textarea id="perfilBio" rows="2" placeholder="Escribe algo sobre ti..." class="w-full p-2 border rounded-xl outline-none text-sm"></textarea>
           </div>
@@ -488,6 +492,7 @@
         const perfil = await res.json();
         
         document.getElementById('perfilNombre').value = perfil.nombre || '';
+        document.getElementById('perfilNick').value = perfil.nick || '';
         document.getElementById('perfilBio').value = perfil.bio || '';
         document.getElementById('perfilAvatarBase64').value = perfil.avatar_base64 || '';
 
@@ -593,6 +598,7 @@
     async function guardarPerfil(e) {
       e.preventDefault();
       const nombre = document.getElementById('perfilNombre').value;
+      const nick = document.getElementById('perfilNick').value;
       const bio = document.getElementById('perfilBio').value;
       const avatar_base64 = document.getElementById('perfilAvatarBase64').value;
       const passActual = document.getElementById('passActual').value;
@@ -611,7 +617,7 @@
 
         const res = await fetchSeguro(`/api/usuario/perfil`, {
           method: 'PUT',
-          body: JSON.stringify({ nombre, bio, avatar_base64 })
+          body: JSON.stringify({ nombre, nick, bio, avatar_base64 })
         });
         const json = await res.json();
         if (json.error) throw new Error(json.error);
