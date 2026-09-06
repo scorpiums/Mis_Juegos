@@ -163,14 +163,12 @@
         </button>
       </div>
 
-      <!-- Navegación por pestañas del perfil -->
       <div class="flex bg-slate-100 p-1 rounded-xl text-xs font-bold text-slate-600">
         <button onclick="cambiarTabPerfil('datos')" id="tabDatosBtn" class="flex-1 py-2 rounded-lg bg-white text-indigo-700 shadow-sm transition">Mis Datos</button>
         <button onclick="cambiarTabPerfil('juegos')" id="tabJuegosBtn" class="flex-1 py-2 rounded-lg transition">Juegos Añadidos</button>
         <button onclick="cambiarTabPerfil('historial')" id="tabHistorialBtn" class="flex-1 py-2 rounded-lg transition">Historial Partidas</button>
       </div>
 
-      <!-- Contenido Solapa 1: Datos y Contraseña -->
       <div id="tabDatosContent" class="space-y-3">
         <form id="perfilForm" onsubmit="guardarPerfil(event)" class="space-y-3">
           <input type="hidden" id="perfilAvatarBase64">
@@ -197,19 +195,17 @@
         <div id="adminBotonContainer" class="pt-2"></div>
       </div>
 
-      <!-- Contenido Solapa 2: Juegos Añadidos por el usuario -->
       <div id="tabJuegosContent" class="space-y-2 hidden max-h-60 overflow-y-auto">
         <div id="misJuegosLista" class="space-y-2 text-xs"></div>
       </div>
 
-      <!-- Contenido Solapa 3: Historial de Partidas -->
       <div id="tabHistorialContent" class="space-y-2 hidden max-h-60 overflow-y-auto">
         <div id="miHistorialLista" class="space-y-2 text-xs"></div>
       </div>
     </div>
   </div>
 
-  <!-- MODAL REGISTRO DE PARTIDA ("¡JUGADO HOY!") -->
+  <!-- MODAL REGISTRO DE PARTIDA -->
   <div id="modalPartida" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-sm w-full p-5 space-y-4 shadow-xl">
       <div class="flex justify-between items-center border-b pb-2">
@@ -484,7 +480,6 @@
       location.reload();
     }
 
-    // --- PERFIL Y PESTAÑAS DE ACTIVIDAD ---
     async function abrirPerfilModal() {
       document.getElementById('modalPerfil').classList.remove('hidden');
       cambiarTabPerfil('datos');
@@ -503,7 +498,6 @@
           preview.innerHTML = `<span class="text-slate-400 text-xs">Sin Foto</span>`;
         }
 
-        // Renderizar Mis Juegos Añadidos
         const misJuegosCont = document.getElementById('misJuegosLista');
         misJuegosCont.innerHTML = '';
         if (perfil.misJuegos && perfil.misJuegos.length > 0) {
@@ -514,15 +508,14 @@
                   <p class="font-bold text-slate-800">${j.nombre}</p>
                   <p class="text-[10px] text-slate-500">📍 ${j.ubicacion || 'Sin ubícación'} • 🕹️ ${j.categoria}</p>
                 </div>
-                <span class="bg-indigo-50 text-indigo-700 font-semibold px-2 py-1 rounded">Añadido</span>
+                <span class="bg-indigo-50 text-indigo-700 font-semibold px-2 py-1 rounded">Subido</span>
               </div>
             `;
           });
         } else {
-          misJuegosCont.innerHTML = `<p class="text-center text-slate-400 py-4">Aún no has añadido ningún juego.</p>`;
+          misJuegosCont.innerHTML = `<p class="text-center text-slate-400 py-4">Aún no has subido ningún juego.</p>`;
         }
 
-        // Renderizar Historial de Partidas
         const historialCont = document.getElementById('miHistorialLista');
         historialCont.innerHTML = '';
         if (perfil.misPartidas && perfil.misPartidas.length > 0) {
@@ -633,7 +626,6 @@
       }
     }
 
-    // --- REGISTRO DE PARTIDA ---
     function abrirModalPartida(juegoId, juegoNombre) {
       document.getElementById('partidaJuegoId').value = juegoId;
       document.getElementById('partidaJuegoNombre').innerText = juegoNombre;
@@ -669,7 +661,6 @@
       }
     }
 
-    // --- PANEL ADMIN ---
     async function abrirAdminPanel() {
       document.getElementById('modalAdmin').classList.remove('hidden');
       try {
@@ -743,7 +734,6 @@
 
     function cerrarAdminPanel() { document.getElementById('modalAdmin').classList.add('hidden'); }
 
-    // --- JUEGOS Y TARJETAS CON AUDITORÍA ---
     async function cargarJuegos() {
       try {
         const res = await fetchSeguro(`/api/juegos`); 
@@ -819,7 +809,7 @@
                   <div class="grid grid-cols-2 gap-1 text-[11px] text-slate-600 bg-slate-50 p-2 rounded-xl">
                     <span>👶 <b>Edad:</b> ${j.edad || 'N/A'}</span>
                     <span>👥 <b>Jugadores:</b> ${j.jugadores || 'N/A'}</span>
-                    <span class="col-span-2 text-indigo-900">👤 <b>Añadido por:</b> @${j.creador_nick || 'Sistema'} (${fechaCreacionStr})</span>
+                    <span class="col-span-2 text-indigo-900">👤 <b>Subido por:</b> @${j.creador_nick || 'Sistema'} (${fechaCreacionStr})</span>
                     <span class="col-span-2 text-emerald-800">🕒 <b>Última vez:</b> ${ultimaPartidaStr} ${j.ultima_partida_ganador ? `(🏆 ${j.ultima_partida_ganador})` : ''}</span>
                   </div>
 
