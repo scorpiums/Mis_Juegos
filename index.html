@@ -9,7 +9,6 @@
     .card-zoom { transition: transform 0.2s ease-in-out; }
     .card-zoom:active { transform: scale(0.97); }
     .scrollbar-none::-webkit-scrollbar { display: none; }
-    /* Estilo moderno gaming para el logotipo superior */
     .logo-gaming {
       font-family: 'Impact', sans-serif;
       letter-spacing: -1px;
@@ -90,21 +89,21 @@
 
   <!-- APLICACIÓN PRINCIPAL (Protegida) -->
   <div id="mainApp" class="hidden">
-    <!-- Encabezado Rediseñado Compacto para Móvil -->
-    <header class="bg-indigo-600 text-white px-3 py-2.5 shadow-md sticky top-0 z-30 flex justify-between items-center">
-      <!-- Logotipo moderno estilo gamer -->
-      <div class="flex items-center gap-2">
-        <div class="w-9 h-9 bg-amber-400 rounded-lg border-2 border-black flex items-center justify-center shadow-md text-black font-black text-sm">🎮</div>
+    <!-- Encabezado Reestructurado para Evitar Solapamientos en Móvil -->
+    <header class="bg-indigo-600 text-white px-3 py-2.5 shadow-md sticky top-0 z-30 flex justify-between items-center gap-2">
+      <!-- Logotipo -->
+      <div class="flex items-center gap-2 shrink-0">
+        <div class="w-8 h-8 sm:w-9 sm:h-9 bg-amber-400 rounded-lg border-2 border-black flex items-center justify-center shadow-md text-black font-black text-sm">🎮</div>
         <div class="leading-tight">
-          <span class="text-amber-300 font-black text-base logo-gaming tracking-wider">MIS JUEGOS</span>
-          <span class="block text-[9px] text-indigo-200 uppercase font-semibold">Colección Familiar</span>
+          <span class="text-amber-300 font-black text-sm sm:text-base logo-gaming tracking-wider">MIS JUEGOS</span>
+          <span class="block text-[8px] sm:text-[9px] text-indigo-200 uppercase font-semibold">Colección Familiar</span>
         </div>
       </div>
 
-      <!-- Zona de Usuario y Botones Compactos -->
-      <div class="flex items-center gap-1.5">
+      <!-- Zona de Usuario y Botón Apagar Optimizados -->
+      <div class="flex items-center gap-1.5 shrink-0">
         <div id="userBadgeContainer"></div>
-        <button onclick="cerrarSesion()" class="bg-indigo-800 hover:bg-indigo-900 text-indigo-100 p-2 rounded-lg text-sm transition" title="Cerrar Sesión">
+        <button onclick="cerrarSesion()" class="bg-indigo-800 hover:bg-indigo-900 text-rose-300 hover:text-rose-200 p-2 sm:p-2.5 rounded-lg text-sm font-bold transition flex items-center justify-center shadow-sm" title="Cerrar Sesión">
           ⏻
         </button>
       </div>
@@ -242,7 +241,7 @@
     const WORKER_URL = "https://backend-juegos.pabgartov.workers.dev";
     let juegosCache = [];
     let categoriaActual = 'Todas';
-    let vistaActual = 'grid'; // 'grid' o 'compact'
+    let vistaActual = 'grid'; 
     let currentUser = null;
 
     async function fetchSeguro(ruta, opciones = {}) {
@@ -272,17 +271,16 @@
       document.getElementById('authScreen').classList.add('hidden');
       document.getElementById('mainApp').classList.remove('hidden');
       
-      // Renderizar el bloque de usuario de forma limpia y integrada
       const userContainer = document.getElementById('userBadgeContainer');
       if (currentUser.rol === 'ADMIN') {
         userContainer.innerHTML = `
-          <button onclick="abrirAdminPanel()" class="bg-amber-400 hover:bg-amber-500 text-slate-900 font-bold text-xs px-2.5 py-1.5 rounded-lg shadow-sm flex items-center gap-1 transition card-zoom" title="Abrir panel de administración">
-            ⚙️ <span class="underline">${currentUser.nick}</span> <span class="text-[10px] bg-black/10 px-1 rounded">ADMIN</span>
+          <button onclick="abrirAdminPanel()" class="bg-amber-400 hover:bg-amber-500 text-slate-900 font-bold text-[11px] sm:text-xs px-2 py-1.5 rounded-lg shadow-sm flex items-center gap-1 transition card-zoom truncate max-w-[120px] sm:max-w-none" title="Abrir panel de administración">
+            ⚙️ <span class="truncate">${currentUser.nick}</span> <span class="text-[9px] bg-black/10 px-1 rounded uppercase">Admin</span>
           </button>
         `;
       } else {
         userContainer.innerHTML = `
-          <span class="text-xs bg-indigo-700 px-2.5 py-1.5 rounded-lg font-medium text-indigo-100">
+          <span class="text-[11px] sm:text-xs bg-indigo-700 px-2 py-1.5 rounded-lg font-medium text-indigo-100 truncate max-w-[100px] sm:max-w-none">
             👤 ${currentUser.nick}
           </span>
         `;
@@ -443,7 +441,6 @@
       }
 
       if (vistaActual === 'grid') {
-        // VISTA CUADRÍCULA (Con fondo inteligente adaptado para fotos verticales)
         let gridHTML = '<div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="gridJuegos">';
         filtrados.forEach(j => {
           const imagenSrc = j.foto_url || j.foto_base64 || '';
@@ -452,7 +449,6 @@
           gridHTML += `
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between">
               <div>
-                <!-- Contenedor con fondo oscuro difuminado para que las fotos verticales u horizontales encajen sin recortes forzados -->
                 <div class="h-52 bg-slate-900 relative flex items-center justify-center overflow-hidden">
                   ${tieneImagen ? `
                     <div class="absolute inset-0 bg-cover bg-center filter blur-md opacity-40 scale-110" style="background-image: url('${imagenSrc}')"></div>
@@ -489,7 +485,6 @@
         container.innerHTML = gridHTML;
 
       } else {
-        // VISTA COMPACTA (Lista densa para ver muchos juegos de un vistazo)
         let listHTML = '<div class="space-y-2 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden divide-y divide-slate-100">';
         filtrados.forEach(j => {
           const imagenSrc = j.foto_url || j.foto_base64 || '';
