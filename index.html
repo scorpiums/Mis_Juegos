@@ -115,12 +115,12 @@
       
       <div class="flex justify-between items-center gap-2">
         <div class="flex gap-1.5 overflow-x-auto pb-1 text-xs scrollbar-none flex-grow" id="categoriasFiltro">
-          <button onclick="filtrarCategoria('Todas', event)" class="cat-btn bg-indigo-600 text-white px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Todas</button>
-          <button onclick="filtrarCategoria('Favoritos', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">❤️ Favoritos</button>
-          <button onclick="filtrarCategoria('Juego de Mesa', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Mesa</button>
-          <button onclick="filtrarCategoria('Construcción', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Construcción</button>
-          <button onclick="filtrarCategoria('Exterior', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Exterior</button>
-          <button onclick="filtrarCategoria('Consola', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap">Consola</button>
+          <button onclick="filtrarCategoria('Todas', event)" class="cat-btn bg-indigo-600 text-white px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition">Todas</button>
+          <button onclick="filtrarCategoria('Favoritos', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition">❤️ Favoritos</button>
+          <button onclick="filtrarCategoria('Juego de Mesa', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition">Mesa</button>
+          <button onclick="filtrarCategoria('Construcción', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition">Construcción</button>
+          <button onclick="filtrarCategoria('Exterior', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition">Exterior</button>
+          <button onclick="filtrarCategoria('Consola', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition">Consola</button>
         </div>
 
         <div class="flex bg-slate-200 p-1 rounded-xl shrink-0">
@@ -160,24 +160,20 @@
         </button>
       </div>
 
-      <!-- Pestañas ordenadas: Historial, Juegos, Mis Datos (con ancho adaptable) -->
       <div class="flex bg-slate-100 p-1 rounded-xl text-xs font-bold text-slate-600 justify-center gap-1">
         <button onclick="cambiarTabPerfil('historial')" id="tabHistorialBtn" class="px-4 py-2 rounded-lg bg-white text-indigo-700 shadow-sm transition">Historial Partidas</button>
         <button onclick="cambiarTabPerfil('juegos')" id="tabJuegosBtn" class="px-4 py-2 rounded-lg transition">Juegos Añadidos</button>
         <button onclick="cambiarTabPerfil('datos')" id="tabDatosBtn" class="px-4 py-2 rounded-lg transition">Mis Datos</button>
       </div>
 
-      <!-- Contenido Solapa 1: Historial Partidas -->
       <div id="tabHistorialContent" class="space-y-2 max-h-60 overflow-y-auto">
         <div id="miHistorialLista" class="space-y-2 text-xs"></div>
       </div>
 
-      <!-- Contenido Solapa 2: Juegos Añadidos -->
       <div id="tabJuegosContent" class="space-y-2 hidden max-h-60 overflow-y-auto">
         <div id="misJuegosLista" class="space-y-2 text-xs"></div>
       </div>
 
-      <!-- Contenido Solapa 3: Mis Datos -->
       <div id="tabDatosContent" class="space-y-3 hidden">
         <form id="perfilForm" onsubmit="guardarPerfil(event)" class="space-y-3">
           <input type="hidden" id="perfilAvatarBase64">
@@ -530,7 +526,7 @@
       location.reload();
     }
 
-    // --- PERFIL Y PESTAÑAS (Ordenadas: Historial, Juegos, Mis Datos) ---
+    // --- PERFIL Y PESTAÑAS ---
     async function abrirPerfilModal() {
       document.getElementById('modalPerfil').classList.remove('hidden');
       cambiarTabPerfil('historial');
@@ -562,7 +558,6 @@
           preview.innerHTML = `<span class="text-slate-400 text-xs">Sin Foto</span>`;
         }
 
-        // Juegos Añadidos
         const misJuegosCont = document.getElementById('misJuegosLista');
         misJuegosCont.innerHTML = '';
         if (perfil.misJuegos && perfil.misJuegos.length > 0) {
@@ -581,22 +576,32 @@
           misJuegosCont.innerHTML = `<p class="text-center text-slate-400 py-4">Aún no has subido ningún juego.</p>`;
         }
 
-        // Historial Partidas Global (participante)
         const historialCont = document.getElementById('miHistorialLista');
         historialCont.innerHTML = '';
         if (perfil.misPartidas && perfil.misPartidas.length > 0) {
           perfil.misPartidas.forEach(p => {
             const fechaFormateada = new Date(p.fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-            const duracionMin = p.duracion_total_segundos ? Math.round(p.duracion_total_segundos / 60) : 0;
+            
+            let duracionTexto = '';
+            if (p.duracion_total_segundos && p.duracion_total_segundos > 0) {
+              const mins = Math.floor(p.duracion_total_segundos / 60);
+              const secs = p.duracion_total_segundos % 60;
+              if (mins > 0) {
+                duracionTexto = `<p class="text-[10px] text-slate-500">⏱️ Duración: ~${mins} min${secs > 0 ? ` ${secs} seg` : ''}</p>`;
+              } else {
+                duracionTexto = `<p class="text-[10px] text-slate-500">⏱️ Duración: ~${secs} seg</p>`;
+              }
+            }
+
             historialCont.innerHTML += `
               <div class="bg-slate-50 p-2.5 rounded-xl border space-y-1">
                 <div class="flex justify-between items-center">
                   <span class="font-bold text-indigo-700">${p.juego_nombre} (${p.num_partidas || 1} part.)</span>
                   <span class="text-[10px] text-slate-400">${fechaFormateada}</span>
                 </div>
-                <p class="text-[11px] text-slate-600">👥 <b>Jugadores:</b> ${p.participantes}</p>
+                <p class="text-[11px] text-slate-600">👥 <b>Participantes:</b> ${p.participantes}</p>
                 <p class="text-[11px] text-emerald-700 font-bold">🏆 ${p.ganador}</p>
-                ${duracionMin > 0 ? `<p class="text-[10px] text-slate-500">⏱️ Duración: ~${duracionMin} min</p>` : ''}
+                ${duracionTexto}
               </div>
             `;
           });
@@ -706,7 +711,7 @@
         const contenedor = document.getElementById('checkboxesJugadores');
         contenedor.innerHTML = '';
         jugadoresDisponiblesCache.forEach(j => {
-          const marcado = (j === currentUser.nombre || j === currentUser.nick) ? 'checked' : '';
+          const marcado = (j === currentUser.nick) ? 'checked' : '';
           contenedor.innerHTML += `
             <label class="flex items-center gap-2 p-1.5 bg-white rounded-lg border cursor-pointer hover:bg-slate-100">
               <input type="checkbox" name="jugadorCheck" value="${j}" ${marcado} class="rounded text-indigo-600">
@@ -720,7 +725,7 @@
     }
 
     async function abrirPromptInvitado() {
-      const nombreInv = prompt("Introduce el nombre del nuevo jugador invitado:");
+      const nombreInv = prompt("Introduce el nick o nombre del nuevo jugador invitado:");
       if (!nombreInv || !nombreInv.trim()) return;
 
       try {
@@ -975,7 +980,17 @@
           const esFav = favoritosCache.includes(j.id);
           const fechaCreacionStr = j.fecha_creacion ? new Date(j.fecha_creacion).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }) : 'N/A';
           const ultimaPartidaStr = j.ultima_partida_fecha ? new Date(j.ultima_partida_fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Ninguna';
-          const tiempoMedioMin = j.tiempo_medio_segundos ? Math.round(j.tiempo_medio_segundos / 60) : 0;
+          
+          let tiempoMedioTexto = '';
+          if (j.tiempo_medio_segundos && j.tiempo_medio_segundos > 0) {
+            const mins = Math.floor(j.tiempo_medio_segundos / 60);
+            const secs = j.tiempo_medio_segundos % 60;
+            if (mins > 0) {
+              tiempoMedioTexto = `<span class="col-span-2 text-amber-800">⏱️ <b>Tiempo medio/partida:</b> ~${mins} min${secs > 0 ? ` ${secs} seg` : ''}</span>`;
+            } else {
+              tiempoMedioTexto = `<span class="col-span-2 text-amber-800">⏱️ <b>Tiempo medio/partida:</b> ~${secs} seg</span>`;
+            }
+          }
           
           const puedeBorrar = currentUser.rol === 'ADMIN' || currentUser.id === j.creador_id;
 
@@ -1005,7 +1020,7 @@
                   <div class="grid grid-cols-2 gap-1 text-[11px] text-slate-600 bg-slate-50 p-2 rounded-xl">
                     <span>👶 <b>Edad:</b> ${j.edad || 'N/A'}</span>
                     <span>👥 <b>Jugadores:</b> ${j.jugadores || 'N/A'}</span>
-                    ${tiempoMedioMin > 0 ? `<span class="col-span-2 text-amber-800">⏱️ <b>Tiempo medio/partida:</b> ~${tiempoMedioMin} min</span>` : ''}
+                    ${tiempoMedioTexto}
                     <span class="col-span-2 text-indigo-900">👤 <b>Subido por:</b> @${j.creador_nick || 'Sistema'} (${fechaCreacionStr})</span>
                     <span class="col-span-2 text-emerald-800">🕒 <b>Última vez:</b> ${ultimaPartidaStr} ${j.ultima_partida_ganador ? `(🏆 ${j.ultima_partida_ganador})` : ''}</span>
                   </div>
@@ -1074,7 +1089,8 @@
       reader.onload = (e) => {
         const img = new Image();
         img.onload = () => {
-          const maxDim = 1024;
+          // Resolución optimizada a 800px para máxima nitidez en textos de cajas y control de tokens
+          const maxDim = 800;
           let width = img.width, height = img.height;
           if (width > height) { if (width > maxDim) { height = Math.round((height * maxDim) / width); width = maxDim; } }
           else { if (height > maxDim) { width = Math.round((width * maxDim) / height); height = maxDim; } }
@@ -1084,7 +1100,7 @@
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, width, height);
 
-          const resizedBase64 = canvas.toDataURL('image/jpeg', 0.75);
+          const resizedBase64 = canvas.toDataURL('image/jpeg', 0.85);
           document.getElementById('juegoFotoBase64').value = resizedBase64;
           document.getElementById('imagePreview').innerHTML = `<img src="${resizedBase64}" class="w-full h-full object-contain">`;
           document.getElementById('btnIA').classList.remove('hidden');
@@ -1171,10 +1187,9 @@
     function filtrarCategoria(cat, event) {
       categoriaActual = cat;
       document.querySelectorAll('.cat-btn').forEach(b => {
-        b.classList.remove('bg-indigo-600', 'text-white');
-        b.classList.add('bg-white', 'text-slate-600');
+        b.className = "cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition";
       });
-      event.target.classList.add('bg-indigo-600', 'text-white');
+      event.target.className = "cat-btn bg-indigo-600 text-white px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition";
       renderizarTarjetas();
     }
 
