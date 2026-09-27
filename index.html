@@ -562,7 +562,6 @@
             <textarea id="instruccionesCompletas" required rows="4" placeholder="Desarrollo oficial paso a paso..." class="w-full p-2 border rounded-xl outline-none mt-0.5 text-xs"></textarea>
           </div>
 
-          <!-- SECCIÓN RECURSOS ADJUNTOS EN FORMULARIO -->
           <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-2">
             <span class="font-bold text-slate-600 uppercase text-[10px] block">📎 Enlaces de Recursos (PDF y Vídeo)</span>
             <div>
@@ -813,7 +812,7 @@
         return juego.jugadores;
       }
       if (min === max) {
-        return min === 1 ? 'Solo 1 jugador' : `${min} jugadores`;
+        return min === 1 ? '1 o más jugadores' : `${min} jugadores`;
       }
       if (max >= 99) {
         return `${min} o más jugadores`;
@@ -1200,6 +1199,7 @@
       renderizarTarjetas();
     }
 
+    // RENDERIZADO DE TARJETAS OPTIMIZADO (NUEVO BOCETO)
     function renderizarTarjetas() {
       const container = document.getElementById('mainContainer');
       const search = document.getElementById('searchInput').value.toLowerCase();
@@ -1239,18 +1239,19 @@
           const esFav = favoritosCache.includes(j.id);
           
           const fechaCreacionStr = formatearFechaCorta(j.fecha_creacion);
-          let autoriaText = `Añadido por: @${j.creador_nick || 'Sistema'} · ${fechaCreacionStr}`;
+          let autoriaText = `@${j.creador_nick || 'admin'} · ${fechaCreacionStr}`;
           
+          let editadoText = '';
           if (j.modificador_nick && j.fecha_modificacion) {
             const fechaModStr = formatearFechaCorta(j.fecha_modificacion);
-            autoriaText += ` <br>✏️ Editado por: @${j.modificador_nick} · ${fechaModStr}`;
+            editadoText = `✏️ por: @${j.modificador_nick} · ${fechaModStr}`;
           }
 
           let tiempoMedioStr = "Sin datos";
           if (j.tiempo_medio_segundos && j.tiempo_medio_segundos > 0) {
             const m = Math.floor(j.tiempo_medio_segundos / 60);
             const s = j.tiempo_medio_segundos % 60;
-            tiempoMedioStr = m > 0 ? `~${m} min ${s} seg` : `~${s} seg`;
+            tiempoMedioStr = m > 0 ? `~${m}m ${s}s` : `~${s}s`;
           }
 
           let ultimaPartidaFechaStr = j.ultima_partida_fecha ? formatearFechaCorta(j.ultima_partida_fecha) : 'Sin partidas';
@@ -1259,10 +1260,17 @@
           gridHTML += `
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between relative transition hover:shadow-md">
               
-              <div class="p-3 space-y-3">
-                <!-- CABECERA HORIZONTAL CON IMAGEN DESTACADA -->
+              <div class="p-3.5 space-y-3">
+                <!-- CABECERA SUPERIOR: TÍTULO A ANCHO COMPLETO Y BADGE CATEGORÍA -->
+                <div class="flex justify-between items-start gap-2 border-b pb-2">
+                  <h4 onclick="abrirFichaDetallada('${j.id}')" class="font-black text-base text-slate-800 leading-snug cursor-pointer hover:text-indigo-600 transition truncate flex-grow">${j.nombre}</h4>
+                  <span class="bg-slate-900 text-white text-[10px] font-bold px-2.5 py-1 rounded-xl shrink-0 shadow-sm">${j.categoria}</span>
+                </div>
+
+                <!-- SECCIÓN CENTRAL: FOTO A LA IZQUIERDA Y DATOS/ESTADÍSTICAS A LA DERECHA -->
                 <div class="flex gap-3 items-stretch">
-                  <div onclick="abrirFichaDetallada('${j.id}')" class="w-2/5 sm:w-1/2 min-h-[140px] max-h-[160px] bg-slate-900 rounded-xl relative flex items-center justify-center overflow-hidden cursor-pointer group shrink-0 border border-slate-200">
+                  <!-- FOTO CON BOTÓN FAVORITO -->
+                  <div onclick="abrirFichaDetallada('${j.id}')" class="w-2/5 min-h-[145px] bg-slate-900 rounded-2xl relative flex items-center justify-center overflow-hidden cursor-pointer group shrink-0 border border-slate-100 shadow-inner">
                     <button onclick="event.stopPropagation(); toggleFavorito('${j.id}')" class="absolute top-2 left-2 w-7 h-7 bg-black/60 hover:bg-black/80 rounded-full flex items-center justify-center text-xs z-10 backdrop-blur-md card-zoom shadow-md text-white">
                       ${esFav ? '❤️' : '🤍'}
                     </button>
@@ -1271,46 +1279,39 @@
                       <div class="absolute inset-0 bg-cover bg-center filter blur-md opacity-40 scale-110 group-hover:scale-125 transition duration-300" style="background-image: url('${imagenSrc}')"></div>
                       <img src="${imagenSrc}" class="w-full h-full object-contain relative z-10 p-1 group-hover:scale-105 transition duration-300">
                     ` : '<div class="text-slate-400 text-xs">Sin Foto</div>'}
-                    
-                    <span class="absolute bottom-1.5 left-1.5 bg-black/70 text-white text-[9px] px-2 py-0.5 rounded-md backdrop-blur-md z-10 font-bold truncate max-w-[90%]">${j.categoria}</span>
                   </div>
 
-                  <div class="w-3/5 sm:w-1/2 flex flex-col justify-between py-0.5">
-                    <div class="space-y-1">
-                      <h4 onclick="abrirFichaDetallada('${j.id}')" class="font-bold text-sm text-slate-800 leading-snug cursor-pointer hover:text-indigo-600 transition line-clamp-2">${j.nombre}</h4>
-                      <p class="text-[10px] text-slate-600 leading-tight">📍 <b>Ubicación:</b> ${j.ubicacion || 'Sin especificar'}</p>
-                      <p class="text-[9px] text-slate-400 leading-tight">👤 ${autoriaText}</p>
+                  <!-- COLUMNA DERECHA: UBICACIÓN, AUTORÍA Y CAJA DE ESTADÍSTICAS -->
+                  <div class="w-3/5 flex flex-col justify-between text-[11px] space-y-2">
+                    <div class="space-y-0.5 leading-tight">
+                      <p class="text-slate-700 truncate">📍 <b>Ubicación:</b> ${j.ubicacion || 'Sin sitio'}</p>
+                      <p class="text-[10px] text-slate-500 truncate">👤 <b>Añadido por:</b> ${autoriaText}</p>
+                      ${editadoText ? `<p class="text-[9px] text-slate-400 truncate">${editadoText}</p>` : ''}
                     </div>
 
-                    <div class="flex justify-end pt-1">
-                      <span class="text-[10px] bg-indigo-50 text-indigo-700 font-bold px-2 py-0.5 rounded-lg border border-indigo-100 flex items-center gap-1">
-                        🎮 ${j.veces_jugado || 0} p.
-                      </span>
+                    <!-- BLOQUE INDEPENDIENTE DE ESTADÍSTICAS -->
+                    <div class="bg-indigo-50/60 border border-indigo-100/80 p-2 rounded-xl space-y-0.5 text-[10px] text-indigo-950 shadow-2xs">
+                      <p class="font-bold text-indigo-700 flex items-center gap-1">🎮 ${j.veces_jugado || 0} partidas</p>
+                      <p class="truncate text-slate-600">⏱️ <b>Tiempo medio:</b> ${tiempoMedioStr}</p>
+                      <p class="truncate text-slate-600">🕒 <b>Última partida:</b> ${ultimaPartidaFechaStr}</p>
+                      <p class="truncate text-emerald-800 font-bold">🏆 <b>Ganador:</b> ${ultimaPartidaGanadorStr}</p>
                     </div>
                   </div>
                 </div>
 
-                <!-- FICHA TÉCNICA NORMALIZADA -->
-                <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100 space-y-1 text-[10px] text-slate-700">
-                  <span class="font-bold text-slate-500 uppercase text-[8px] block tracking-wider">📦 Ficha Técnica</span>
-                  <div class="grid grid-cols-2 gap-2">
+                <!-- PIE FICHA TÉCNICA (EDAD, JUGADORES, MECÁNICAS) -->
+                <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200/80 space-y-1 text-[11px] text-slate-700">
+                  <div class="flex justify-between items-center gap-1">
                     <span>👶 <b>Edad:</b> ${formatearTextoEdad(j)}</span>
-                    <span>👥 <b>Jugadores:</b> ${formatearTextoJugadores(j)}</span>
+                    <span class="truncate">👥 <b>Jugadores:</b> ${formatearTextoJugadores(j)}</span>
                   </div>
-                  <p class="truncate text-slate-600 mt-0.5">🧩 <b>Mecánicas:</b> ${j.mecanicas || 'Sin especificar'}</p>
-                </div>
-
-                <!-- ESTADÍSTICAS Y ACTIVIDAD -->
-                <div class="bg-indigo-50/40 p-2.5 rounded-xl border border-indigo-100/70 space-y-0.5 text-[10px] text-indigo-950">
-                  <span class="font-bold text-indigo-800 uppercase text-[8px] block tracking-wider">📊 Estadísticas y Actividad</span>
-                  <p class="truncate">⏱️ <b>Tiempo medio/partida:</b> ${tiempoMedioStr}</p>
-                  <p class="truncate">🕒 <b>Última partida:</b> ${ultimaPartidaFechaStr}</p>
-                  <p class="truncate text-emerald-800 font-semibold">🏆 <b>Ganador:</b> ${ultimaPartidaGanadorStr}</p>
+                  <p class="truncate text-[10px] text-slate-600 pt-0.5">🧩 <b>Mecánicas:</b> ${j.mecanicas || 'Sin especificar'}</p>
                 </div>
               </div>
 
-              <div class="p-3 pt-0">
-                <button onclick="abrirModalPartida('${j.id}', '${j.nombre.replace(/'/g, "\\'")}')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs card-zoom shadow-sm flex items-center justify-center gap-1.5">
+              <!-- BOTÓN PRINCIPAL VAMOS A JUGAR -->
+              <div class="p-3.5 pt-0">
+                <button onclick="abrirModalPartida('${j.id}', '${j.nombre.replace(/'/g, "\\'")}')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs card-zoom shadow-md flex items-center justify-center gap-1.5">
                   ¡Vamos a jugar!
                 </button>
               </div>
@@ -1372,7 +1373,6 @@
         document.getElementById('instrucciones').value = juegoAEditar.instrucciones || '';
         document.getElementById('instruccionesCompletas').value = juegoAEditar.instrucciones_completas || '';
 
-        // CARGA DE CAMPOS RECURSOS PDF Y VÍDEO
         document.getElementById('pdf_reglas_url').value = juegoAEditar.pdf_reglas_url || '';
         document.getElementById('video_tutorial_url').value = juegoAEditar.video_tutorial_url || '';
 
@@ -1457,7 +1457,7 @@
       finally { btn.innerText = "Guardar en la Nube"; btn.disabled = false; }
     }
 
-    // CONSULTAR Y EXTRAER CON IA RESPETANDO EXCLUSIVAMENTE LAS OPCIONES SELECCIONADAS
+    // CONSULTAR IA CON CHECKBOXES
     async function analizarConIA() {
       const base64 = document.getElementById('juegoFotoBase64').value;
       const nombreActual = document.getElementById('nombre').value;
@@ -1516,7 +1516,6 @@
       let bloquesGenerados = 0;
 
       mapaCampos.forEach(campo => {
-        // RENDERIZADO EXCLUSIVO SI LA SECCIÓN FUE MARCADA EN LOS CHECKBOXES
         if (!seccionesMarcadasIA.includes(campo.grupo)) return;
 
         const valIA = iaNormalizada[campo.key];
