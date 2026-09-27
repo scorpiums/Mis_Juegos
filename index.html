@@ -261,7 +261,7 @@
         </div>
       </div>
 
-      <div class="h-36 bg-slate-900 overflow-hidden relative flex items-center justify-center shrink-0 shadow-inner" id="fichaImagenContainer"></div>
+      <div class="h-44 bg-slate-900 overflow-hidden relative flex items-center justify-center shrink-0 shadow-inner" id="fichaImagenContainer"></div>
 
       <div class="flex bg-slate-100 p-1 text-[11px] font-bold text-slate-600 justify-between shrink-0 border-y border-slate-200">
         <button onclick="cambiarTabFicha('info')" id="tabInfoBtn" class="flex-1 py-1.5 rounded-lg text-center transition">Info</button>
@@ -439,8 +439,9 @@
 
       <div class="flex-grow overflow-y-auto p-3 space-y-3 text-xs">
         <div class="space-y-2 bg-slate-50 p-2.5 rounded-2xl border border-slate-200">
-          <div id="imagePreview" class="w-full h-32 bg-slate-900 rounded-xl flex items-center justify-center border-2 border-dashed border-slate-300 overflow-hidden relative">
-            <span class="text-slate-400 text-xs">Sin fotografía</span>
+          <!-- PREVIEW DE FOTO CUADRADA -->
+          <div id="imagePreview" class="w-48 h-48 mx-auto bg-slate-900 rounded-xl flex items-center justify-center border-2 border-dashed border-slate-300 overflow-hidden relative shadow-inner">
+            <span class="text-slate-400 text-xs text-center px-2">Sin fotografía<br><span class="text-[10px] text-slate-500">(Se adaptará a 3:4 / 4:3)</span></span>
           </div>
 
           <input type="file" id="inputCamara" accept="image/*" capture="environment" onchange="procesarFoto(event)" class="hidden">
@@ -787,7 +788,6 @@
       return `${dia}/${mes}/${anio}`;
     }
 
-    // NORMALIZACIÓN DE EDAD Y JUGADORES
     function obtenerEdadNumerica(juego) {
       if (juego.min_edad !== undefined && juego.min_edad !== null && juego.min_edad > 0) {
         return parseInt(juego.min_edad);
@@ -817,7 +817,7 @@
       if (max >= 99) {
         return `${min} o más jugadores`;
       }
-      return `${min} a ${max} jugadores`;
+      return `${min}-${max}`;
     }
 
     function reproducirSonidoClick() {
@@ -1181,7 +1181,6 @@
       finally { btn.innerText = "Preguntar"; btn.disabled = false; }
     }
 
-    // CARGAR Y RENDERIZAR
     async function cargarJuegos() {
       try {
         const res = await fetchSeguro(`/api/juegos`); 
@@ -1199,7 +1198,7 @@
       renderizarTarjetas();
     }
 
-    // RENDERIZADO DE TARJETAS OPTIMIZADO (NUEVO BOCETO)
+    // RENDERIZADO OPTIMIZADO (FORMATO CUADRADO Y MEJOR BALANCE VISUAL)
     function renderizarTarjetas() {
       const container = document.getElementById('mainContainer');
       const search = document.getElementById('searchInput').value.toLowerCase();
@@ -1237,17 +1236,8 @@
           const imagenSrc = j.foto_url || j.foto_base64 || '';
           const tieneImagen = imagenSrc && imagenSrc.trim().length > 0;
           const esFav = favoritosCache.includes(j.id);
-          
-          const fechaCreacionStr = formatearFechaCorta(j.fecha_creacion);
-          let autoriaText = `@${j.creador_nick || 'admin'} · ${fechaCreacionStr}`;
-          
-          let editadoText = '';
-          if (j.modificador_nick && j.fecha_modificacion) {
-            const fechaModStr = formatearFechaCorta(j.fecha_modificacion);
-            editadoText = `✏️ por: @${j.modificador_nick} · ${fechaModStr}`;
-          }
 
-          let tiempoMedioStr = "Sin datos";
+          let tiempoMedioStr = "Sin dato";
           if (j.tiempo_medio_segundos && j.tiempo_medio_segundos > 0) {
             const m = Math.floor(j.tiempo_medio_segundos / 60);
             const s = j.tiempo_medio_segundos % 60;
@@ -1261,51 +1251,51 @@
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between relative transition hover:shadow-md">
               
               <div class="p-3.5 space-y-3">
-                <!-- CABECERA SUPERIOR: TÍTULO A ANCHO COMPLETO Y BADGE CATEGORÍA -->
+                <!-- CABECERA: TÍTULO A ANCHO COMPLETO Y BADGE CATEGORÍA -->
                 <div class="flex justify-between items-start gap-2 border-b pb-2">
-                  <h4 onclick="abrirFichaDetallada('${j.id}')" class="font-black text-base text-slate-800 leading-snug cursor-pointer hover:text-indigo-600 transition truncate flex-grow">${j.nombre}</h4>
+                  <h4 onclick="abrirFichaDetallada('${j.id}')" class="font-black text-base text-slate-800 leading-snug cursor-pointer hover:text-indigo-600 transition truncate flex-grow" title="${j.nombre}">${j.nombre}</h4>
                   <span class="bg-slate-900 text-white text-[10px] font-bold px-2.5 py-1 rounded-xl shrink-0 shadow-sm">${j.categoria}</span>
                 </div>
 
-                <!-- SECCIÓN CENTRAL: FOTO A LA IZQUIERDA Y DATOS/ESTADÍSTICAS A LA DERECHA -->
-                <div class="flex gap-3 items-stretch">
-                  <!-- FOTO CON BOTÓN FAVORITO -->
-                  <div onclick="abrirFichaDetallada('${j.id}')" class="w-2/5 min-h-[145px] bg-slate-900 rounded-2xl relative flex items-center justify-center overflow-hidden cursor-pointer group shrink-0 border border-slate-100 shadow-inner">
+                <!-- SECCIÓN CENTRAL: FOTO CUADRADA + COLUMNA DERECHA COMPACTA -->
+                <div class="flex gap-3 items-start">
+                  <!-- FOTO EN FORMATO CUADRADO PERFECTO (1:1) -->
+                  <div onclick="abrirFichaDetallada('${j.id}')" class="w-5/12 aspect-square bg-slate-900 rounded-2xl relative flex items-center justify-center overflow-hidden cursor-pointer group shrink-0 border border-slate-100 shadow-inner">
                     <button onclick="event.stopPropagation(); toggleFavorito('${j.id}')" class="absolute top-2 left-2 w-7 h-7 bg-black/60 hover:bg-black/80 rounded-full flex items-center justify-center text-xs z-10 backdrop-blur-md card-zoom shadow-md text-white">
                       ${esFav ? '❤️' : '🤍'}
                     </button>
 
                     ${tieneImagen ? `
-                      <div class="absolute inset-0 bg-cover bg-center filter blur-md opacity-40 scale-110 group-hover:scale-125 transition duration-300" style="background-image: url('${imagenSrc}')"></div>
-                      <img src="${imagenSrc}" class="w-full h-full object-contain relative z-10 p-1 group-hover:scale-105 transition duration-300">
-                    ` : '<div class="text-slate-400 text-xs">Sin Foto</div>'}
+                      <div class="absolute inset-0 bg-cover bg-center filter blur-md opacity-35 scale-110 group-hover:scale-125 transition duration-300" style="background-image: url('${imagenSrc}')"></div>
+                      <img src="${imagenSrc}" class="w-full h-full object-contain relative z-10 p-1.5 group-hover:scale-105 transition duration-300">
+                    ` : '<div class="text-slate-400 text-xs text-center p-2">Sin Foto</div>'}
                   </div>
 
-                  <!-- COLUMNA DERECHA: UBICACIÓN, AUTORÍA Y CAJA DE ESTADÍSTICAS -->
-                  <div class="w-3/5 flex flex-col justify-between text-[11px] space-y-2">
-                    <div class="space-y-0.5 leading-tight">
-                      <p class="text-slate-700 truncate">📍 <b>Ubicación:</b> ${j.ubicacion || 'Sin sitio'}</p>
-                      <p class="text-[10px] text-slate-500 truncate">👤 <b>Añadido por:</b> ${autoriaText}</p>
-                      ${editadoText ? `<p class="text-[9px] text-slate-400 truncate">${editadoText}</p>` : ''}
+                  <!-- COLUMNA DERECHA CON FICHA TÉCNICA Y ESTADÍSTICAS -->
+                  <div class="w-7/12 flex flex-col justify-between text-[11px] space-y-2">
+                    
+                    <!-- BLOQUE 1: FICHA TÉCNICA RÁPIDA -->
+                    <div class="bg-slate-50 p-2 rounded-xl border border-slate-200/80 space-y-1">
+                      <p class="text-slate-700 truncate">👶 <b>Edad:</b> ${formatearTextoEdad(j)}</p>
+                      <p class="text-slate-700 truncate">👥 <b>Jugadores:</b> ${formatearTextoJugadores(j)}</p>
+                      <p class="text-slate-600 text-[10px] truncate">🧩 <b>Mecánicas:</b> ${j.mecanicas || 'Sin especificar'}</p>
                     </div>
 
-                    <!-- BLOQUE INDEPENDIENTE DE ESTADÍSTICAS -->
-                    <div class="bg-indigo-50/60 border border-indigo-100/80 p-2 rounded-xl space-y-0.5 text-[10px] text-indigo-950 shadow-2xs">
+                    <!-- BLOQUE 2: ESTADÍSTICAS DE JUEGO -->
+                    <div class="bg-indigo-50/70 border border-indigo-100 p-2 rounded-xl space-y-0.5 text-[10px] text-indigo-950">
                       <p class="font-bold text-indigo-700 flex items-center gap-1">🎮 ${j.veces_jugado || 0} partidas</p>
                       <p class="truncate text-slate-600">⏱️ <b>Tiempo medio:</b> ${tiempoMedioStr}</p>
                       <p class="truncate text-slate-600">🕒 <b>Última partida:</b> ${ultimaPartidaFechaStr}</p>
                       <p class="truncate text-emerald-800 font-bold">🏆 <b>Ganador:</b> ${ultimaPartidaGanadorStr}</p>
                     </div>
+
                   </div>
                 </div>
 
-                <!-- PIE FICHA TÉCNICA (EDAD, JUGADORES, MECÁNICAS) -->
-                <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200/80 space-y-1 text-[11px] text-slate-700">
-                  <div class="flex justify-between items-center gap-1">
-                    <span>👶 <b>Edad:</b> ${formatearTextoEdad(j)}</span>
-                    <span class="truncate">👥 <b>Jugadores:</b> ${formatearTextoJugadores(j)}</span>
-                  </div>
-                  <p class="truncate text-[10px] text-slate-600 pt-0.5">🧩 <b>Mecánicas:</b> ${j.mecanicas || 'Sin especificar'}</p>
+                <!-- UBICACIÓN Y AUTORÍA (ABAJO) -->
+                <div class="text-[10px] text-slate-500 pt-0.5 flex justify-between items-center border-t border-slate-100">
+                  <span class="truncate">📍 <b>Ubicación:</b> ${j.ubicacion || 'Sin sitio'}</span>
+                  <span class="truncate shrink-0">👤 @${j.creador_nick || 'admin'}</span>
                 </div>
               </div>
 
@@ -1352,7 +1342,7 @@
       }
     }
 
-    // FORMULARIO Y EDICIÓN COMPLETA (INCLUYENDO CAMPOS PDF Y VÍDEO)
+    // FORMULARIO Y EDICIÓN COMPLETA
     function abrirModalFormulario(juegoAEditar = null) {
       const form = document.getElementById('juegoForm');
       form.reset();
@@ -1387,7 +1377,7 @@
         document.getElementById('juegoFotoBase64').value = '';
         document.getElementById('pdf_reglas_url').value = '';
         document.getElementById('video_tutorial_url').value = '';
-        document.getElementById('imagePreview').innerHTML = `<span class="text-slate-400 text-xs">Sin fotografía</span>`;
+        document.getElementById('imagePreview').innerHTML = `<span class="text-slate-400 text-xs text-center px-2">Sin fotografía<br><span class="text-[10px] text-slate-500">(Se adaptará a 3:4 / 4:3)</span></span>`;
         document.getElementById('contenedorBorradoEdicion').classList.add('hidden');
       }
 
@@ -1457,7 +1447,7 @@
       finally { btn.innerText = "Guardar en la Nube"; btn.disabled = false; }
     }
 
-    // CONSULTAR IA CON CHECKBOXES
+    // CONSULTAR IA
     async function analizarConIA() {
       const base64 = document.getElementById('juegoFotoBase64').value;
       const nombreActual = document.getElementById('nombre').value;
@@ -1658,6 +1648,7 @@
       } catch (err) { alert(err.message); }
     }
 
+    // PROCESAMIENTO Y RECUPERACIÓN DE FOTO ADAPTADA A FORMATOS 3:4 O 4:3 EN CANVAS CUADRADO
     function procesarFoto(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1666,15 +1657,34 @@
       reader.onload = (e) => {
         const img = new Image();
         img.onload = () => {
-          const maxDim = 800;
-          let width = img.width, height = img.height;
-          if (width > height) { if (width > maxDim) { height = Math.round((height * maxDim) / width); width = maxDim; } }
-          else { if (height > maxDim) { width = Math.round((width * maxDim) / height); height = maxDim; } }
+          // Determinamos si es vertical (3:4) u horizontal (4:3)
+          const esVertical = img.height >= img.width;
+          const targetRatio = esVertical ? (3 / 4) : (4 / 3);
 
           const canvas = document.createElement('canvas');
-          canvas.width = width; canvas.height = height;
+          const canvasSize = 800; // Tamaño base estándar
+          canvas.width = canvasSize;
+          canvas.height = canvasSize;
           const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, width, height);
+
+          // Fondo oscuro elegante
+          ctx.fillStyle = '#0f172a';
+          ctx.fillRect(0, 0, canvasSize, canvasSize);
+
+          // Calculamos dimensiones escaladas adaptadas al ratio 3:4 o 4:3
+          let drawW, drawH;
+          if (esVertical) {
+            drawH = canvasSize * 0.92;
+            drawW = drawH * targetRatio; // Proporción 3:4
+          } else {
+            drawW = canvasSize * 0.92;
+            drawH = drawW / targetRatio; // Proporción 4:3
+          }
+
+          const offsetX = (canvasSize - drawW) / 2;
+          const offsetY = (canvasSize - drawH) / 2;
+
+          ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
 
           const resizedBase64 = canvas.toDataURL('image/jpeg', 0.85);
           document.getElementById('juegoFotoBase64').value = resizedBase64;
