@@ -14,7 +14,6 @@
       letter-spacing: -1px;
       text-shadow: 2px 2px 0px #000, -1px -1px 0px #000, 1px -1px 0px #000, -1px 1px 0px #000;
     }
-    /* RULETA CLÁSICA CON EFECTO DE GIRO Y SONIDO */
     .roulette-container {
       position: relative;
       width: 200px;
@@ -139,7 +138,6 @@
 
   <!-- APLICACIÓN PRINCIPAL -->
   <div id="mainApp" class="hidden">
-    <!-- CABECERA SUPERIOR FIJA -->
     <header class="bg-indigo-600 text-white px-3 py-2.5 shadow-md sticky top-0 z-40 flex justify-between items-center gap-1">
       <div class="flex items-center gap-2 shrink-0">
         <div class="w-8 h-8 bg-amber-400 rounded-xl border-2 border-black flex items-center justify-center shadow-md text-black font-black text-sm">🎮</div>
@@ -159,7 +157,7 @@
       </div>
     </header>
 
-    <!-- MENÚ SUPERIOR ANCLADO (STICKY Z-30 CON FONDO SÓLIDO PARA EVITAR TRANSPARENCIAS) -->
+    <!-- MENÚ SUPERIOR ANCLADO -->
     <div class="sticky top-[48px] z-30 bg-slate-100 p-3 border-b border-slate-200 shadow-md">
       <div class="max-w-4xl mx-auto space-y-2.5">
         <div class="flex gap-1.5">
@@ -174,19 +172,18 @@
           </button>
         </div>
 
-        <!-- PANEL FILTROS AVANZADOS CON MECÁNICAS DINÁMICAS DESDE LA BD -->
+        <!-- PANEL FILTROS AVANZADOS -->
         <div id="panelFiltrosAvanzados" class="hidden bg-white p-3.5 rounded-2xl border border-slate-200 shadow-md space-y-3 text-xs">
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label class="font-bold text-slate-500 uppercase text-[10px]">👥 Nº de Jugadores</label>
               <select id="filtroNumJugadores" onchange="filtrarJuegos()" class="w-full p-2 border rounded-xl outline-none mt-1 bg-slate-50 font-medium">
                 <option value="">Cualquier número</option>
-                <option value="1">1+ Jugadores</option>
-                <option value="2">2+ Jugadores</option>
-                <option value="3">3+ Jugadores</option>
-                <option value="4">4+ Jugadores</option>
+                <option value="1">1 Jugador</option>
+                <option value="2">2 Jugadores</option>
+                <option value="3">3 Jugadores</option>
+                <option value="4">4 Jugadores</option>
                 <option value="5">5+ Jugadores</option>
-                <option value="6">6+ Jugadores</option>
               </select>
             </div>
 
@@ -194,10 +191,10 @@
               <label class="font-bold text-slate-500 uppercase text-[10px]">👶 Edad Mínima</label>
               <select id="filtroEdadMinima" onchange="filtrarJuegos()" class="w-full p-2 border rounded-xl outline-none mt-1 bg-slate-50 font-medium">
                 <option value="">Cualquier edad</option>
-                <option value="4">Para niños (<4 años)</option>
-                <option value="6">Infantil (6+ años)</option>
-                <option value="8">Familiar (8+ años)</option>
-                <option value="12">Adultos / Avanzado (12+ años)</option>
+                <option value="4">Para niños (+4)</option>
+                <option value="6">Infantil (+6)</option>
+                <option value="8">Familiar (+8)</option>
+                <option value="12">Adultos / Avanzado (+12)</option>
               </select>
             </div>
 
@@ -213,14 +210,13 @@
           </div>
 
           <div>
-            <label class="font-bold text-slate-500 uppercase text-[10px] block mb-1">🧩 Componentes y Mecánicas (Dinámicos):</label>
+            <label class="font-bold text-slate-500 uppercase text-[10px] block mb-1">🧩 Componentes y Mecánicas:</label>
             <div class="flex flex-wrap gap-1.5" id="checkboxesMecanicasDinamicas">
               <span class="text-slate-400 text-[10px]">Cargando mecánicas...</span>
             </div>
           </div>
         </div>
         
-        <!-- CATEGORÍAS RÁPIDAS Y SELECTOR VISTA -->
         <div class="flex justify-between items-center gap-2">
           <div class="flex gap-1.5 overflow-x-auto pb-1 text-xs scrollbar-none flex-grow" id="categoriasFiltro">
             <button onclick="filtrarCategoria('Todas', event)" class="cat-btn bg-indigo-600 text-white px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition">Todas</button>
@@ -239,7 +235,7 @@
       </div>
     </div>
 
-    <!-- CONTENEDOR PRINCIPAL DE JUEGOS -->
+    <!-- MAIN -->
     <main class="p-3 max-w-4xl mx-auto" id="mainContainer">
       <div class="text-center py-10 text-slate-400">Cargando colección desde la nube...</div>
     </main>
@@ -249,7 +245,7 @@
     </button>
   </div>
 
-  <!-- MODAL FICHA DETALLADA DEL JUEGO CON ESTRUCTURA REORGANIZADA -->
+  <!-- MODAL FICHA DETALLADA DEL JUEGO -->
   <div id="modalFichaJuego" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
     <div class="bg-white rounded-2xl max-w-md w-full h-[85vh] max-h-[620px] flex flex-col shadow-2xl overflow-hidden relative border border-slate-100">
       <div class="p-3 border-b flex justify-between items-center bg-slate-50 shrink-0">
@@ -262,7 +258,6 @@
 
       <div class="h-36 bg-slate-900 overflow-hidden relative flex items-center justify-center shrink-0 shadow-inner" id="fichaImagenContainer"></div>
 
-      <!-- PESTAÑAS FICHA UNIFICADAS -->
       <div class="flex bg-slate-100 p-1 text-[11px] font-bold text-slate-600 justify-between shrink-0 border-y border-slate-200">
         <button onclick="cambiarTabFicha('info')" id="tabInfoBtn" class="flex-1 py-1.5 rounded-lg text-center transition">Info</button>
         <button onclick="cambiarTabFicha('reglas')" id="tabReglasBtn" class="flex-1 py-1.5 rounded-lg text-center transition">Reglas & IA</button>
@@ -271,7 +266,6 @@
       </div>
 
       <div class="flex-grow overflow-y-auto p-3 space-y-3 text-xs">
-        <!-- TAB 1: INFO ESTRUCTURADA COMO LAS TARJETAS -->
         <div id="tabInfoContent" class="space-y-2.5">
           <div class="border-b pb-1.5 space-y-0.5">
             <p class="text-slate-700">📍 <b>Ubicación:</b> <span id="fichaUbicacion"></span></p>
@@ -291,14 +285,12 @@
           </div>
         </div>
 
-        <!-- TAB 2: REGLAS COMPLETAS, MULTIMEDIA Y ÁRBITRO IA -->
         <div id="tabReglasContent" class="space-y-3 hidden">
           <div class="space-y-1">
             <p class="font-bold text-slate-700 uppercase text-[10px] tracking-wider">📖 Instrucciones Oficiales Completas:</p>
             <div id="fichaReglasCompletasText" class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-slate-700 leading-relaxed whitespace-pre-line text-xs max-h-40 overflow-y-auto"></div>
           </div>
 
-          <!-- GESTIÓN DE DOCUMENTO PDF Y VÍDEO YOUTUBE -->
           <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-2">
             <span class="font-bold text-slate-600 uppercase text-[9px] block">📎 Recursos Adjuntos</span>
             <div class="grid grid-cols-2 gap-2">
@@ -329,7 +321,6 @@
           </div>
         </div>
 
-        <!-- TAB 3: ESTADÍSTICAS -->
         <div id="tabStatsContent" class="space-y-3 hidden">
           <div class="grid grid-cols-2 gap-2 text-center">
             <div class="bg-amber-50 border border-amber-200 p-2.5 rounded-xl">
@@ -348,7 +339,6 @@
           </div>
         </div>
 
-        <!-- TAB 4: HISTORIAL DE PARTIDAS -->
         <div id="tabHistorialJuegoContent" class="space-y-2 hidden">
           <div id="listaPartidasJuego" class="space-y-2"></div>
         </div>
@@ -434,7 +424,7 @@
     </div>
   </div>
 
-  <!-- MODAL FORMULARIO DE JUEGO -->
+  <!-- MODAL FORMULARIO CON SELECCIÓN INDEPENDIENTE DE MÍNIMO Y MÁXIMO DE JUGADORES + DESPLEGABLE DE EDAD (+6, +8...) -->
   <div id="modalForm" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
     <div class="bg-white rounded-2xl max-w-md w-full h-[90vh] max-h-[660px] flex flex-col shadow-2xl overflow-hidden relative border border-slate-100">
       <div class="p-3 border-b flex justify-between items-center bg-slate-50 shrink-0">
@@ -460,7 +450,6 @@
             </button>
           </div>
 
-          <!-- AUTOREVISIÓN Y SELECCIÓN DE CAMPOS IA (SIN OPCIÓN DE PDF/VÍDEO) -->
           <div class="bg-purple-50 p-2.5 rounded-xl border border-purple-200 space-y-2 mt-2">
             <span class="font-bold text-purple-900 text-[11px] block">✨ Autorrellenar / Revisar con IA:</span>
             <div class="grid grid-cols-2 gap-1.5 text-[10px]" id="checkboxesSeccionesIA">
@@ -506,23 +495,52 @@
             </div>
           </div>
 
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="font-bold text-slate-600 uppercase text-[10px]">Edad Recomendada <span class="text-rose-500">*</span></label>
-              <input type="text" id="edad" required placeholder="Ej. 6+ años" class="w-full p-2 border rounded-xl outline-none mt-0.5">
-            </div>
-            <div>
-              <label class="font-bold text-slate-600 uppercase text-[10px]">Nº de Jugadores <span class="text-rose-500">*</span></label>
-              <select id="jugadores" required class="w-full p-2 border rounded-xl outline-none mt-0.5 bg-white font-medium">
-                <option value="1+ jugadores">1+ jugadores</option>
-                <option value="2+ jugadores">2+ jugadores</option>
-                <option value="3+ jugadores">3+ jugadores</option>
-                <option value="4+ jugadores">4+ jugadores</option>
-                <option value="5+ jugadores">5+ jugadores</option>
-                <option value="6+ jugadores">6+ jugadores</option>
-                <option value="2-4 jugadores">2-4 jugadores</option>
-                <option value="2-6 jugadores">2-6 jugadores</option>
-              </select>
+          <!-- EDAD CON SELECTOR EXPLICITO DE +3, +4, +6... -->
+          <div>
+            <label class="font-bold text-slate-600 uppercase text-[10px]">Edad Recomendada <span class="text-rose-500">*</span></label>
+            <select id="edad" required class="w-full p-2 border rounded-xl outline-none mt-0.5 bg-white font-semibold">
+              <option value="+3">+3 años</option>
+              <option value="+4">+4 años</option>
+              <option value="+6" selected>+6 años</option>
+              <option value="+8">+8 años</option>
+              <option value="+10">+10 años</option>
+              <option value="+12">+12 años</option>
+              <option value="+14">+14 años</option>
+              <option value="+16">+16 años</option>
+              <option value="+18">+18 años</option>
+            </select>
+          </div>
+
+          <!-- RANGO INDEPENDIENTE DE JUGADORES MÍNIMO Y MÁXIMO -->
+          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-1.5">
+            <span class="font-bold text-slate-600 uppercase text-[10px] block">Nº de Jugadores Permitidos <span class="text-rose-500">*</span></span>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="text-[9px] text-slate-500 font-bold uppercase">Mínimo</label>
+                <select id="minJugadoresSelect" required class="w-full p-2 border rounded-xl outline-none mt-0.5 bg-white font-medium">
+                  <option value="1">1 jugador</option>
+                  <option value="2" selected>2 jugadores</option>
+                  <option value="3">3 jugadores</option>
+                  <option value="4">4 jugadores</option>
+                  <option value="5">5 jugadores</option>
+                  <option value="6">6 jugadores</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-[9px] text-slate-500 font-bold uppercase">Máximo</label>
+                <select id="maxJugadoresSelect" required class="w-full p-2 border rounded-xl outline-none mt-0.5 bg-white font-medium">
+                  <option value="1">1 jugador</option>
+                  <option value="2">2 jugadores</option>
+                  <option value="3">3 jugadores</option>
+                  <option value="4" selected>4 jugadores</option>
+                  <option value="5">5 jugadores</option>
+                  <option value="6">6 jugadores</option>
+                  <option value="8">8 jugadores</option>
+                  <option value="10">10 jugadores</option>
+                  <option value="12">12 jugadores</option>
+                  <option value="99">Sin límite (+)</option>
+                </select>
+              </div>
             </div>
           </div>
 
@@ -555,7 +573,7 @@
     </div>
   </div>
 
-  <!-- MODAL COMPARADOR IA INTERACTIVO MEDIANTE TAP/CLIC EN CAJAS -->
+  <!-- MODAL COMPARADOR IA -->
   <div id="modalComparadorIA" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 hidden flex items-center justify-center p-3">
     <div class="bg-white rounded-2xl max-w-lg w-full h-[85vh] max-h-[620px] flex flex-col shadow-2xl overflow-hidden relative border border-purple-200">
       <div class="p-3 border-b bg-purple-900 text-white flex justify-between items-center shrink-0">
@@ -578,7 +596,7 @@
     </div>
   </div>
 
-  <!-- MODAL RULETA CLÁSICA CON SONIDO Y ANIMACIÓN -->
+  <!-- MODAL RULETA -->
   <div id="modalRuleta" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
     <div class="bg-white rounded-2xl max-w-md w-full p-4 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b pb-2">
@@ -645,7 +663,7 @@
     </div>
   </div>
 
-  <!-- MODAL PARTIDAS Y CRONÓMETRO -->
+  <!-- MODAL PARTIDAS -->
   <div id="modalPartida" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
     <div class="bg-white rounded-2xl max-w-md w-full p-5 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b pb-2">
@@ -743,7 +761,6 @@
     let seleccionesComparadorIA = {};
     let audioCtx = null;
 
-    // FORMATEO DE FECHAS A FORMATO CORTO DD/MM/YYYY
     function formatearFechaCorta(fechaStr) {
       if (!fechaStr) return '';
       const d = new Date(fechaStr);
@@ -754,7 +771,6 @@
       return `${dia}/${mes}/${anio}`;
     }
 
-    // SINTETIZADOR DE SONIDOS PARA LA RULETA
     function reproducirSonidoClick() {
       try {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -939,7 +955,6 @@
       const imgContainer = document.getElementById('fichaImagenContainer');
       imgContainer.innerHTML = imagenSrc ? `<img src="${imagenSrc}" class="w-full h-full object-contain p-2">` : `<span class="text-slate-400 text-xs">Sin Foto</span>`;
 
-      // RECURSOS MULTIMEDIA (PDF Y VÍDEO)
       actualizarBotonesRecursosFicha();
 
       const btnEditar = document.getElementById('btnEditarDesdeFicha');
@@ -1117,7 +1132,7 @@
       finally { btn.innerText = "Preguntar"; btn.disabled = false; }
     }
 
-    // --- RENDERIZADO PRINCIPAL (TARJETAS AJUSTADAS Z-INDEX Y MECÁNICAS) ---
+    // --- RENDERIZADO PRINCIPAL ---
     async function cargarJuegos() {
       try {
         const res = await fetchSeguro(`/api/juegos`); 
@@ -1213,7 +1228,6 @@
                     <p class="text-[9px] text-slate-400 leading-tight">${autoriaText}</p>
                   </div>
 
-                  <!-- SECCIÓN 1: FICHA TÉCNICA CON MECÁNICAS -->
                   <div class="bg-slate-50 p-2 rounded-xl border border-slate-100 space-y-1 text-[10px] text-slate-700">
                     <span class="font-bold text-slate-500 uppercase text-[8px] block tracking-wider">📦 Ficha Técnica</span>
                     <div class="flex justify-between">
@@ -1223,7 +1237,6 @@
                     <p class="truncate text-slate-600">🧩 <b>Mecánicas:</b> ${j.mecanicas || 'Sin especificar'}</p>
                   </div>
 
-                  <!-- SECCIÓN 2: ESTADÍSTICAS Y ACTIVIDAD -->
                   <div class="bg-indigo-50/50 p-2 rounded-xl border border-indigo-100 space-y-0.5 text-[10px] text-indigo-950">
                     <span class="font-bold text-indigo-800 uppercase text-[8px] block tracking-wider">📊 Estadísticas y Actividad</span>
                     <p class="truncate">⏱️ <b>Tiempo medio/partida:</b> ${tiempoMedioStr}</p>
@@ -1274,7 +1287,130 @@
       }
     }
 
-    // --- COMPARADOR DE IA INTERACTIVO MEDIANTE TAP/CLIC ---
+    // --- FORMULARIO & COMPARADOR ---
+    function abrirModalFormulario(juegoAEditar = null) {
+      const form = document.getElementById('juegoForm');
+      form.reset();
+      poblarSelectUbicaciones();
+
+      if (juegoAEditar) {
+        document.getElementById('modalTitulo').innerText = "Editar Ficha de Juego";
+        document.getElementById('juegoId').value = juegoAEditar.id;
+        document.getElementById('nombre').value = juegoAEditar.nombre || '';
+        document.getElementById('categoria').value = juegoAEditar.categoria || 'Juego de Mesa';
+        document.getElementById('ubicacionSelect').value = juegoAEditar.ubicacion || '';
+        document.getElementById('edad').value = juegoAEditar.edad || '+6';
+        
+        document.getElementById('minJugadoresSelect').value = juegoAEditar.min_jugadores || 1;
+        document.getElementById('maxJugadoresSelect').value = juegoAEditar.max_jugadores || 4;
+
+        document.getElementById('mecanicas').value = juegoAEditar.mecanicas || '';
+        document.getElementById('instrucciones').value = juegoAEditar.instrucciones || '';
+        document.getElementById('instruccionesCompletas').value = juegoAEditar.instrucciones_completas || '';
+
+        const foto = juegoAEditar.foto_url || juegoAEditar.foto_base64 || '';
+        document.getElementById('juegoFotoBase64').value = foto;
+        document.getElementById('imagePreview').innerHTML = foto ? `<img src="${foto}" class="w-full h-full object-contain">` : `<span class="text-slate-400 text-xs">Sin fotografía</span>`;
+
+        document.getElementById('contenedorBorradoEdicion').classList.remove('hidden');
+      } else {
+        document.getElementById('modalTitulo').innerText = "Nuevo Juego / Juguete";
+        document.getElementById('juegoId').value = '';
+        document.getElementById('juegoFotoBase64').value = '';
+        document.getElementById('imagePreview').innerHTML = `<span class="text-slate-400 text-xs">Sin fotografía</span>`;
+        document.getElementById('contenedorBorradoEdicion').classList.add('hidden');
+      }
+
+      document.getElementById('modalForm').classList.remove('hidden');
+    }
+
+    function cerrarModalFormulario() { document.getElementById('modalForm').classList.add('hidden'); }
+
+    async function preprocesarGuardadoJuego(e) {
+      e.preventDefault();
+      const nombreInput = document.getElementById('nombre').value;
+      const juegoIdActual = document.getElementById('juegoId').value;
+
+      try {
+        const res = await fetchSeguro(`/api/juegos/comprobar-duplicado`, {
+          method: 'POST',
+          body: JSON.stringify({ nombre: nombreInput, id_actual: juegoIdActual })
+        });
+        const check = await res.json();
+
+        if (check.existe) {
+          const confirmarVariante = confirm(
+            `⚠️ ATENCIÓN: Ya existe un juego registrado con el nombre "${check.juego_existente}".\n\n` +
+            `Si se trata de una versión, expansión o variante diferente, presiona OK para guardarlo como una nueva ficha independiente.\n` +
+            `De lo contrario, pulsa Cancelar para modificar el nombre.`
+          );
+          if (!confirmarVariante) return;
+        }
+
+        guardarJuego();
+      } catch (err) { alert(err.message); }
+    }
+
+    async function guardarJuego() {
+      const btn = document.getElementById('btnGuardar');
+      btn.innerText = "Subiendo...";
+      btn.disabled = true;
+
+      const idActual = document.getElementById('juegoId').value;
+
+      const nuevoJuego = {
+        id: idActual || crypto.randomUUID(),
+        nombre: document.getElementById('nombre').value,
+        categoria: document.getElementById('categoria').value,
+        ubicacion: document.getElementById('ubicacionSelect').value,
+        edad: document.getElementById('edad').value,
+        min_jugadores: document.getElementById('minJugadoresSelect').value,
+        max_jugadores: document.getElementById('maxJugadoresSelect').value,
+        mecanicas: document.getElementById('mecanicas').value,
+        instrucciones: document.getElementById('instrucciones').value,
+        instrucciones_completas: document.getElementById('instruccionesCompletas').value,
+        foto_base64: document.getElementById('juegoFotoBase64').value
+      };
+
+      try {
+        const res = await fetchSeguro(`/api/juegos`, { method: 'POST', body: JSON.stringify(nuevoJuego) });
+        const json = await res.json();
+        if (json.error) throw new Error(json.error);
+
+        cerrarModalFormulario();
+        await cargarUbicaciones();
+        await cargarMecanicasDinamicas();
+        cargarJuegos();
+      } catch (err) { alert(err.message); }
+      finally { btn.innerText = "Guardar en la Nube"; btn.disabled = false; }
+    }
+
+    async function analizarConIA() {
+      const base64 = document.getElementById('juegoFotoBase64').value;
+      const nombreActual = document.getElementById('nombre').value;
+      
+      const seccionesChecked = Array.from(document.querySelectorAll('#checkboxesSeccionesIA input:checked')).map(el => el.value);
+      if (seccionesChecked.length === 0) return alert("Selecciona al menos una sección para consultar a la IA.");
+
+      if (!base64 && !nombreActual) return alert("Sube una foto o escribe el nombre del juego para que Gemini pueda identificarlo.");
+
+      const btnIA = document.getElementById('btnIA');
+      btnIA.innerText = "⏳ Consultando a Gemini...";
+      btnIA.disabled = true;
+
+      try {
+        const response = await fetchSeguro(`/api/analizar-imagen`, {
+          method: 'POST',
+          body: JSON.stringify({ foto_base64: base64, secciones_solicitadas: seccionesChecked, nombre_juego_ref: nombreActual })
+        });
+        datosAnalizadosIA = await response.json();
+        if (datosAnalizadosIA.error) throw new Error(datosAnalizadosIA.error);
+
+        abrirComparadorIA();
+      } catch (err) { alert(err.message); }
+      finally { btnIA.innerText = "🤖 Consultar a Gemini IA"; btnIA.disabled = false; }
+    }
+
     function abrirComparadorIA() {
       if (!datosAnalizadosIA) return;
 
@@ -1286,7 +1422,6 @@
         { key: 'nombre', label: 'Nombre del Juego', idElem: 'nombre' },
         { key: 'categoria', label: 'Categoría', idElem: 'categoria' },
         { key: 'edad', label: 'Edad Recomendada', idElem: 'edad' },
-        { key: 'jugadores', label: 'Nº de Jugadores', idElem: 'jugadores' },
         { key: 'mecanicas', label: 'Mecánicas', idElem: 'mecanicas' },
         { key: 'instrucciones', label: 'Reglas Básicas (Resumen)', idElem: 'instrucciones' },
         { key: 'instrucciones_completas', label: 'Reglas Completas Paso a Paso', idElem: 'instruccionesCompletas' }
@@ -1298,7 +1433,7 @@
         const valActual = elemForm ? elemForm.value : '';
 
         if (valIA && valIA.toString().trim().length > 0) {
-          seleccionesComparadorIA[campo.idElem] = 'ia'; // Por defecto seleccionada IA
+          seleccionesComparadorIA[campo.idElem] = 'ia';
 
           contenedor.innerHTML += `
             <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-2">
@@ -1332,6 +1467,13 @@
           `;
         }
       });
+
+      if (datosAnalizadosIA.min_jugadores) {
+        document.getElementById('minJugadoresSelect').value = datosAnalizadosIA.min_jugadores;
+      }
+      if (datosAnalizadosIA.max_jugadores) {
+        document.getElementById('maxJugadoresSelect').value = datosAnalizadosIA.max_jugadores;
+      }
 
       document.getElementById('modalComparadorIA').classList.remove('hidden');
     }
@@ -1376,7 +1518,6 @@
         { key: 'nombre', idElem: 'nombre' },
         { key: 'categoria', idElem: 'categoria' },
         { key: 'edad', idElem: 'edad' },
-        { key: 'jugadores', idElem: 'jugadores' },
         { key: 'mecanicas', idElem: 'mecanicas' },
         { key: 'instrucciones', idElem: 'instrucciones' },
         { key: 'instrucciones_completas', idElem: 'instruccionesCompletas' }
@@ -1396,126 +1537,6 @@
 
       cerrarComparadorIA();
       alert("✅ Cambios de la IA aplicados al formulario.");
-    }
-
-    // --- FORMULARIO Y CONTROL DE DUPLICADOS ---
-    async function preprocesarGuardadoJuego(e) {
-      e.preventDefault();
-      const nombreInput = document.getElementById('nombre').value;
-      const juegoIdActual = document.getElementById('juegoId').value;
-
-      try {
-        const res = await fetchSeguro(`/api/juegos/comprobar-duplicado`, {
-          method: 'POST',
-          body: JSON.stringify({ nombre: nombreInput, id_actual: juegoIdActual })
-        });
-        const check = await res.json();
-
-        if (check.existe) {
-          const confirmarVariante = confirm(
-            `⚠️ ATENCIÓN: Ya existe un juego registrado con el nombre "${check.juego_existente}".\n\n` +
-            `Si se trata de una versión, expansión o variante diferente, presiona OK para guardarlo como una nueva ficha independiente.\n` +
-            `De lo contrario, pulsa Cancelar para modificar el nombre.`
-          );
-          if (!confirmarVariante) return;
-        }
-
-        guardarJuego();
-      } catch (err) { alert(err.message); }
-    }
-
-    async function guardarJuego() {
-      const btn = document.getElementById('btnGuardar');
-      btn.innerText = "Subiendo...";
-      btn.disabled = true;
-
-      const idActual = document.getElementById('juegoId').value;
-
-      const nuevoJuego = {
-        id: idActual || crypto.randomUUID(),
-        nombre: document.getElementById('nombre').value,
-        categoria: document.getElementById('categoria').value,
-        ubicacion: document.getElementById('ubicacionSelect').value,
-        edad: document.getElementById('edad').value,
-        jugadores: document.getElementById('jugadores').value,
-        mecanicas: document.getElementById('mecanicas').value,
-        instrucciones: document.getElementById('instrucciones').value,
-        instrucciones_completas: document.getElementById('instruccionesCompletas').value,
-        foto_base64: document.getElementById('juegoFotoBase64').value
-      };
-
-      try {
-        const res = await fetchSeguro(`/api/juegos`, { method: 'POST', body: JSON.stringify(nuevoJuego) });
-        const json = await res.json();
-        if (json.error) throw new Error(json.error);
-
-        cerrarModalFormulario();
-        await cargarUbicaciones();
-        await cargarMecanicasDinamicas();
-        cargarJuegos();
-      } catch (err) { alert(err.message); }
-      finally { btn.innerText = "Guardar en la Nube"; btn.disabled = false; }
-    }
-
-    function abrirModalFormulario(juegoAEditar = null) {
-      const form = document.getElementById('juegoForm');
-      form.reset();
-      poblarSelectUbicaciones();
-
-      if (juegoAEditar) {
-        document.getElementById('modalTitulo').innerText = "Editar Ficha de Juego";
-        document.getElementById('juegoId').value = juegoAEditar.id;
-        document.getElementById('nombre').value = juegoAEditar.nombre || '';
-        document.getElementById('categoria').value = juegoAEditar.categoria || 'Juego de Mesa';
-        document.getElementById('ubicacionSelect').value = juegoAEditar.ubicacion || '';
-        document.getElementById('edad').value = juegoAEditar.edad || '';
-        document.getElementById('jugadores').value = juegoAEditar.jugadores || '1+ jugadores';
-        document.getElementById('mecanicas').value = juegoAEditar.mecanicas || '';
-        document.getElementById('instrucciones').value = juegoAEditar.instrucciones || '';
-        document.getElementById('instruccionesCompletas').value = juegoAEditar.instrucciones_completas || '';
-
-        const foto = juegoAEditar.foto_url || juegoAEditar.foto_base64 || '';
-        document.getElementById('juegoFotoBase64').value = foto;
-        document.getElementById('imagePreview').innerHTML = foto ? `<img src="${foto}" class="w-full h-full object-contain">` : `<span class="text-slate-400 text-xs">Sin fotografía</span>`;
-
-        document.getElementById('contenedorBorradoEdicion').classList.remove('hidden');
-      } else {
-        document.getElementById('modalTitulo').innerText = "Nuevo Juego / Juguete";
-        document.getElementById('juegoId').value = '';
-        document.getElementById('juegoFotoBase64').value = '';
-        document.getElementById('imagePreview').innerHTML = `<span class="text-slate-400 text-xs">Sin fotografía</span>`;
-        document.getElementById('contenedorBorradoEdicion').classList.add('hidden');
-      }
-
-      document.getElementById('modalForm').classList.remove('hidden');
-    }
-
-    function cerrarModalFormulario() { document.getElementById('modalForm').classList.add('hidden'); }
-
-    async function analizarConIA() {
-      const base64 = document.getElementById('juegoFotoBase64').value;
-      const nombreActual = document.getElementById('nombre').value;
-      
-      const seccionesChecked = Array.from(document.querySelectorAll('#checkboxesSeccionesIA input:checked')).map(el => el.value);
-      if (seccionesChecked.length === 0) return alert("Selecciona al menos una sección para consultar a la IA.");
-
-      if (!base64 && !nombreActual) return alert("Sube una foto o escribe el nombre del juego para que Gemini pueda identificarlo.");
-
-      const btnIA = document.getElementById('btnIA');
-      btnIA.innerText = "⏳ Consultando a Gemini...";
-      btnIA.disabled = true;
-
-      try {
-        const response = await fetchSeguro(`/api/analizar-imagen`, {
-          method: 'POST',
-          body: JSON.stringify({ foto_base64: base64, secciones_solicitadas: seccionesChecked, nombre_juego_ref: nombreActual })
-        });
-        datosAnalizadosIA = await response.json();
-        if (datosAnalizadosIA.error) throw new Error(datosAnalizadosIA.error);
-
-        abrirComparadorIA();
-      } catch (err) { alert(err.message); }
-      finally { btnIA.innerText = "🤖 Consultar a Gemini IA"; btnIA.disabled = false; }
     }
 
     async function confirmarBorradoSeguro() {
@@ -1559,7 +1580,7 @@
       reader.readAsDataURL(file);
     }
 
-    // --- RULETA CLÁSICA CON EFECTO DE SONIDO ---
+    // --- RULETA ---
     function abrirModalRuleta() {
       document.getElementById('pasoRuletaConfig').classList.remove('hidden');
       document.getElementById('pasoRuletaAnimacion').classList.add('hidden');
