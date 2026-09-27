@@ -187,14 +187,20 @@
               </select>
             </div>
 
+            <!-- FILTRO DE EDAD ACTUALIZADO CON VALORES NORMALIZADOS +3, +4, +6... -->
             <div>
-              <label class="font-bold text-slate-500 uppercase text-[10px]">👶 Edad Mínima</label>
+              <label class="font-bold text-slate-500 uppercase text-[10px]">👶 Apto para Edad</label>
               <select id="filtroEdadMinima" onchange="filtrarJuegos()" class="w-full p-2 border rounded-xl outline-none mt-1 bg-slate-50 font-medium">
-                <option value="">Cualquier edad</option>
-                <option value="4">Para niños (+4)</option>
-                <option value="6">Infantil (+6)</option>
-                <option value="8">Familiar (+8)</option>
-                <option value="12">Adultos / Avanzado (+12)</option>
+                <option value="">Todas las edades</option>
+                <option value="3">Para +3 años</option>
+                <option value="4">Para +4 años</option>
+                <option value="6">Para +6 años</option>
+                <option value="8">Para +8 años</option>
+                <option value="10">Para +10 años</option>
+                <option value="12">Para +12 años</option>
+                <option value="14">Para +14 años</option>
+                <option value="16">Para +16 años</option>
+                <option value="18">Para +18 años</option>
               </select>
             </div>
 
@@ -424,7 +430,7 @@
     </div>
   </div>
 
-  <!-- MODAL FORMULARIO CON SELECCIÓN INDEPENDIENTE DE MÍNIMO Y MÁXIMO DE JUGADORES + DESPLEGABLE DE EDAD (+6, +8...) -->
+  <!-- MODAL FORMULARIO CON SELECCIÓN DE EDAD (+3, +4...) Y JUGADORES MÍN/MÁX -->
   <div id="modalForm" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
     <div class="bg-white rounded-2xl max-w-md w-full h-[90vh] max-h-[660px] flex flex-col shadow-2xl overflow-hidden relative border border-slate-100">
       <div class="p-3 border-b flex justify-between items-center bg-slate-50 shrink-0">
@@ -495,7 +501,6 @@
             </div>
           </div>
 
-          <!-- EDAD CON SELECTOR EXPLICITO DE +3, +4, +6... -->
           <div>
             <label class="font-bold text-slate-600 uppercase text-[10px]">Edad Recomendada <span class="text-rose-500">*</span></label>
             <select id="edad" required class="w-full p-2 border rounded-xl outline-none mt-0.5 bg-white font-semibold">
@@ -511,7 +516,6 @@
             </select>
           </div>
 
-          <!-- RANGO INDEPENDIENTE DE JUGADORES MÍNIMO Y MÁXIMO -->
           <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-1.5">
             <span class="font-bold text-slate-600 uppercase text-[10px] block">Nº de Jugadores Permitidos <span class="text-rose-500">*</span></span>
             <div class="grid grid-cols-2 gap-2">
@@ -573,7 +577,7 @@
     </div>
   </div>
 
-  <!-- MODAL COMPARADOR IA -->
+  <!-- MODAL COMPARADOR IA ROBUSTO -->
   <div id="modalComparadorIA" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 hidden flex items-center justify-center p-3">
     <div class="bg-white rounded-2xl max-w-lg w-full h-[85vh] max-h-[620px] flex flex-col shadow-2xl overflow-hidden relative border border-purple-200">
       <div class="p-3 border-b bg-purple-900 text-white flex justify-between items-center shrink-0">
@@ -769,6 +773,18 @@
       const mes = (d.getMonth() + 1).toString().padStart(2, '0');
       const anio = d.getFullYear();
       return `${dia}/${mes}/${anio}`;
+    }
+
+    // EXTRAER EL VALOR NUMÉRICO DE LA EDAD MÍNIMA PARA FILTRADO
+    function obtenerEdadNumerica(juego) {
+      if (juego.min_edad !== undefined && juego.min_edad !== null && juego.min_edad > 0) {
+        return parseInt(juego.min_edad);
+      }
+      if (juego.edad) {
+        const num = parseInt(juego.edad.toString().replace(/[^0-9]/g, ''));
+        return isNaN(num) ? 0 : num;
+      }
+      return 0;
     }
 
     function reproducirSonidoClick() {
@@ -1132,7 +1148,7 @@
       finally { btn.innerText = "Preguntar"; btn.disabled = false; }
     }
 
-    // --- RENDERIZADO PRINCIPAL ---
+    // --- RENDERIZADO Y FILTRADO CON LÓGICA DE EDAD REVISADA ---
     async function cargarJuegos() {
       try {
         const res = await fetchSeguro(`/api/juegos`); 
@@ -1154,7 +1170,7 @@
       const container = document.getElementById('mainContainer');
       const search = document.getElementById('searchInput').value.toLowerCase();
       const numJug = parseInt(document.getElementById('filtroNumJugadores').value) || 0;
-      const edadMin = parseInt(document.getElementById('filtroEdadMinima').value) || 0;
+      const edadSeleccionada = parseInt(document.getElementById('filtroEdadMinima').value) || 0;
       const orden = document.getElementById('filtroOrdenacion').value;
       const mecsChecked = Array.from(document.querySelectorAll('#checkboxesMecanicasDinamicas input:checked')).map(el => el.value);
 
@@ -1162,7 +1178,11 @@
         let okCat = (categoriaActual === 'Favoritos') ? favoritosCache.includes(j.id) : (categoriaActual === 'Todas' || j.categoria === categoriaActual);
         let okNom = j.nombre.toLowerCase().includes(search);
         let okJug = numJug === 0 || ((j.min_jugadores || 1) <= numJug && (j.max_jugadores || 99) >= numJug);
-        let okEdad = edadMin === 0 || (j.min_edad || 0) <= edadMin;
+        
+        // REVISIÓN DEL FILTRO DE EDAD: El juego es apto si su edad mínima recomendada es menor o igual que la edad elegida
+        const edadJuego = obtenerEdadNumerica(j);
+        let okEdad = edadSeleccionada === 0 || (edadJuego <= edadSeleccionada);
+
         let okMec = mecsChecked.length === 0 || mecsChecked.every(m => (j.mecanicas || '').includes(m));
 
         return okCat && okNom && okJug && okEdad && okMec;
@@ -1287,7 +1307,7 @@
       }
     }
 
-    // --- FORMULARIO & COMPARADOR ---
+    // --- FORMULARIO Y COMPARADOR IA CORREGIDO ---
     function abrirModalFormulario(juegoAEditar = null) {
       const form = document.getElementById('juegoForm');
       form.reset();
@@ -1411,6 +1431,7 @@
       finally { btnIA.innerText = "🤖 Consultar a Gemini IA"; btnIA.disabled = false; }
     }
 
+    // COMPARADOR IA ROBUSTO CON MANEJO DE FORMATOS CAMELCASE/SNAKE_CASE
     function abrirComparadorIA() {
       if (!datosAnalizadosIA) return;
 
@@ -1418,21 +1439,33 @@
       contenedor.innerHTML = '';
       seleccionesComparadorIA = {};
 
+      const iaNormalizada = {
+        nombre: datosAnalizadosIA.nombre || '',
+        categoria: datosAnalizadosIA.categoria || '',
+        edad: datosAnalizadosIA.edad || '',
+        mecanicas: datosAnalizadosIA.mecanicas || '',
+        instrucciones: datosAnalizadosIA.instrucciones || datosAnalizadosIA.reglas_basicas || '',
+        instruccionesCompletas: datosAnalizadosIA.instrucciones_completas || datosAnalizadosIA.instruccionesCompletas || ''
+      };
+
       const mapaCampos = [
         { key: 'nombre', label: 'Nombre del Juego', idElem: 'nombre' },
         { key: 'categoria', label: 'Categoría', idElem: 'categoria' },
         { key: 'edad', label: 'Edad Recomendada', idElem: 'edad' },
         { key: 'mecanicas', label: 'Mecánicas', idElem: 'mecanicas' },
         { key: 'instrucciones', label: 'Reglas Básicas (Resumen)', idElem: 'instrucciones' },
-        { key: 'instrucciones_completas', label: 'Reglas Completas Paso a Paso', idElem: 'instruccionesCompletas' }
+        { key: 'instruccionesCompletas', label: 'Reglas Completas Paso a Paso', idElem: 'instruccionesCompletas' }
       ];
 
+      let bloquesGenerados = 0;
+
       mapaCampos.forEach(campo => {
-        const valIA = datosAnalizadosIA[campo.key] || '';
+        const valIA = iaNormalizada[campo.key];
         const elemForm = document.getElementById(campo.idElem);
         const valActual = elemForm ? elemForm.value : '';
 
         if (valIA && valIA.toString().trim().length > 0) {
+          bloquesGenerados++;
           seleccionesComparadorIA[campo.idElem] = 'ia';
 
           contenedor.innerHTML += `
@@ -1440,7 +1473,7 @@
               <span class="font-bold text-slate-700 uppercase text-[10px] block border-b pb-1">${campo.label}</span>
               
               <div class="grid grid-cols-2 gap-2 text-[11px]">
-                <div id="card_orig_${campo.idElem}" onclick="seleccionarOpcionComparador('${campo.idElem}', 'original')" class="p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-white border-slate-200">
+                <div id="card_orig_${campo.idElem}" onclick="seleccionarOpcionComparador('${campo.idElem}', 'original')" class="p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-white border-slate-200 opacity-60">
                   <div>
                     <span class="text-[9px] font-bold text-slate-400 block uppercase mb-1">📄 Original:</span>
                     <p class="text-slate-700 whitespace-pre-line">${valActual || '(Vacío)'}</p>
@@ -1469,10 +1502,21 @@
       });
 
       if (datosAnalizadosIA.min_jugadores) {
-        document.getElementById('minJugadoresSelect').value = datosAnalizadosIA.min_jugadores;
+        const elMin = document.getElementById('minJugadoresSelect');
+        if (elMin) elMin.value = datosAnalizadosIA.min_jugadores;
       }
       if (datosAnalizadosIA.max_jugadores) {
-        document.getElementById('maxJugadoresSelect').value = datosAnalizadosIA.max_jugadores;
+        const elMax = document.getElementById('maxJugadoresSelect');
+        if (elMax) elMax.value = datosAnalizadosIA.max_jugadores;
+      }
+
+      if (bloquesGenerados === 0) {
+        contenedor.innerHTML = `
+          <div class="text-center py-8 text-slate-500 space-y-2">
+            <p class="font-bold">⚠️ No se extrajeron textos comparables.</p>
+            <p class="text-xs">Gemini ha identificado los parámetros básicos, pero no generó texto para las secciones seleccionadas.</p>
+          </div>
+        `;
       }
 
       document.getElementById('modalComparadorIA').classList.remove('hidden');
@@ -1520,7 +1564,7 @@
         { key: 'edad', idElem: 'edad' },
         { key: 'mecanicas', idElem: 'mecanicas' },
         { key: 'instrucciones', idElem: 'instrucciones' },
-        { key: 'instrucciones_completas', idElem: 'instruccionesCompletas' }
+        { key: 'instruccionesCompletas', idElem: 'instruccionesCompletas' }
       ];
 
       mapaCampos.forEach(campo => {
@@ -1528,7 +1572,8 @@
         const targetElem = document.getElementById(campo.idElem);
 
         if (modo === 'ia') {
-          targetElem.value = datosAnalizadosIA[campo.key] || targetElem.value;
+          const valIA = datosAnalizadosIA[campo.key] || datosAnalizadosIA.instrucciones_completas;
+          if (valIA) targetElem.value = valIA;
         } else if (modo === 'manual') {
           const areaManual = document.getElementById(`manual_${campo.idElem}`);
           if (areaManual && areaManual.value.trim()) targetElem.value = areaManual.value;
@@ -1664,7 +1709,7 @@
       document.getElementById('pasoRuletaConfig').classList.remove('hidden');
     }
 
-    // --- PERFIL DE USUARIO Y REGISTRO ---
+    // --- PERFIL Y AUTENTICACIÓN ---
     async function procesarLogin(e) {
       e.preventDefault();
       const nick = document.getElementById('loginNick').value;
@@ -1848,7 +1893,7 @@
       } catch (err) { alert(err.message); }
     }
 
-    // --- REGISTRO DE PARTIDAS & CRONÓMETRO ---
+    // --- PARTIDAS Y CRONÓMETRO ---
     async function abrirModalPartida(juegoId, juegoNombre) {
       document.getElementById('partidaJuegoId').value = juegoId;
       document.getElementById('partidaJuegoNombre').innerText = juegoNombre;
