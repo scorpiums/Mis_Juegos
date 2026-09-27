@@ -279,7 +279,7 @@
 
           <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-1">
             <span class="font-bold text-slate-500 uppercase text-[9px] block tracking-wider">📦 Ficha Técnica</span>
-            <p class="text-slate-700">👶 <b>Edad Recomendada:</b> <span id="fichaEdad"></span></p>
+            <p class="text-slate-700">👶 <b>Edad:</b> <span id="fichaEdad"></span></p>
             <p class="text-slate-700">👥 <b>Jugadores:</b> <span id="fichaJugadores"></span></p>
             <p class="text-slate-700">🧩 <b>Mecánicas BGG:</b> <span id="fichaMecanicas"></span></p>
           </div>
@@ -811,12 +811,17 @@
         return juego.jugadores;
       }
       if (min === max) {
-        return min === 1 ? '1 o más jugadores' : `${min} jugadores`;
+        return min === 1 ? '1 jugador' : `${min} jugadores`;
       }
       if (max >= 99) {
-        return `${min} o más jugadores`;
+        return `${min}+`;
       }
       return `${min}-${max}`;
+    }
+
+    function formatearGanadoresSimplificado(ganadorStr) {
+      if (!ganadorStr || ganadorStr === 'N/A' || ganadorStr === 'Sin ganador') return 'Sin datos';
+      return ganadorStr.replace(/P\d+:\s*/g, '').trim();
     }
 
     function reproducirSonidoClick() {
@@ -1197,7 +1202,7 @@
       renderizarTarjetas();
     }
 
-    // RENDERIZADO OPTIMIZADO (ANCHO UNIFORME, ORDEN FICHA->STATS Y SIN ZOOM)
+    // RENDERIZADO REVISADO Y OPTIMIZADO PARA MÓVIL Y DESKTOP
     function renderizarTarjetas() {
       const container = document.getElementById('mainContainer');
       const search = document.getElementById('searchInput').value.toLowerCase();
@@ -1244,21 +1249,21 @@
           }
 
           let ultimaPartidaFechaStr = j.ultima_partida_fecha ? formatearFechaCorta(j.ultima_partida_fecha) : 'Sin partidas';
-          let ultimaPartidaGanadorStr = j.ultima_partida_ganador || 'N/A';
+          let ganadoresLimpios = formatearGanadoresSimplificado(j.ultima_partida_ganador);
 
           gridHTML += `
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between relative transition hover:shadow-md">
               
               <div class="p-3.5 space-y-3">
-                <!-- CABECERA: TÍTULO A ANCHO COMPLETO Y BADGE CATEGORÍA -->
+                <!-- CABECERA: TÍTULO Y BADGE -->
                 <div class="flex justify-between items-start gap-2 border-b pb-2">
                   <h4 onclick="abrirFichaDetallada('${j.id}')" class="font-black text-base text-slate-800 leading-snug cursor-pointer hover:text-indigo-600 transition truncate flex-grow" title="${j.nombre}">${j.nombre}</h4>
                   <span class="bg-slate-900 text-white text-[10px] font-bold px-2.5 py-1 rounded-xl shrink-0 shadow-sm">${j.categoria}</span>
                 </div>
 
-                <!-- SECCIÓN CENTRAL: FOTO CUADRADA + COLUMNA DERECHA COMPACTA -->
-                <div class="flex gap-3 items-start">
-                  <!-- FOTO EN FORMATO CUADRADO PERFECTO (1:1) SIN EFECTO DE ZOOM -->
+                <!-- SECCIÓN CENTRAL: FOTO AMPLIADA + DATOS Y STATS ALTURA EXACTA IGUALADA -->
+                <div class="flex gap-3 items-stretch">
+                  <!-- FOTO EN FORMATO CUADRADO CON MAYOR PRESENCIA -->
                   <div onclick="abrirFichaDetallada('${j.id}')" class="w-5/12 aspect-square bg-slate-900 rounded-2xl relative flex items-center justify-center overflow-hidden cursor-pointer shrink-0 border border-slate-100 shadow-inner">
                     
                     <!-- BOTÓN CORAZÓN (Z-20) -->
@@ -1272,22 +1277,22 @@
                     ` : '<div class="text-slate-400 text-xs text-center p-2">Sin Foto</div>'}
                   </div>
 
-                  <!-- COLUMNA DERECHA CON ANCHO UNIFORME -->
-                  <div class="w-7/12 min-w-0 flex flex-col justify-between text-[11px] space-y-2">
+                  <!-- COLUMNA DERECHA CON DOS BLOQUES FLEXIBLES QUE SUMAN LA ALTURA DE LA FOTO -->
+                  <div class="w-7/12 min-w-0 flex flex-col justify-between space-y-1.5">
                     
-                    <!-- BLOQUE 1: FICHA TÉCNICA RÁPIDA (PRIMERO) -->
-                    <div class="bg-slate-50 p-2 rounded-xl border border-slate-200/80 space-y-1 w-full">
+                    <!-- BLOQUE 1: FICHA TÉCNICA SIMPLIFICADA -->
+                    <div class="bg-slate-50 p-2 rounded-xl border border-slate-200/80 text-[11px] space-y-1 flex-1 flex flex-col justify-center">
                       <p class="text-slate-700 truncate">👶 <b>Edad:</b> ${formatearTextoEdad(j)}</p>
                       <p class="text-slate-700 truncate">👥 <b>Jugadores:</b> ${formatearTextoJugadores(j)}</p>
                       <p class="text-slate-600 text-[10px] truncate" title="${j.mecanicas || 'Sin especificar'}">🧩 <b>Mecánicas:</b> ${j.mecanicas || 'Sin especificar'}</p>
                     </div>
 
-                    <!-- BLOQUE 2: ESTADÍSTICAS DE JUEGO (DESPUÉS) -->
-                    <div class="bg-indigo-50/70 border border-indigo-100 p-2 rounded-xl space-y-0.5 text-[10px] text-indigo-950 w-full">
+                    <!-- BLOQUE 2: ESTADÍSTICAS SIMPLIFICADAS (MISMAS ALTURAS Y SIMPLIFICADO) -->
+                    <div class="bg-indigo-50/70 border border-indigo-100 p-2 rounded-xl text-[10px] space-y-0.5 text-indigo-950 flex-1 flex flex-col justify-center">
                       <p class="font-bold text-indigo-700 flex items-center gap-1">🎮 ${j.veces_jugado || 0} partidas</p>
-                      <p class="truncate text-slate-600">⏱️ <b>Tiempo medio:</b> ${tiempoMedioStr}</p>
-                      <p class="truncate text-slate-600">🕒 <b>Última partida:</b> ${ultimaPartidaFechaStr}</p>
-                      <p class="truncate text-emerald-800 font-bold">🏆 <b>Ganador:</b> ${ultimaPartidaGanadorStr}</p>
+                      <p class="truncate text-slate-600">⏱️ ${tiempoMedioStr}</p>
+                      <p class="truncate text-slate-600">🕒 ${ultimaPartidaFechaStr}</p>
+                      <p class="truncate text-emerald-800 font-bold">🏆 ${ganadoresLimpios}</p>
                     </div>
 
                   </div>
@@ -1317,27 +1322,46 @@
         container.innerHTML = gridHTML;
 
       } else {
-        let listHTML = '<div class="space-y-2 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden divide-y divide-slate-100 p-2">';
+        // MODO LISTA REVISADO: MÁS AMPLIO, IMAGEN MÁS GRANDE Y BOTÓN / CATEGORÍA EN SEGUNDA LÍNEA
+        let listHTML = '<div class="space-y-2.5 max-w-4xl mx-auto">';
         filtrados.forEach(j => {
           const imagenSrc = j.foto_url || j.foto_base64 || '';
           const tieneImagen = imagenSrc && imagenSrc.trim().length > 0;
           const esFav = favoritosCache.includes(j.id);
 
           listHTML += `
-            <div class="p-2 space-y-1.5 hover:bg-slate-50 transition">
-              <div class="flex items-center gap-2 min-w-0">
-                <button onclick="toggleFavorito('${j.id}')" class="text-sm shrink-0">${esFav ? '❤️' : '🤍'}</button>
-                <div onclick="abrirFichaDetallada('${j.id}')" class="w-9 h-9 bg-slate-900 rounded-lg overflow-hidden shrink-0 flex items-center justify-center relative cursor-pointer">
-                  ${tieneImagen ? `<img src="${imagenSrc}" class="w-full h-full object-cover">` : '<span class="text-[8px] text-slate-400">Foto</span>'}
+            <div class="bg-white p-3 rounded-2xl shadow-sm border border-slate-200 space-y-2 hover:border-indigo-200 transition">
+              
+              <!-- PRIMERA LÍNEA: FAV + FOTO GRANDE + TÍTULO Y META -->
+              <div class="flex items-center gap-3 min-w-0">
+                <button onclick="toggleFavorito('${j.id}')" class="text-base shrink-0 p-1">
+                  ${esFav ? '❤️' : '🤍'}
+                </button>
+
+                <!-- IMAGEN MÁS GRANDE (14x14 = 56px) -->
+                <div onclick="abrirFichaDetallada('${j.id}')" class="w-14 h-14 bg-slate-900 rounded-xl overflow-hidden shrink-0 flex items-center justify-center relative cursor-pointer border border-slate-100 shadow-inner">
+                  ${tieneImagen ? `<img src="${imagenSrc}" class="w-full h-full object-cover">` : '<span class="text-[9px] text-slate-400">Sin Foto</span>'}
                 </div>
+
                 <div class="min-w-0 flex-grow cursor-pointer" onclick="abrirFichaDetallada('${j.id}')">
-                  <h4 class="font-bold text-slate-800 text-xs leading-tight hover:text-indigo-600 transition truncate">${j.nombre}</h4>
-                  <p class="text-[9px] text-slate-500 truncate">📍 ${j.ubicacion || 'Sin sitio'} • 👶 ${formatearTextoEdad(j)} • 👥 ${formatearTextoJugadores(j)}</p>
+                  <h4 class="font-black text-slate-800 text-sm leading-tight hover:text-indigo-600 transition truncate">${j.nombre}</h4>
+                  <p class="text-[11px] text-slate-500 truncate mt-0.5">
+                    📍 ${j.ubicacion || 'Sin sitio'} • 👶 ${formatearTextoEdad(j)} • 👥 ${formatearTextoJugadores(j)}
+                  </p>
                 </div>
-                <button onclick="abrirModalPartida('${j.id}', '${j.nombre.replace(/'/g, "\\'")}')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-2.5 py-1 rounded-lg text-[10px] card-zoom shadow-sm shrink-0">
-                  ¡Jugar!
+              </div>
+
+              <!-- SEGUNDA LÍNEA: BADGE DE CATEGORÍA Y BOTÓN JUGAR AL LADO -->
+              <div class="flex justify-between items-center pt-1 border-t border-slate-100">
+                <span class="bg-slate-100 text-slate-700 text-[10px] font-bold px-2.5 py-1 rounded-lg border border-slate-200">
+                  ${j.categoria}
+                </span>
+
+                <button onclick="abrirModalPartida('${j.id}', '${j.nombre.replace(/'/g, "\\'")}')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs card-zoom shadow-sm flex items-center gap-1">
+                  ¡Vamos a jugar!
                 </button>
               </div>
+
             </div>
           `;
         });
