@@ -786,6 +786,19 @@
     let seccionesMarcadasIA = [];
     let audioCtx = null;
 
+    // HELPER PARA TRANSFORMAR OBJETOS O ARRAYS EN TEXTO PLANO
+    function aTextoPlano(val) {
+      if (val === null || val === undefined) return '';
+      if (typeof val === 'string') return val;
+      if (Array.isArray(val)) {
+        return val.map(v => aTextoPlano(v)).join(', ');
+      }
+      if (typeof val === 'object') {
+        return val.resumen || val.texto || val.descripcion || Object.values(val).map(v => aTextoPlano(v)).join('\n');
+      }
+      return String(val);
+    }
+
     function formatearFechaCorta(fechaStr) {
       if (!fechaStr) return '';
       const d = new Date(fechaStr);
@@ -812,7 +825,6 @@
       return num > 0 ? `+${num} años` : (juego.edad || 'N/A');
     }
 
-    // FORMATEO SIMPLIFICADO DE JUGADORES A "1+" O "2-8"
     function formatearTextoJugadores(juego) {
       const min = parseInt(juego.min_jugadores) || 1;
       const max = parseInt(juego.max_jugadores) || 99;
@@ -1210,7 +1222,6 @@
       renderizarTarjetas();
     }
 
-    // RENDERIZADO AJUSTADO EXACTAMENTE A LAS MAQUETAS
     function renderizarTarjetas() {
       const container = document.getElementById('mainContainer');
       const search = document.getElementById('searchInput').value.toLowerCase();
@@ -1262,16 +1273,12 @@
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between relative transition hover:shadow-md">
               
               <div class="p-3.5 space-y-2.5">
-                <!-- TÍTULO Y CATEGORÍA -->
                 <div class="flex justify-between items-center gap-2 border-b pb-1.5">
                   <h4 onclick="abrirFichaDetallada('${j.id}')" class="font-black text-base text-slate-800 leading-snug cursor-pointer hover:text-indigo-600 transition truncate flex-grow" title="${j.nombre}">${j.nombre}</h4>
                   <span class="bg-slate-900 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shrink-0">${j.categoria}</span>
                 </div>
 
-                <!-- BLOQUE CENTRAL: IMAGEN CUADRADA + RECUADROS DE ALTO IDENTICO -->
                 <div class="flex gap-3 items-stretch">
-                  
-                  <!-- FOTO CUADRADA ESTRICTA -->
                   <div onclick="abrirFichaDetallada('${j.id}')" class="w-36 h-36 aspect-square bg-slate-900 rounded-2xl relative flex items-center justify-center overflow-hidden cursor-pointer shrink-0 border border-slate-100 shadow-inner">
                     <button onclick="event.stopPropagation(); toggleFavorito('${j.id}')" class="absolute top-1.5 left-1.5 w-6 h-6 bg-black/60 hover:bg-black/80 rounded-full flex items-center justify-center text-xs z-20 backdrop-blur-md card-zoom shadow-md text-white">
                       ${esFav ? '❤️' : '🤍'}
@@ -1283,10 +1290,7 @@
                     ` : '<div class="text-slate-400 text-xs text-center p-2">Sin Foto</div>'}
                   </div>
 
-                  <!-- BLOQUES DE INFORMACIÓN DERECHA (ALTURA AJUSTADA A LA FOTO H-36) -->
                   <div class="flex-grow min-w-0 flex flex-col justify-between gap-1.5 h-36">
-                    
-                    <!-- RECUADRO 1: TIPOLOGÍA, MECÁNICAS, EDAD Y JUGADORES -->
                     <div class="bg-slate-50 p-2 rounded-xl border border-slate-200 text-[11px] space-y-1 flex-1 flex flex-col justify-center">
                       <div class="flex items-center justify-between text-slate-700 font-semibold gap-1">
                         <span class="truncate">🏷️ ${j.tipologia || 'General'}</span>
@@ -1297,25 +1301,21 @@
                       </p>
                     </div>
 
-                    <!-- RECUADRO 2: PARTIDAS Y ESTADÍSTICAS -->
                     <div class="bg-indigo-50/70 border border-indigo-100 p-2 rounded-xl text-[10px] space-y-0.5 text-indigo-950 flex-1 flex flex-col justify-center">
                       <p class="font-bold text-indigo-700 truncate">🎮 ${j.veces_jugado || 0} partidas</p>
                       <p class="truncate text-slate-600">⏱️ ${tiempoMedioStr}</p>
                       <p class="truncate text-slate-600">🕒 ${ultimaPartidaFechaStr}</p>
                       <p class="truncate text-emerald-800 font-bold">🏆 ${ganadoresLimpios}</p>
                     </div>
-
                   </div>
                 </div>
 
-                <!-- UBICACIÓN Y AUTORÍA -->
                 <div class="text-[10px] text-slate-500 pt-0.5 flex justify-between items-center border-t border-slate-100">
                   <span class="truncate">📍 ${j.ubicacion || 'Sin sitio'}</span>
                   <span class="truncate text-right shrink-0">👤 @${j.creador_nick || 'admin'}</span>
                 </div>
               </div>
 
-              <!-- BOTÓN JUGAR (COMPLETO) -->
               <div class="p-3.5 pt-0">
                 <button onclick="abrirModalPartida('${j.id}', '${j.nombre.replace(/'/g, "\\'")}')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs card-zoom shadow-md flex items-center justify-center">
                   ¡Vamos a jugar!
@@ -1329,7 +1329,6 @@
         container.innerHTML = gridHTML;
 
       } else {
-        // MODO LISTA COMPACTA
         let listHTML = '<div class="space-y-2.5 max-w-4xl mx-auto">';
         filtrados.forEach(j => {
           const imagenSrc = j.foto_url || j.foto_base64 || '';
@@ -1338,7 +1337,6 @@
 
           listHTML += `
             <div class="bg-white p-2.5 rounded-2xl shadow-sm border border-slate-200 flex gap-3 items-center hover:border-indigo-200 transition">
-              
               <div onclick="abrirFichaDetallada('${j.id}')" class="w-14 h-14 aspect-square bg-slate-900 rounded-xl overflow-hidden shrink-0 flex items-center justify-center relative cursor-pointer border border-slate-100 shadow-inner">
                 <button onclick="event.stopPropagation(); toggleFavorito('${j.id}')" class="absolute top-1 left-1 w-5 h-5 bg-black/60 rounded-full flex items-center justify-center text-[10px] z-10 text-white">
                   ${esFav ? '❤️' : '🤍'}
@@ -1369,7 +1367,6 @@
                   </button>
                 </div>
               </div>
-
             </div>
           `;
         });
@@ -1378,7 +1375,6 @@
       }
     }
 
-    // FORMULARIO Y EDICIÓN COMPLETA
     function abrirModalFormulario(juegoAEditar = null) {
       const form = document.getElementById('juegoForm');
       form.reset();
@@ -1491,7 +1487,6 @@
       finally { btn.innerText = "Guardar en la Nube"; btn.disabled = false; }
     }
 
-    // CONSULTAR IA EN 4 SECCIONES
     async function analizarConIA() {
       const base64 = document.getElementById('juegoFotoBase64').value;
       const nombreActual = document.getElementById('nombre').value;
@@ -1522,7 +1517,7 @@
       finally { btnIA.innerText = "🤖 Consultar a Gemini IA"; btnIA.disabled = false; }
     }
 
-    // COMPARADOR IA REPARADO
+    // COMPARADOR IA CORREGIDO (SOLUCIONA DEFINITIVAMENTE [object Object] Y DESBORDAMIENTO)
     function abrirComparadorIA() {
       if (!datosAnalizadosIA) return;
 
@@ -1531,13 +1526,13 @@
       seleccionesComparadorIA = {};
 
       const iaNormalizada = {
-        nombre: datosAnalizadosIA.nombre || '',
-        categoria: datosAnalizadosIA.categoria || '',
-        tipologia: datosAnalizadosIA.tipologia || '',
-        edad: datosAnalizadosIA.edad || '',
-        mecanicas: datosAnalizadosIA.mecanicas || '',
-        instrucciones: datosAnalizadosIA.instrucciones || datosAnalizadosIA.reglas_basicas || '',
-        instruccionesCompletas: datosAnalizadosIA.instrucciones_completas || datosAnalizadosIA.instruccionesCompletas || ''
+        nombre: aTextoPlano(datosAnalizadosIA.nombre),
+        categoria: aTextoPlano(datosAnalizadosIA.categoria),
+        tipologia: aTextoPlano(datosAnalizadosIA.tipologia),
+        edad: aTextoPlano(datosAnalizadosIA.edad),
+        mecanicas: aTextoPlano(datosAnalizadosIA.mecanicas).split(',').map(s => s.trim()).filter(Boolean).slice(0, 3).join(', '),
+        instrucciones: aTextoPlano(datosAnalizadosIA.instrucciones || datosAnalizadosIA.reglas_basicas),
+        instruccionesCompletas: aTextoPlano(datosAnalizadosIA.instrucciones_completas || datosAnalizadosIA.reglas_completas || datosAnalizadosIA.instruccionesCompletas)
       };
 
       const mapaCampos = [
@@ -1559,7 +1554,7 @@
         const elemForm = document.getElementById(campo.idElem);
         const valActual = elemForm ? elemForm.value : '';
 
-        if (valIA && valIA.toString().trim().length > 0) {
+        if (valIA && valIA.trim().length > 0) {
           bloquesGenerados++;
           seleccionesComparadorIA[campo.idElem] = 'ia';
 
@@ -1568,18 +1563,18 @@
               <span class="font-bold text-slate-700 uppercase text-[10px] block border-b pb-1">${campo.label}</span>
               
               <div class="grid grid-cols-2 gap-2 text-[11px]">
-                <div id="card_orig_${campo.idElem}" onclick="seleccionarOpcionComparador('${campo.idElem}', 'original')" class="p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-white border-slate-200 opacity-60">
-                  <div>
+                <div id="card_orig_${campo.idElem}" onclick="seleccionarOpcionComparador('${campo.idElem}', 'original')" class="p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-white border-slate-200 opacity-60 overflow-hidden">
+                  <div class="break-words">
                     <span class="text-[9px] font-bold text-slate-400 block uppercase mb-1">📄 Original:</span>
-                    <p class="text-slate-700 whitespace-pre-line">${valActual || '(Vacío)'}</p>
+                    <p class="text-slate-700 whitespace-pre-line leading-relaxed">${valActual || '(Vacío)'}</p>
                   </div>
                   <span id="check_orig_${campo.idElem}" class="text-[10px] font-bold text-slate-400 mt-2 block">✕ No seleccionado</span>
                 </div>
 
-                <div id="card_ia_${campo.idElem}" onclick="seleccionarOpcionComparador('${campo.idElem}', 'ia')" class="p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-purple-100 border-purple-500 shadow-sm">
-                  <div>
+                <div id="card_ia_${campo.idElem}" onclick="seleccionarOpcionComparador('${campo.idElem}', 'ia')" class="p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-purple-100 border-purple-500 shadow-sm overflow-hidden">
+                  <div class="break-words">
                     <span class="text-[9px] font-bold text-purple-700 block uppercase mb-1">✨ Sugerido por IA:</span>
-                    <p class="text-purple-950 font-semibold whitespace-pre-line">${valIA}</p>
+                    <p class="text-purple-950 font-semibold whitespace-pre-line leading-relaxed">${valIA}</p>
                   </div>
                   <span id="check_ia_${campo.idElem}" class="text-[10px] font-bold text-purple-700 mt-2 block">✓ Seleccionado</span>
                 </div>
@@ -1628,19 +1623,19 @@
       const checkIa = document.getElementById(`check_ia_${idElem}`);
 
       if (opcion === 'original') {
-        cardOrig.className = "p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-emerald-50 border-emerald-500 shadow-sm";
+        cardOrig.className = "p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-emerald-50 border-emerald-500 shadow-sm overflow-hidden";
         checkOrig.className = "text-[10px] font-bold text-emerald-700 mt-2 block";
         checkOrig.innerText = "✓ Seleccionado";
 
-        cardIa.className = "p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-white border-slate-200 opacity-60";
+        cardIa.className = "p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-white border-slate-200 opacity-60 overflow-hidden";
         checkIa.className = "text-[10px] font-bold text-slate-400 mt-2 block";
         checkIa.innerText = "✕ No seleccionado";
       } else {
-        cardIa.className = "p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-purple-100 border-purple-500 shadow-sm";
+        cardIa.className = "p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-purple-100 border-purple-500 shadow-sm overflow-hidden";
         checkIa.className = "text-[10px] font-bold text-purple-700 mt-2 block";
         checkIa.innerText = "✓ Seleccionado";
 
-        cardOrig.className = "p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-white border-slate-200 opacity-60";
+        cardOrig.className = "p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-white border-slate-200 opacity-60 overflow-hidden";
         checkOrig.className = "text-[10px] font-bold text-slate-400 mt-2 block";
         checkOrig.innerText = "✕ No seleccionado";
       }
@@ -1669,12 +1664,14 @@
         const modo = seleccionesComparadorIA[campo.idElem];
         const targetElem = document.getElementById(campo.idElem);
 
-        if (modo === 'ia') {
-          const valIA = datosAnalizadosIA[campo.key] || datosAnalizadosIA.instrucciones_completas;
-          if (valIA) targetElem.value = valIA;
-        } else if (modo === 'manual') {
-          const areaManual = document.getElementById(`manual_${campo.idElem}`);
-          if (areaManual && areaManual.value.trim()) targetElem.value = areaManual.value;
+        if (targetElem && modo) {
+          if (modo === 'ia') {
+            const valIA = aTextoPlano(datosAnalizadosIA[campo.key] || datosAnalizadosIA.instrucciones_completas || datosAnalizadosIA.instrucciones);
+            if (valIA) targetElem.value = valIA;
+          } else if (modo === 'manual') {
+            const areaManual = document.getElementById(`manual_${campo.idElem}`);
+            if (areaManual && areaManual.value.trim()) targetElem.value = areaManual.value;
+          }
         }
       });
 
@@ -1696,7 +1693,6 @@
       } catch (err) { alert(err.message); }
     }
 
-    // PROCESAMIENTO DE FOTO
     function procesarFoto(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1740,7 +1736,6 @@
       reader.readAsDataURL(file);
     }
 
-    // RULETA
     function abrirModalRuleta() {
       document.getElementById('pasoRuletaConfig').classList.remove('hidden');
       document.getElementById('pasoRuletaAnimacion').classList.add('hidden');
@@ -1824,7 +1819,6 @@
       document.getElementById('pasoRuletaConfig').classList.remove('hidden');
     }
 
-    // PERFIL Y AUTENTICACIÓN
     async function procesarLogin(e) {
       e.preventDefault();
       const nick = document.getElementById('loginNick').value;
@@ -2005,6 +1999,66 @@
         alert("Perfil actualizado correctamente");
         iniciarApp();
         cerrarPerfilModal();
+      } catch (err) { alert(err.message); }
+    }
+
+    // PANEL ADMINISTRADOR
+    async function abrirAdminPanel() {
+      document.getElementById('modalAdmin').classList.remove('hidden');
+      cargarUsuariosAdmin();
+    }
+
+    function cerrarAdminPanel() { document.getElementById('modalAdmin').classList.add('hidden'); }
+
+    async function cargarUsuariosAdmin() {
+      try {
+        const res = await fetchSeguro(`/api/admin/usuarios`);
+        const usuarios = await res.json();
+
+        const lista = document.getElementById('listaUsuarios');
+        lista.innerHTML = '';
+
+        usuarios.forEach(u => {
+          const esActivo = u.estado === 'ACTIVO';
+          lista.innerHTML += `
+            <div class="bg-slate-50 p-3 rounded-xl border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+              <div>
+                <span class="font-bold text-slate-800">${u.nombre} (@${u.nick})</span>
+                <span class="ml-2 text-[10px] px-2 py-0.5 rounded-full ${esActivo ? 'bg-emerald-100 text-emerald-800 font-bold' : 'bg-amber-100 text-amber-800 font-bold'}">${u.estado}</span>
+                ${u.codigo_verificacion ? `<p class="text-[11px] text-indigo-600 font-mono mt-0.5">Código: ${u.codigo_verificacion}</p>` : ''}
+              </div>
+
+              <div class="flex gap-1.5 w-full sm:w-auto">
+                <button onclick="cambiarEstadoUsuarioAdmin('${u.id}', '${esActivo ? 'PENDIENTE' : 'ACTIVO'}')" class="text-xs ${esActivo ? 'bg-amber-500 hover:bg-amber-600' : 'bg-emerald-600 hover:bg-emerald-700'} text-white font-bold px-2.5 py-1 rounded-lg flex-1 sm:flex-none">
+                  ${esActivo ? 'Desactivar' : 'Activar'}
+                </button>
+                ${u.id !== 'admin-root' ? `
+                  <button onclick="borrarUsuarioAdmin('${u.id}')" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold px-2.5 py-1 rounded-lg">
+                    🗑️
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+          `;
+        });
+      } catch (err) { alert(err.message); }
+    }
+
+    async function cambiarEstadoUsuarioAdmin(userId, nuevoEstado) {
+      try {
+        await fetchSeguro(`/api/admin/usuarios/${userId}/estado`, {
+          method: 'PUT',
+          body: JSON.stringify({ estado: nuevoEstado })
+        });
+        cargarUsuariosAdmin();
+      } catch (err) { alert(err.message); }
+    }
+
+    async function borrarUsuarioAdmin(userId) {
+      if (!confirm("¿Seguro que deseas borrar este usuario?")) return;
+      try {
+        await fetchSeguro(`/api/admin/usuarios/${userId}`, { method: 'DELETE' });
+        cargarUsuariosAdmin();
       } catch (err) { alert(err.message); }
     }
 
