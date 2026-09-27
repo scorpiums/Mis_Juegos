@@ -14,11 +14,59 @@
       letter-spacing: -1px;
       text-shadow: 2px 2px 0px #000, -1px -1px 0px #000, 1px -1px 0px #000, -1px 1px 0px #000;
     }
-    @keyframes rouletteSpin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(1440deg); }
+    /* ESTILOS DE LA RULETA CLÁSICA DE SELECCIÓN */
+    .roulette-container {
+      position: relative;
+      width: 200px;
+      height: 200px;
+      margin: 0 auto;
     }
-    .spin-anim { animation: rouletteSpin 2.2s cubic-bezier(0.15, 0.85, 0.35, 1.2) forwards; }
+    .roulette-wheel {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 6px solid #1e1b4b;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      position: relative;
+      overflow: hidden;
+      transition: transform 3.5s cubic-bezier(0.15, 0.85, 0.35, 1.02);
+      background: conic-gradient(
+        #f59e0b 0deg 45deg, #6366f1 45deg 90deg, 
+        #10b981 90deg 135deg, #ec4899 135deg 180deg,
+        #8b5cf6 180deg 225deg, #3b82f6 225deg 270deg,
+        #f43f5e 270deg 315deg, #14b8a6 315deg 360deg
+      );
+    }
+    .roulette-pointer {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 12px solid transparent;
+      border-right: 12px solid transparent;
+      border-top: 22px solid #dc2626;
+      z-index: 20;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+    }
+    .roulette-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 44px;
+      height: 44px;
+      background: #ffffff;
+      border: 4px solid #1e1b4b;
+      border-radius: 50%;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen pb-20">
@@ -91,6 +139,7 @@
 
   <!-- APLICACIÓN PRINCIPAL -->
   <div id="mainApp" class="hidden">
+    <!-- CABECERA SUPERIOR FIJA -->
     <header class="bg-indigo-600 text-white px-3 py-2.5 shadow-md sticky top-0 z-30 flex justify-between items-center gap-1">
       <div class="flex items-center gap-2 shrink-0">
         <div class="w-8 h-8 bg-amber-400 rounded-xl border-2 border-black flex items-center justify-center shadow-md text-black font-black text-sm">🎮</div>
@@ -110,96 +159,100 @@
       </div>
     </header>
 
-    <div class="p-3 max-w-4xl mx-auto space-y-2.5">
-      <div class="flex gap-1.5">
-        <input type="text" id="searchInput" oninput="filtrarJuegos()" placeholder="🔍 Buscar juego..." class="w-full p-2.5 rounded-xl border border-slate-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-xs sm:text-sm">
+    <!-- MENÚ SUPERIOR ANCLADO (STICKY HEADER PARA BÚSQUEDA Y FILTROS) -->
+    <div class="sticky top-12 z-20 bg-slate-100/95 backdrop-blur-md p-3 border-b border-slate-200/80 shadow-sm">
+      <div class="max-w-4xl mx-auto space-y-2.5">
+        <div class="flex gap-1.5">
+          <input type="text" id="searchInput" oninput="filtrarJuegos()" placeholder="🔍 Buscar juego..." class="w-full p-2.5 rounded-xl border border-slate-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-xs sm:text-sm">
+          
+          <button onclick="togglePanelFiltros()" id="btnToggleFiltros" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-3 py-2 rounded-xl shadow-sm flex items-center gap-1 whitespace-nowrap card-zoom text-xs">
+            🎛️ Filtros
+          </button>
+
+          <button onclick="abrirModalRuleta()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-3 py-2 rounded-xl shadow-md flex items-center gap-1 whitespace-nowrap card-zoom text-xs">
+            🎡 Ruleta
+          </button>
+        </div>
+
+        <!-- PANEL FILTROS AVANZADOS -->
+        <div id="panelFiltrosAvanzados" class="hidden bg-white p-3.5 rounded-2xl border border-slate-200 shadow-md space-y-3 text-xs">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="font-bold text-slate-500 uppercase text-[10px]">👥 Nº de Jugadores</label>
+              <select id="filtroNumJugadores" onchange="filtrarJuegos()" class="w-full p-2 border rounded-xl outline-none mt-1 bg-slate-50 font-medium">
+                <option value="">Cualquier número</option>
+                <option value="1">1 Jugador (Solitario)</option>
+                <option value="2">2 Jugadores (Pareja)</option>
+                <option value="3">3 Jugadores</option>
+                <option value="4">4 Jugadores</option>
+                <option value="5">5+ Jugadores (Grupo)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="font-bold text-slate-500 uppercase text-[10px]">👶 Edad Mínima</label>
+              <select id="filtroEdadMinima" onchange="filtrarJuegos()" class="w-full p-2 border rounded-xl outline-none mt-1 bg-slate-50 font-medium">
+                <option value="">Cualquier edad</option>
+                <option value="4">Para niños (<4 años)</option>
+                <option value="6">Infantil (6+ años)</option>
+                <option value="8">Familiar (8+ años)</option>
+                <option value="12">Adultos / Avanzado (12+ años)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="font-bold text-slate-500 uppercase text-[10px]">📊 Ordenar Por</label>
+              <select id="filtroOrdenacion" onchange="filtrarJuegos()" class="w-full p-2 border rounded-xl outline-none mt-1 bg-indigo-50 text-indigo-900 font-bold">
+                <option value="nombre_asc">Nombre (A - Z)</option>
+                <option value="mas_jugados">Más jugados primero</option>
+                <option value="menos_jugados">Menos jugados primero</option>
+                <option value="recientes">Partida reciente</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="font-bold text-slate-500 uppercase text-[10px] block mb-1">🧩 Componentes / Mecánicas</label>
+            <div class="flex flex-wrap gap-1.5" id="checkboxesMecanicas">
+              <label class="bg-slate-100 px-2.5 py-1 rounded-lg border flex items-center gap-1 cursor-pointer hover:bg-slate-200">
+                <input type="checkbox" value="Cartas" onchange="filtrarJuegos()" class="rounded text-indigo-600"> 🃏 Cartas
+              </label>
+              <label class="bg-slate-100 px-2.5 py-1 rounded-lg border flex items-center gap-1 cursor-pointer hover:bg-slate-200">
+                <input type="checkbox" value="Dados" onchange="filtrarJuegos()" class="rounded text-indigo-600"> 🎲 Dados
+              </label>
+              <label class="bg-slate-100 px-2.5 py-1 rounded-lg border flex items-center gap-1 cursor-pointer hover:bg-slate-200">
+                <input type="checkbox" value="Tablero" onchange="filtrarJuegos()" class="rounded text-indigo-600"> 🗺️ Tablero
+              </label>
+              <label class="bg-slate-100 px-2.5 py-1 rounded-lg border flex items-center gap-1 cursor-pointer hover:bg-slate-200">
+                <input type="checkbox" value="Pelota/Red" onchange="filtrarJuegos()" class="rounded text-indigo-600"> 🏸 Red/Pista
+              </label>
+              <label class="bg-slate-100 px-2.5 py-1 rounded-lg border flex items-center gap-1 cursor-pointer hover:bg-slate-200">
+                <input type="checkbox" value="Agilidad" onchange="filtrarJuegos()" class="rounded text-indigo-600"> ⚡ Agilidad
+              </label>
+            </div>
+          </div>
+        </div>
         
-        <button onclick="togglePanelFiltros()" id="btnToggleFiltros" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-3 py-2 rounded-xl shadow-sm flex items-center gap-1 whitespace-nowrap card-zoom text-xs">
-          🎛️ Filtros
-        </button>
-
-        <button onclick="abrirModalRuleta()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-3 py-2 rounded-xl shadow-md flex items-center gap-1 whitespace-nowrap card-zoom text-xs">
-          🎲 ¡Azar!
-        </button>
-      </div>
-
-      <!-- PANEL FILTROS AVANZADOS -->
-      <div id="panelFiltrosAvanzados" class="hidden bg-white p-3.5 rounded-2xl border border-slate-200 shadow-md space-y-3 text-xs">
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div>
-            <label class="font-bold text-slate-500 uppercase text-[10px]">👥 Nº de Jugadores</label>
-            <select id="filtroNumJugadores" onchange="filtrarJuegos()" class="w-full p-2 border rounded-xl outline-none mt-1 bg-slate-50 font-medium">
-              <option value="">Cualquier número</option>
-              <option value="1">1 Jugador (Solitario)</option>
-              <option value="2">2 Jugadores (Pareja)</option>
-              <option value="3">3 Jugadores</option>
-              <option value="4">4 Jugadores</option>
-              <option value="5">5+ Jugadores (Grupo)</option>
-            </select>
+        <!-- CATEGORÍAS RÁPIDAS Y SELECTOR VISTA -->
+        <div class="flex justify-between items-center gap-2">
+          <div class="flex gap-1.5 overflow-x-auto pb-1 text-xs scrollbar-none flex-grow" id="categoriasFiltro">
+            <button onclick="filtrarCategoria('Todas', event)" class="cat-btn bg-indigo-600 text-white px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition">Todas</button>
+            <button onclick="filtrarCategoria('Favoritos', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition">❤️ Favoritos</button>
+            <button onclick="filtrarCategoria('Juego de Mesa', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition">Mesa</button>
+            <button onclick="filtrarCategoria('Construcción', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition">Construcción</button>
+            <button onclick="filtrarCategoria('Exterior', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition">Exterior</button>
+            <button onclick="filtrarCategoria('Consola', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition">Consola</button>
           </div>
 
-          <div>
-            <label class="font-bold text-slate-500 uppercase text-[10px]">👶 Edad Mínima</label>
-            <select id="filtroEdadMinima" onchange="filtrarJuegos()" class="w-full p-2 border rounded-xl outline-none mt-1 bg-slate-50 font-medium">
-              <option value="">Cualquier edad</option>
-              <option value="4">Para niños (<4 años)</option>
-              <option value="6">Infantil (6+ años)</option>
-              <option value="8">Familiar (8+ años)</option>
-              <option value="12">Adultos / Avanzado (12+ años)</option>
-            </select>
+          <div class="flex bg-slate-200 p-1 rounded-xl shrink-0">
+            <button onclick="cambiarVista('grid')" id="btnGrid" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-indigo-600 shadow-sm transition">⊞</button>
+            <button onclick="cambiarVista('compact')" id="btnCompact" class="px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 transition">☰</button>
           </div>
-
-          <div>
-            <label class="font-bold text-slate-500 uppercase text-[10px]">📊 Ordenar Por</label>
-            <select id="filtroOrdenacion" onchange="filtrarJuegos()" class="w-full p-2 border rounded-xl outline-none mt-1 bg-indigo-50 text-indigo-900 font-bold">
-              <option value="nombre_asc">Nombre (A - Z)</option>
-              <option value="mas_jugados">Más jugados primero</option>
-              <option value="menos_jugados">Menos jugados primero</option>
-              <option value="recientes">Partida reciente</option>
-            </select>
-          </div>
-        </div>
-
-        <div>
-          <label class="font-bold text-slate-500 uppercase text-[10px] block mb-1">🧩 Componentes / Mecánicas</label>
-          <div class="flex flex-wrap gap-1.5" id="checkboxesMecanicas">
-            <label class="bg-slate-100 px-2.5 py-1 rounded-lg border flex items-center gap-1 cursor-pointer hover:bg-slate-200">
-              <input type="checkbox" value="Cartas" onchange="filtrarJuegos()" class="rounded text-indigo-600"> 🃏 Cartas
-            </label>
-            <label class="bg-slate-100 px-2.5 py-1 rounded-lg border flex items-center gap-1 cursor-pointer hover:bg-slate-200">
-              <input type="checkbox" value="Dados" onchange="filtrarJuegos()" class="rounded text-indigo-600"> 🎲 Dados
-            </label>
-            <label class="bg-slate-100 px-2.5 py-1 rounded-lg border flex items-center gap-1 cursor-pointer hover:bg-slate-200">
-              <input type="checkbox" value="Tablero" onchange="filtrarJuegos()" class="rounded text-indigo-600"> 🗺️ Tablero
-            </label>
-            <label class="bg-slate-100 px-2.5 py-1 rounded-lg border flex items-center gap-1 cursor-pointer hover:bg-slate-200">
-              <input type="checkbox" value="Pelota/Red" onchange="filtrarJuegos()" class="rounded text-indigo-600"> 🏸 Red/Pista
-            </label>
-            <label class="bg-slate-100 px-2.5 py-1 rounded-lg border flex items-center gap-1 cursor-pointer hover:bg-slate-200">
-              <input type="checkbox" value="Agilidad" onchange="filtrarJuegos()" class="rounded text-indigo-600"> ⚡ Agilidad
-            </label>
-          </div>
-        </div>
-      </div>
-      
-      <!-- CATEGORÍAS RÁPIDAS -->
-      <div class="flex justify-between items-center gap-2">
-        <div class="flex gap-1.5 overflow-x-auto pb-1 text-xs scrollbar-none flex-grow" id="categoriasFiltro">
-          <button onclick="filtrarCategoria('Todas', event)" class="cat-btn bg-indigo-600 text-white px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition">Todas</button>
-          <button onclick="filtrarCategoria('Favoritos', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition">❤️ Favoritos</button>
-          <button onclick="filtrarCategoria('Juego de Mesa', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition">Mesa</button>
-          <button onclick="filtrarCategoria('Construcción', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition">Construcción</button>
-          <button onclick="filtrarCategoria('Exterior', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition">Exterior</button>
-          <button onclick="filtrarCategoria('Consola', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition">Consola</button>
-        </div>
-
-        <div class="flex bg-slate-200 p-1 rounded-xl shrink-0">
-          <button onclick="cambiarVista('grid')" id="btnGrid" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-indigo-600 shadow-sm transition">⊞</button>
-          <button onclick="cambiarVista('compact')" id="btnCompact" class="px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 transition">☰</button>
         </div>
       </div>
     </div>
 
+    <!-- CONTENEDOR DE TARJETAS -->
     <main class="p-3 max-w-4xl mx-auto" id="mainContainer">
       <div class="text-center py-10 text-slate-400">Cargando colección desde la nube...</div>
     </main>
@@ -222,7 +275,6 @@
 
       <div class="h-36 bg-slate-900 overflow-hidden relative flex items-center justify-center shrink-0 shadow-inner" id="fichaImagenContainer"></div>
 
-      <!-- PESTAÑAS FICHA UNIFICADAS -->
       <div class="flex bg-slate-100 p-1 text-[11px] font-bold text-slate-600 justify-between shrink-0 border-y border-slate-200">
         <button onclick="cambiarTabFicha('info')" id="tabInfoBtn" class="flex-1 py-1.5 rounded-lg text-center transition">Info</button>
         <button onclick="cambiarTabFicha('reglas')" id="tabReglasBtn" class="flex-1 py-1.5 rounded-lg text-center transition">Reglas & IA</button>
@@ -231,7 +283,6 @@
       </div>
 
       <div class="flex-grow overflow-y-auto p-3 space-y-3 text-xs">
-        <!-- TAB 1: INFO -->
         <div id="tabInfoContent" class="space-y-2.5">
           <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1.5">
             <p class="text-slate-700">📍 <b>Ubicación:</b> <span id="fichaUbicacion"></span></p>
@@ -247,7 +298,6 @@
           </div>
         </div>
 
-        <!-- TAB 2: REGLAS COMPLETAS Y ÁRBITRO IA -->
         <div id="tabReglasContent" class="space-y-3 hidden">
           <div class="space-y-1">
             <p class="font-bold text-slate-700 uppercase text-[10px] tracking-wider">📖 Instrucciones Oficiales Completas:</p>
@@ -275,7 +325,6 @@
           </div>
         </div>
 
-        <!-- TAB 3: ESTADÍSTICAS -->
         <div id="tabStatsContent" class="space-y-3 hidden">
           <div class="grid grid-cols-2 gap-2 text-center">
             <div class="bg-amber-50 border border-amber-200 p-2.5 rounded-xl">
@@ -294,7 +343,6 @@
           </div>
         </div>
 
-        <!-- TAB 4: HISTORIAL DE PARTIDAS -->
         <div id="tabHistorialJuegoContent" class="space-y-2 hidden">
           <div id="listaPartidasJuego" class="space-y-2"></div>
         </div>
@@ -333,7 +381,6 @@
         </div>
       </div>
 
-      <!-- PESTAÑAS PERFIL UNIFICADAS -->
       <div class="flex bg-slate-100 p-1 text-[11px] font-bold text-slate-600 justify-between shrink-0 border-y border-slate-200">
         <button onclick="cambiarTabPerfil('historial')" id="tabHistorialPerfilBtn" class="flex-1 py-1.5 rounded-lg text-center transition">Historial</button>
         <button onclick="cambiarTabPerfil('juegos')" id="tabJuegosPerfilBtn" class="flex-1 py-1.5 rounded-lg text-center transition">Mis Juegos</button>
@@ -407,7 +454,6 @@
             </button>
           </div>
 
-          <!-- AUTOREVISIÓN Y SELECCIÓN DE CAMPOS IA -->
           <div class="bg-purple-50 p-2.5 rounded-xl border border-purple-200 space-y-2 mt-2">
             <span class="font-bold text-purple-900 text-[11px] block">✨ Autorrellenar / Revisar con IA:</span>
             <div class="grid grid-cols-2 gap-1.5 text-[10px]" id="checkboxesSeccionesIA">
@@ -423,7 +469,7 @@
           </div>
         </div>
 
-        <form id="juegoForm" onsubmit="guardarJuego(event)" class="space-y-3">
+        <form id="juegoForm" onsubmit="preprocesarGuardadoJuego(event)" class="space-y-3">
           <input type="hidden" id="juegoId">
           <input type="hidden" id="juegoFotoBase64">
 
@@ -528,11 +574,11 @@
     </div>
   </div>
 
-  <!-- MODAL RULETA DE SELECCIÓN -->
+  <!-- MODAL RULETA CLÁSICA CON SONIDO Y ANIMACIÓN -->
   <div id="modalRuleta" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
     <div class="bg-white rounded-2xl max-w-md w-full p-4 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b pb-2">
-        <h3 class="font-bold text-lg text-slate-800">🎰 Ruleta de Selección</h3>
+        <h3 class="font-bold text-lg text-slate-800 flex items-center gap-1">🎡 Ruleta de Selección</h3>
         <button onclick="cerrarModalRuleta()" class="text-slate-400 font-bold text-xl px-2">✕</button>
       </div>
 
@@ -557,16 +603,19 @@
           </div>
         </div>
 
-        <button onclick="girarRuletaInteligente()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-black py-3 rounded-xl shadow-lg card-zoom text-sm">
+        <button onclick="girarRuletaClasica()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-black py-3 rounded-xl shadow-lg card-zoom text-sm">
           🎰 ¡GIRAR RULETA!
         </button>
       </div>
 
-      <div id="pasoRuletaAnimacion" class="hidden text-center py-8 space-y-4">
-        <div class="w-24 h-24 bg-gradient-to-tr from-amber-400 to-indigo-600 rounded-full mx-auto flex items-center justify-center text-4xl shadow-xl spin-anim border-4 border-white">
-          🎲
+      <!-- VISTA DE ANIMACIÓN RULETA CIRCULAR -->
+      <div id="pasoRuletaAnimacion" class="hidden text-center py-6 space-y-4">
+        <div class="roulette-container">
+          <div class="roulette-pointer"></div>
+          <div class="roulette-wheel" id="rouletteWheelElem"></div>
+          <div class="roulette-center">🎮</div>
         </div>
-        <p class="font-bold text-slate-600 animate-pulse">Eligiendo el mejor juego para hoy...</p>
+        <p class="font-bold text-slate-600 animate-pulse text-xs">¡Girando la ruleta...</p>
       </div>
 
       <div id="pasoRuletaResultado" class="hidden space-y-3">
@@ -687,6 +736,44 @@
     let segundosTranscurridos = 0;
     let modoPartidaActual = '';
     let datosAnalizadosIA = null;
+    let audioCtx = null;
+
+    // SINTETIZADOR DE SONIDOS PARA LA RULETA (Web Audio API)
+    function reproducirSonidoClick() {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(120, audioCtx.currentTime + 0.04);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.04);
+      } catch(e){}
+    }
+
+    function reproducirSonidoVictoria() {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const notas = [523.25, 659.25, 783.99, 1046.50];
+        notas.forEach((freq, idx) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime + (idx * 0.08));
+          gain.gain.setValueAtTime(0.3, audioCtx.currentTime + (idx * 0.08));
+          gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + (idx * 0.08) + 0.25);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(audioCtx.currentTime + (idx * 0.08));
+          osc.stop(audioCtx.currentTime + (idx * 0.08) + 0.25);
+        });
+      } catch(e){}
+    }
 
     async function fetchSeguro(ruta, opciones = {}) {
       const token = localStorage.getItem('auth_token');
@@ -1067,7 +1154,66 @@
       }
     }
 
-    // --- FORMULARIO Y COMPARADOR DE IA ---
+    // --- CONTROL DE DUPLICADOS Y GUARDADO ---
+    async function preprocesarGuardadoJuego(e) {
+      e.preventDefault();
+      const nombreInput = document.getElementById('nombre').value;
+      const juegoIdActual = document.getElementById('juegoId').value;
+
+      try {
+        const res = await fetchSeguro(`/api/juegos/comprobar-duplicado`, {
+          method: 'POST',
+          body: JSON.stringify({ nombre: nombreInput, id_actual: juegoIdActual })
+        });
+        const check = await res.json();
+
+        if (check.existe) {
+          const confirmarVariante = confirm(
+            `⚠️ ATENCIÓN: Ya existe un juego registrado con el nombre "${check.juego_existente}".\n\n` +
+            `Si se trata de una versión, expansión o variante diferente, presiona OK para guardarlo como una nueva ficha independiente.\n` +
+            `De lo contrario, pulsa Cancelar para modificar el nombre.`
+          );
+          if (!confirmarVariante) return;
+        }
+
+        guardarJuego();
+      } catch (err) { alert(err.message); }
+    }
+
+    async function guardarJuego() {
+      const btn = document.getElementById('btnGuardar');
+      btn.innerText = "Subiendo...";
+      btn.disabled = true;
+
+      const idActual = document.getElementById('juegoId').value;
+
+      const nuevoJuego = {
+        id: idActual || crypto.randomUUID(),
+        nombre: document.getElementById('nombre').value,
+        categoria: document.getElementById('categoria').value,
+        ubicacion: document.getElementById('ubicacionSelect').value,
+        edad: document.getElementById('edad').value,
+        jugadores: document.getElementById('jugadores').value,
+        mecanicas: document.getElementById('mecanicas').value,
+        pdf_reglas_url: document.getElementById('pdfReglasUrl').value,
+        video_tutorial_url: document.getElementById('videoTutorialUrl').value,
+        instrucciones: document.getElementById('instrucciones').value,
+        instrucciones_completas: document.getElementById('instruccionesCompletas').value,
+        foto_base64: document.getElementById('juegoFotoBase64').value
+      };
+
+      try {
+        const res = await fetchSeguro(`/api/juegos`, { method: 'POST', body: JSON.stringify(nuevoJuego) });
+        const json = await res.json();
+        if (json.error) throw new Error(json.error);
+
+        cerrarModalFormulario();
+        await cargarUbicaciones();
+        cargarJuegos();
+      } catch (err) { alert(err.message); }
+      finally { btn.innerText = "Guardar en la Nube"; btn.disabled = false; }
+    }
+
     function abrirModalFormulario(juegoAEditar = null) {
       const form = document.getElementById('juegoForm');
       form.reset();
@@ -1226,42 +1372,7 @@
       });
 
       cerrarComparadorIA();
-      alert("✅ Datos de la IA aplicados al formulario. Puedes revisarlos antes de guardar.");
-    }
-
-    async function guardarJuego(e) {
-      e.preventDefault();
-      const btn = document.getElementById('btnGuardar');
-      btn.innerText = "Subiendo...";
-      btn.disabled = true;
-
-      const idActual = document.getElementById('juegoId').value;
-
-      const nuevoJuego = {
-        id: idActual || Date.now().toString(),
-        nombre: document.getElementById('nombre').value,
-        categoria: document.getElementById('categoria').value,
-        ubicacion: document.getElementById('ubicacionSelect').value,
-        edad: document.getElementById('edad').value,
-        jugadores: document.getElementById('jugadores').value,
-        mecanicas: document.getElementById('mecanicas').value,
-        pdf_reglas_url: document.getElementById('pdfReglasUrl').value,
-        video_tutorial_url: document.getElementById('videoTutorialUrl').value,
-        instrucciones: document.getElementById('instrucciones').value,
-        instrucciones_completas: document.getElementById('instruccionesCompletas').value,
-        foto_base64: document.getElementById('juegoFotoBase64').value
-      };
-
-      try {
-        const res = await fetchSeguro(`/api/juegos`, { method: 'POST', body: JSON.stringify(nuevoJuego) });
-        const json = await res.json();
-        if (json.error) throw new Error(json.error);
-
-        cerrarModalFormulario();
-        await cargarUbicaciones();
-        cargarJuegos();
-      } catch (err) { alert(err.message); }
-      finally { btn.innerText = "Guardar en la Nube"; btn.disabled = false; }
+      alert("✅ Datos de la IA aplicados al formulario.");
     }
 
     async function confirmarBorradoSeguro() {
@@ -1305,7 +1416,92 @@
       reader.readAsDataURL(file);
     }
 
-    // --- PERFIL DE USUARIO & AUTENTICACIÓN ---
+    // --- RULETA CLÁSICA CON EFECTO DE SONIDO ---
+    function abrirModalRuleta() {
+      document.getElementById('pasoRuletaConfig').classList.remove('hidden');
+      document.getElementById('pasoRuletaAnimacion').classList.add('hidden');
+      document.getElementById('pasoRuletaResultado').classList.add('hidden');
+      document.getElementById('modalRuleta').classList.remove('hidden');
+    }
+
+    function cerrarModalRuleta() { document.getElementById('modalRuleta').classList.add('hidden'); }
+
+    function girarRuletaClasica() {
+      const modo = document.getElementById('ruletaModo').value;
+      const catsElegidas = Array.from(document.querySelectorAll('#checkboxesRuletaCat input:checked')).map(el => el.value);
+
+      let elegibles = juegosCache.filter(j => catsElegidas.includes(j.categoria));
+      if (elegibles.length === 0) return alert("No hay juegos disponibles con las categorías seleccionadas.");
+
+      if (modo === 'descarte') {
+        if (bolsaDescarteRuleta.length === 0) bolsaDescarteRuleta = [...elegibles.map(j => j.id)];
+        elegibles = elegibles.filter(j => bolsaDescarteRuleta.includes(j.id));
+      } else if (modo === 'rapida') {
+        const rapidos = elegibles.filter(j => (j.tiempo_medio_segundos || 0) <= 1200);
+        if (rapidos.length > 0) elegibles = rapidos;
+      }
+
+      let seleccionado = null;
+      if (modo === 'compensado') {
+        elegibles.sort((a,b) => (a.veces_jugado || 0) - (b.veces_jugado || 0));
+        seleccionado = elegibles[0];
+      } else {
+        seleccionado = elegibles[Math.floor(Math.random() * elegibles.length)];
+      }
+
+      if (modo === 'descarte') {
+        bolsaDescarteRuleta = bolsaDescarteRuleta.filter(id => id !== seleccionado.id);
+      }
+
+      document.getElementById('pasoRuletaConfig').classList.add('hidden');
+      document.getElementById('pasoRuletaAnimacion').classList.remove('hidden');
+
+      const wheel = document.getElementById('rouletteWheelElem');
+      wheel.style.transition = 'none';
+      wheel.style.transform = 'rotate(0deg)';
+      
+      setTimeout(() => {
+        const vueltasGrados = 1440 + Math.floor(Math.random() * 360);
+        wheel.style.transition = 'transform 3.5s cubic-bezier(0.15, 0.85, 0.35, 1.02)';
+        wheel.style.transform = `rotate(${vueltasGrados}deg)`;
+
+        // Efectos de sonido de los clics durante el giro
+        let clicks = 0;
+        const soundInterval = setInterval(() => {
+          reproducirSonidoClick();
+          clicks++;
+          if (clicks > 28) clearInterval(soundInterval);
+        }, 120);
+
+        setTimeout(() => {
+          reproducirSonidoVictoria();
+
+          document.getElementById('ruletaResultadoNombre').innerText = seleccionado.nombre;
+          const imgCont = document.getElementById('ruletaResultadoImagen');
+          const imgSrc = seleccionado.foto_url || seleccionado.foto_base64 || '';
+          imgCont.innerHTML = imgSrc ? `<img src="${imgSrc}" class="w-full h-full object-contain p-2">` : `<span class="text-slate-400 text-xs">Sin Foto</span>`;
+
+          document.getElementById('btnJugarRuleta').onclick = () => {
+            cerrarModalRuleta();
+            abrirModalPartida(seleccionado.id, seleccionado.nombre);
+          };
+          document.getElementById('btnVerFichaRuleta').onclick = () => {
+            cerrarModalRuleta();
+            abrirFichaDetallada(seleccionado.id);
+          };
+
+          document.getElementById('pasoRuletaAnimacion').classList.add('hidden');
+          document.getElementById('pasoRuletaResultado').classList.remove('hidden');
+        }, 3600);
+      }, 50);
+    }
+
+    function reiniciarRuleta() {
+      document.getElementById('pasoRuletaResultado').classList.add('hidden');
+      document.getElementById('pasoRuletaConfig').classList.remove('hidden');
+    }
+
+    // --- PERFIL DE USUARIO Y REGISTRO ---
     async function procesarLogin(e) {
       e.preventDefault();
       const nick = document.getElementById('loginNick').value;
@@ -1487,71 +1683,6 @@
         iniciarApp();
         cerrarPerfilModal();
       } catch (err) { alert(err.message); }
-    }
-
-    // --- RULETA DE SELECCIÓN ---
-    function abrirModalRuleta() {
-      document.getElementById('pasoRuletaConfig').classList.remove('hidden');
-      document.getElementById('pasoRuletaAnimacion').classList.add('hidden');
-      document.getElementById('pasoRuletaResultado').classList.add('hidden');
-      document.getElementById('modalRuleta').classList.remove('hidden');
-    }
-
-    function cerrarModalRuleta() { document.getElementById('modalRuleta').classList.add('hidden'); }
-
-    function girarRuletaInteligente() {
-      const modo = document.getElementById('ruletaModo').value;
-      const catsElegidas = Array.from(document.querySelectorAll('#checkboxesRuletaCat input:checked')).map(el => el.value);
-
-      let elegibles = juegosCache.filter(j => catsElegidas.includes(j.categoria));
-      if (elegibles.length === 0) return alert("No hay juegos disponibles con las categorías seleccionadas.");
-
-      if (modo === 'descarte') {
-        if (bolsaDescarteRuleta.length === 0) bolsaDescarteRuleta = [...elegibles.map(j => j.id)];
-        elegibles = elegibles.filter(j => bolsaDescarteRuleta.includes(j.id));
-      } else if (modo === 'rapida') {
-        const rapidos = elegibles.filter(j => (j.tiempo_medio_segundos || 0) <= 1200);
-        if (rapidos.length > 0) elegibles = rapidos;
-      }
-
-      document.getElementById('pasoRuletaConfig').classList.add('hidden');
-      document.getElementById('pasoRuletaAnimacion').classList.remove('hidden');
-
-      setTimeout(() => {
-        let seleccionado = null;
-        if (modo === 'compensado') {
-          elegibles.sort((a,b) => (a.veces_jugado || 0) - (b.veces_jugado || 0));
-          seleccionado = elegibles[0];
-        } else {
-          seleccionado = elegibles[Math.floor(Math.random() * elegibles.length)];
-        }
-
-        if (modo === 'descarte') {
-          bolsaDescarteRuleta = bolsaDescarteRuleta.filter(id => id !== seleccionado.id);
-        }
-
-        document.getElementById('ruletaResultadoNombre').innerText = seleccionado.nombre;
-        const imgCont = document.getElementById('ruletaResultadoImagen');
-        const imgSrc = seleccionado.foto_url || seleccionado.foto_base64 || '';
-        imgCont.innerHTML = imgSrc ? `<img src="${imgSrc}" class="w-full h-full object-contain p-2">` : `<span class="text-slate-400 text-xs">Sin Foto</span>`;
-
-        document.getElementById('btnJugarRuleta').onclick = () => {
-          cerrarModalRuleta();
-          abrirModalPartida(seleccionado.id, seleccionado.nombre);
-        };
-        document.getElementById('btnVerFichaRuleta').onclick = () => {
-          cerrarModalRuleta();
-          abrirFichaDetallada(seleccionado.id);
-        };
-
-        document.getElementById('pasoRuletaAnimacion').classList.add('hidden');
-        document.getElementById('pasoRuletaResultado').classList.remove('hidden');
-      }, 2000);
-    }
-
-    function reiniciarRuleta() {
-      document.getElementById('pasoRuletaResultado').classList.add('hidden');
-      document.getElementById('pasoRuletaConfig').classList.remove('hidden');
     }
 
     // --- REGISTRO DE PARTIDAS & CRONÓMETRO ---
