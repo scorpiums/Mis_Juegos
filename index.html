@@ -14,130 +14,14 @@
       letter-spacing: -1px;
       text-shadow: 2px 2px 0px #000, -1px -1px 0px #000, 1px -1px 0px #000, -1px 1px 0px #000;
     }
-    .roulette-container {
-      position: relative;
-      width: 200px;
-      height: 200px;
-      margin: 0 auto;
-    }
-    .roulette-wheel {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      border: 6px solid #1e1b4b;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-      position: relative;
-      overflow: hidden;
-      transition: transform 3.5s cubic-bezier(0.15, 0.85, 0.35, 1.02);
-      background: conic-gradient(
-        #f59e0b 0deg 45deg, #6366f1 45deg 90deg, 
-        #10b981 90deg 135deg, #ec4899 135deg 180deg,
-        #8b5cf6 180deg 225deg, #3b82f6 225deg 270deg,
-        #f43f5e 270deg 315deg, #14b8a6 315deg 360deg
-      );
-    }
-    .roulette-pointer {
-      position: absolute;
-      top: -12px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 0;
-      height: 0;
-      border-left: 12px solid transparent;
-      border-right: 12px solid transparent;
-      border-top: 22px solid #dc2626;
-      z-index: 20;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
-    }
-    .roulette-center {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 44px;
-      height: 44px;
-      background: #ffffff;
-      border: 4px solid #1e1b4b;
-      border-radius: 50%;
-      z-index: 10;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 900;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen pb-20">
 
-  <!-- PANTALLA DE AUTENTICACIÓN -->
-  <div id="authScreen" class="fixed inset-0 bg-indigo-900 z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4">
-      <div class="text-center space-y-1">
-        <div class="flex justify-center items-center gap-2 mb-2">
-          <div class="w-10 h-10 bg-amber-400 rounded-xl border-2 border-black flex items-center justify-center shadow-md font-bold text-black">🎮</div>
-          <h2 class="text-2xl font-black text-indigo-900 tracking-tight">MIS JUEGOS</h2>
-        </div>
-        <p class="text-xs text-slate-500">Inicia sesión para entrar a la colección</p>
-      </div>
-
-      <form id="loginForm" onsubmit="procesarLogin(event)" class="space-y-3">
-        <div>
-          <label class="text-xs font-bold text-slate-500 uppercase">Usuario / Nick</label>
-          <input type="text" id="loginNick" required class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500">
-        </div>
-        <div>
-          <label class="text-xs font-bold text-slate-500 uppercase">Contraseña</label>
-          <input type="password" id="loginPassword" required class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500">
-        </div>
-        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl card-zoom">
-          Entrar
-        </button>
-        <p class="text-center text-xs text-slate-500 pt-2">
-          ¿No tienes cuenta? <a href="#" onclick="toggleAuthMode('registro')" class="text-indigo-600 font-bold">Regístrate</a>
-        </p>
-      </form>
-
-      <form id="registroForm" onsubmit="procesarRegistro(event)" class="space-y-3 hidden" autocomplete="off">
-        <input type="text" style="display:none" name="fakeusernameremembered">
-        <input type="password" style="display:none" name="fakepasswordremembered">
-
-        <div>
-          <label class="text-xs font-bold text-slate-500 uppercase">Nombre Completo</label>
-          <input type="text" id="regNombre" required autocomplete="off" class="w-full p-2.5 border rounded-xl outline-none">
-        </div>
-        <div>
-          <label class="text-xs font-bold text-slate-500 uppercase">Nick de Usuario</label>
-          <input type="text" id="regNick" required autocomplete="new-username" class="w-full p-2.5 border rounded-xl outline-none">
-        </div>
-        <div>
-          <label class="text-xs font-bold text-slate-500 uppercase">Contraseña</label>
-          <input type="password" id="regPass1" required autocomplete="new-password" class="w-full p-2.5 border rounded-xl outline-none">
-        </div>
-        <div>
-          <label class="text-xs font-bold text-slate-500 uppercase">Repetir Contraseña</label>
-          <input type="password" id="regPass2" required autocomplete="new-password" class="w-full p-2.5 border rounded-xl outline-none">
-        </div>
-        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl card-zoom">
-          Solicitar Cuenta
-        </button>
-        <p class="text-center text-xs text-slate-500 pt-1">
-          ¿Ya tienes cuenta? <a href="#" onclick="toggleAuthMode('login')" class="text-indigo-600 font-bold">Inicia Sesión</a>
-        </p>
-      </form>
-
-      <div id="codigoForm" class="space-y-3 hidden">
-        <p class="text-xs text-slate-600 text-center">Introduce el código de 6 dígitos proporcionado por el Administrador:</p>
-        <input type="text" id="valCodigo" placeholder="000000" maxlength="6" class="w-full p-3 border text-center font-bold text-xl tracking-widest rounded-xl outline-none">
-        <button type="button" onclick="validarCodigoAcceso()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl">
-          Validar y Activar
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- APLICACIÓN PRINCIPAL -->
-  <div id="mainApp" class="hidden">
+  <!-- APP PRINCIPAL -->
+  <div id="mainApp">
+    
+    <!-- HEADER -->
     <header class="bg-indigo-600 text-white px-3 py-2.5 shadow-md sticky top-0 z-40 flex justify-between items-center gap-1">
       <div class="flex items-center gap-2 shrink-0">
         <div class="w-8 h-8 bg-amber-400 rounded-xl border-2 border-black flex items-center justify-center shadow-md text-black font-black text-sm">🎮</div>
@@ -146,39 +30,42 @@
           <span class="block text-[8px] text-indigo-200 uppercase font-semibold">Colección Familiar</span>
         </div>
       </div>
-
-      <div class="flex items-center gap-2 shrink-0">
-        <div id="userBadgeContainer"></div>
-        <button onclick="cerrarSesion()" class="text-indigo-200 hover:text-white p-1.5 transition flex items-center justify-center card-zoom" title="Cerrar Sesión">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 3H7a2 2 0 00-2 2v14a2 2 0 002 2h8m4-10l-4-4m4 4l-4 4m4-4H9"></path>
-          </svg>
-        </button>
-      </div>
+      <div id="userBadgeContainer"></div>
     </header>
 
-    <!-- MENÚ SUPERIOR ANCLADO -->
+    <!-- MENÚ SUPERIOR Y FILTROS -->
     <div class="sticky top-[48px] z-30 bg-slate-100 p-3 border-b border-slate-200 shadow-md">
       <div class="max-w-4xl mx-auto space-y-2.5">
+        
+        <!-- BÚSQUEDA Y BOTONES DE ACCIÓN -->
         <div class="flex gap-1.5">
-          <input type="text" id="searchInput" oninput="filtrarJuegos()" placeholder="🔍 Buscar juego..." class="w-full p-2.5 rounded-xl border border-slate-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-xs sm:text-sm">
+          <input type="text" id="searchInput" oninput="filtrarJuegos()" placeholder="🔍 Buscar por nombre, formato, regla..." class="w-full p-2.5 rounded-xl border border-slate-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-xs sm:text-sm">
           
-          <button onclick="togglePanelFiltros()" id="btnToggleFiltros" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-3 py-2 rounded-xl shadow-sm flex items-center gap-1 whitespace-nowrap card-zoom text-xs">
+          <button onclick="togglePanelFiltros()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-3 py-2 rounded-xl shadow-sm flex items-center gap-1 whitespace-nowrap card-zoom text-xs">
             🎛️ Filtros
-          </button>
-
-          <button onclick="abrirModalRuleta()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-3 py-2 rounded-xl shadow-md flex items-center gap-1 whitespace-nowrap card-zoom text-xs">
-            🎡 Ruleta
           </button>
         </div>
 
         <!-- PANEL FILTROS AVANZADOS -->
         <div id="panelFiltrosAvanzados" class="hidden bg-white p-3.5 rounded-2xl border border-slate-200 shadow-md space-y-3 text-xs">
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-2.5">
             <div>
-              <label class="font-bold text-slate-500 uppercase text-[10px]">👥 Nº de Jugadores</label>
-              <select id="filtroNumJugadores" onchange="filtrarJuegos()" class="w-full p-2 border rounded-xl outline-none mt-1 bg-slate-50 font-medium">
-                <option value="">Cualquier número</option>
+              <label class="font-bold text-slate-500 uppercase text-[10px]">🎴 Tipología / Formato</label>
+              <select id="filtroTipologia" onchange="filtrarJuegos()" class="w-full p-2 border rounded-xl outline-none mt-1 bg-slate-50 font-medium text-xs">
+                <option value="">Todas las tipologías</option>
+                <option value="Cartas">🃏 Cartas</option>
+                <option value="Tablero">🗺️ Tablero</option>
+                <option value="Dados">🎲 Dados</option>
+                <option value="Bloques">🧱 Bloques / Habilidad</option>
+                <option value="Losetas">🧩 Losetas / Fichas</option>
+                <option value="Deducción">🔍 Roles / Deducción</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="font-bold text-slate-500 uppercase text-[10px]">👥 Nº Jugadores</label>
+              <select id="filtroNumJugadores" onchange="filtrarJuegos()" class="w-full p-2 border rounded-xl outline-none mt-1 bg-slate-50 font-medium text-xs">
+                <option value="">Cualquiera</option>
                 <option value="1">1 Jugador</option>
                 <option value="2">2 Jugadores</option>
                 <option value="3">3 Jugadores</option>
@@ -188,40 +75,29 @@
             </div>
 
             <div>
-              <label class="font-bold text-slate-500 uppercase text-[10px]">👶 Apto para Edad</label>
-              <select id="filtroEdadMinima" onchange="filtrarJuegos()" class="w-full p-2 border rounded-xl outline-none mt-1 bg-slate-50 font-medium">
+              <label class="font-bold text-slate-500 uppercase text-[10px]">👶 Edad Apta</label>
+              <select id="filtroEdadMinima" onchange="filtrarJuegos()" class="w-full p-2 border rounded-xl outline-none mt-1 bg-slate-50 font-medium text-xs">
                 <option value="">Todas las edades</option>
-                <option value="3">Para +3 años</option>
-                <option value="4">Para +4 años</option>
-                <option value="6">Para +6 años</option>
-                <option value="8">Para +8 años</option>
-                <option value="10">Para +10 años</option>
-                <option value="12">Para +12 años</option>
-                <option value="14">Para +14 años</option>
-                <option value="16">Para +16 años</option>
-                <option value="18">Para +18 años</option>
+                <option value="3">+3 años</option>
+                <option value="6">+6 años</option>
+                <option value="8">+8 años</option>
+                <option value="10">+10 años</option>
+                <option value="12">+12 años</option>
               </select>
             </div>
 
             <div>
               <label class="font-bold text-slate-500 uppercase text-[10px]">📊 Ordenar Por</label>
-              <select id="filtroOrdenacion" onchange="filtrarJuegos()" class="w-full p-2 border rounded-xl outline-none mt-1 bg-indigo-50 text-indigo-900 font-bold">
+              <select id="filtroOrdenacion" onchange="filtrarJuegos()" class="w-full p-2 border rounded-xl outline-none mt-1 bg-indigo-50 text-indigo-900 font-bold text-xs">
                 <option value="nombre_asc">Nombre (A - Z)</option>
-                <option value="mas_jugados">Más jugados primero</option>
-                <option value="menos_jugados">Menos jugados primero</option>
-                <option value="recientes">Partida reciente</option>
+                <option value="mas_jugados">Más jugados</option>
+                <option value="menos_jugados">Menos jugados</option>
               </select>
             </div>
           </div>
-
-          <div>
-            <label class="font-bold text-slate-500 uppercase text-[10px] block mb-1">🧩 Componentes y Mecánicas (BGG):</label>
-            <div class="flex flex-wrap gap-1.5" id="checkboxesMecanicasDinamicas">
-              <span class="text-slate-400 text-[10px]">Cargando mecánicas...</span>
-            </div>
-          </div>
         </div>
-        
+
+        <!-- CATEGORÍAS EN PASTILLAS Y TOGGLE VISTA -->
         <div class="flex justify-between items-center gap-2">
           <div class="flex gap-1.5 overflow-x-auto pb-1 text-xs scrollbar-none flex-grow" id="categoriasFiltro">
             <button onclick="filtrarCategoria('Todas', event)" class="cat-btn bg-indigo-600 text-white px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition">Todas</button>
@@ -237,199 +113,52 @@
             <button onclick="cambiarVista('compact')" id="btnCompact" class="px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 transition">☰</button>
           </div>
         </div>
+
       </div>
     </div>
 
-    <!-- MAIN -->
+    <!-- CONTENEDOR PRINCIPAL DE TARJETAS -->
     <main class="p-3 max-w-4xl mx-auto" id="mainContainer">
-      <div class="text-center py-10 text-slate-400">Cargando colección desde la nube...</div>
+      <div class="text-center py-10 text-slate-400">Cargando colección...</div>
     </main>
 
+    <!-- BOTÓN FLOTANTE CREAR -->
     <button onclick="abrirModalFormulario()" class="fixed bottom-6 right-6 bg-indigo-600 hover:bg-indigo-700 text-white p-4 rounded-full shadow-2xl z-40 text-2xl font-bold flex items-center justify-center w-14 h-14 card-zoom">
       ＋
     </button>
   </div>
 
-  <!-- MODAL FICHA DETALLADA DEL JUEGO -->
+  <!-- MODAL FICHA DETALLADA -->
   <div id="modalFichaJuego" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
     <div class="bg-white rounded-2xl max-w-md w-full h-[85vh] max-h-[620px] flex flex-col shadow-2xl overflow-hidden relative border border-slate-100">
       <div class="p-3 border-b flex justify-between items-center bg-slate-50 shrink-0">
         <h3 class="font-bold text-base text-slate-800 truncate pr-2" id="fichaTitulo">Detalles del Juego</h3>
-        <div class="flex items-center gap-1.5">
-          <button id="btnEditarDesdeFicha" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-2.5 py-1 rounded-lg transition">✏️ Editar</button>
-          <button onclick="cerrarFichaModal()" class="text-slate-400 font-bold text-xl px-1">✕</button>
-        </div>
+        <button onclick="cerrarFichaModal()" class="text-slate-400 font-bold text-xl px-1">✕</button>
       </div>
 
       <div class="h-44 bg-slate-900 overflow-hidden relative flex items-center justify-center shrink-0 shadow-inner" id="fichaImagenContainer"></div>
 
-      <div class="flex bg-slate-100 p-1 text-[11px] font-bold text-slate-600 justify-between shrink-0 border-y border-slate-200">
-        <button onclick="cambiarTabFicha('info')" id="tabInfoBtn" class="flex-1 py-1.5 rounded-lg text-center transition">Info</button>
-        <button onclick="cambiarTabFicha('reglas')" id="tabReglasBtn" class="flex-1 py-1.5 rounded-lg text-center transition">Reglas & IA</button>
-        <button onclick="cambiarTabFicha('stats')" id="tabStatsBtn" class="flex-1 py-1.5 rounded-lg text-center transition">Estadísticas</button>
-        <button onclick="cambiarTabFicha('historial')" id="tabHistorialBtn" class="flex-1 py-1.5 rounded-lg text-center transition">Historial</button>
-      </div>
-
-      <div class="flex-grow overflow-y-auto p-3 space-y-3 text-xs">
-        <div id="tabInfoContent" class="space-y-2.5">
-          <div class="border-b pb-1.5 space-y-0.5">
-            <p class="text-slate-700">📍 <b>Ubicación:</b> <span id="fichaUbicacion"></span></p>
-            <p class="text-slate-600 text-[10px]" id="fichaAutoriaTexto"></p>
+      <div class="p-3 space-y-3 text-xs overflow-y-auto">
+        <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-1.5">
+          <div class="flex justify-between items-center border-b pb-1">
+            <span class="font-bold text-slate-500 uppercase text-[9px] tracking-wider">📦 Ficha Técnica</span>
+            <span id="fichaTipologiaBadge" class="bg-indigo-100 text-indigo-800 font-bold text-[10px] px-2 py-0.5 rounded-md"></span>
           </div>
-
-          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-1">
-            <span class="font-bold text-slate-500 uppercase text-[9px] block tracking-wider">📦 Ficha Técnica</span>
-            <p class="text-slate-700">👶 <b>Edad:</b> <span id="fichaEdad"></span></p>
-            <p class="text-slate-700">👥 <b>Jugadores:</b> <span id="fichaJugadores"></span></p>
-            <p class="text-slate-700">🧩 <b>Mecánicas BGG:</b> <span id="fichaMecanicas"></span></p>
-          </div>
-
-          <div class="bg-indigo-50/50 p-2.5 rounded-xl border border-indigo-100 space-y-1">
-            <p class="font-bold text-indigo-900 uppercase text-[9px] tracking-wider">⚡ Reglas Básicas (Resumen Rápido):</p>
-            <p id="fichaReglasBasicasText" class="text-slate-700 leading-relaxed text-xs"></p>
-          </div>
+          <p class="text-slate-700">👶 <b>Edad:</b> <span id="fichaEdad"></span></p>
+          <p class="text-slate-700">👥 <b>Jugadores:</b> <span id="fichaJugadores"></span></p>
+          <p class="text-slate-700">🧩 <b>Mecánicas (Máx 3):</b> <span id="fichaMecanicas"></span></p>
+          <p class="text-slate-700">📍 <b>Ubicación:</b> <span id="fichaUbicacion"></span></p>
         </div>
 
-        <div id="tabReglasContent" class="space-y-3 hidden">
-          <div class="space-y-1">
-            <p class="font-bold text-slate-700 uppercase text-[10px] tracking-wider">📖 Instrucciones Oficiales Completas:</p>
-            <div id="fichaReglasCompletasText" class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-slate-700 leading-relaxed whitespace-pre-line text-xs max-h-40 overflow-y-auto"></div>
-          </div>
-
-          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-2">
-            <span class="font-bold text-slate-600 uppercase text-[9px] block">📎 Recursos Adjuntos</span>
-            <div class="grid grid-cols-2 gap-2">
-              <div>
-                <input type="file" id="inputSubirPdfModal" accept="application/pdf" onchange="subirPdfJuegoDirecto(event)" class="hidden">
-                <button onclick="document.getElementById('inputSubirPdfModal').click()" id="btnAccionPdf" class="w-full bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 font-bold p-2 rounded-xl text-center text-[10px] flex items-center justify-center gap-1">
-                  📄 Subir PDF
-                </button>
-              </div>
-              <div>
-                <button onclick="agregarEnlaceYouTubePrompt()" id="btnAccionVideo" class="w-full bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 font-bold p-2 rounded-xl text-center text-[10px] flex items-center justify-center gap-1">
-                  🎬 Añadir Vídeo
-                </button>
-              </div>
-            </div>
-            <div id="visorVideoContainer" class="hidden aspect-video w-full rounded-xl overflow-hidden border mt-1"></div>
-          </div>
-
-          <div class="bg-purple-50/80 p-3 rounded-2xl border border-purple-200 space-y-2">
-            <p class="font-bold text-purple-900 text-xs flex items-center gap-1">🤖 Pregunta al Árbitro IA sobre las Reglas</p>
-            <div class="flex gap-1.5">
-              <input type="text" id="inputDudaIA" placeholder="Ej. ¿Qué ocurre en empate?" class="w-full p-2 border border-purple-200 rounded-xl outline-none text-xs">
-              <button onclick="consultarArbitroIA()" id="btnConsultarIA" class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-3 py-2 rounded-xl text-xs card-zoom">
-                Preguntar
-              </button>
-            </div>
-            <div id="respuestaArbitroIA" class="hidden bg-white p-2.5 rounded-xl border border-purple-200 text-[11px] text-purple-900 leading-relaxed"></div>
-          </div>
-        </div>
-
-        <div id="tabStatsContent" class="space-y-3 hidden">
-          <div class="grid grid-cols-2 gap-2 text-center">
-            <div class="bg-amber-50 border border-amber-200 p-2.5 rounded-xl">
-              <span class="block text-lg font-black text-amber-600" id="statPartidas">0</span>
-              <span class="text-[9px] text-amber-800 font-bold uppercase">Partidas Jugadas</span>
-            </div>
-            <div class="bg-indigo-50 border border-indigo-200 p-2.5 rounded-xl">
-              <span class="block text-lg font-black text-indigo-600" id="statTiempoMedio">0 min</span>
-              <span class="text-[9px] text-indigo-800 font-bold uppercase">Tiempo Medio</span>
-            </div>
-          </div>
-
-          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-1.5">
-            <p class="font-bold text-slate-700 uppercase text-[10px] tracking-wider">🏆 Ránking de Victorias:</p>
-            <div id="listaRankingGanadores" class="space-y-1"></div>
-          </div>
-        </div>
-
-        <div id="tabHistorialJuegoContent" class="space-y-2 hidden">
-          <div id="listaPartidasJuego" class="space-y-2"></div>
-        </div>
-      </div>
-
-      <div class="p-3 border-t bg-slate-50 shrink-0">
-        <button id="btnJugarDesdeFicha" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs card-zoom shadow-md">
-          ¡Vamos a jugar!
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL PERFIL UNIFICADO -->
-  <div id="modalPerfil" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
-    <div class="bg-white rounded-2xl max-w-md w-full h-[85vh] max-h-[620px] flex flex-col shadow-2xl overflow-hidden relative border border-slate-100">
-      <div class="p-3 border-b flex justify-between items-center bg-slate-50 shrink-0">
-        <div class="flex items-center gap-2">
-          <h3 class="font-bold text-base text-slate-800">👤 Perfil de Usuario</h3>
-          <div id="adminIconContainer"></div>
-        </div>
-        <button onclick="cerrarPerfilModal()" class="text-slate-400 font-bold text-xl px-1">✕</button>
-      </div>
-
-      <div class="p-3 bg-slate-900 text-white flex items-center gap-3 shrink-0 shadow-inner">
-        <div id="avatarPreview" class="w-14 h-14 bg-slate-700 rounded-full flex items-center justify-center border-2 border-amber-400 overflow-hidden relative shrink-0">
-          <span class="text-slate-400 text-xs">Foto</span>
-        </div>
-        <div class="min-w-0 flex-grow">
-          <h4 id="perfilHeaderNombre" class="font-bold text-sm truncate">Usuario</h4>
-          <p id="perfilHeaderNick" class="text-xs text-amber-300 font-medium truncate">@nick</p>
-          <input type="file" id="inputAvatar" accept="image/*" onchange="procesarAvatar(event)" class="hidden">
-          <button type="button" onclick="document.getElementById('inputAvatar').click()" class="text-[10px] bg-white/20 hover:bg-white/30 text-white font-semibold px-2 py-0.5 rounded-md mt-1 transition">
-            📷 Cambiar Avatar
-          </button>
-        </div>
-      </div>
-
-      <div class="flex bg-slate-100 p-1 text-[11px] font-bold text-slate-600 justify-between shrink-0 border-y border-slate-200">
-        <button onclick="cambiarTabPerfil('historial')" id="tabHistorialPerfilBtn" class="flex-1 py-1.5 rounded-lg text-center transition">Historial</button>
-        <button onclick="cambiarTabPerfil('juegos')" id="tabJuegosPerfilBtn" class="flex-1 py-1.5 rounded-lg text-center transition">Mis Juegos</button>
-        <button onclick="cambiarTabPerfil('datos')" id="tabDatosPerfilBtn" class="flex-1 py-1.5 rounded-lg text-center transition">Mis Datos</button>
-      </div>
-
-      <div class="flex-grow overflow-y-auto p-3 space-y-3 text-xs">
-        <div id="tabHistorialPerfilContent" class="space-y-2">
-          <div id="miHistorialLista" class="space-y-2"></div>
-        </div>
-
-        <div id="tabJuegosPerfilContent" class="space-y-2 hidden">
-          <div id="misJuegosLista" class="space-y-2"></div>
-        </div>
-
-        <div id="tabDatosPerfilContent" class="space-y-3 hidden">
-          <form id="perfilForm" onsubmit="guardarPerfil(event)" class="space-y-3">
-            <input type="hidden" id="perfilAvatarBase64">
-            <div>
-              <label class="text-[10px] font-bold text-slate-500 uppercase">Nombre Completo</label>
-              <input type="text" id="perfilNombre" required class="w-full p-2 border rounded-xl outline-none">
-            </div>
-            <div>
-              <label class="text-[10px] font-bold text-slate-500 uppercase">Nick de Usuario</label>
-              <input type="text" id="perfilNick" required class="w-full p-2 border rounded-xl outline-none">
-            </div>
-            <div>
-              <label class="text-[10px] font-bold text-slate-500 uppercase">Bio / Datos Personales</label>
-              <textarea id="perfilBio" rows="2" placeholder="Escribe algo sobre ti..." class="w-full p-2 border rounded-xl outline-none"></textarea>
-            </div>
-
-            <div class="border-t pt-2 space-y-2">
-              <p class="text-[10px] font-bold text-indigo-600 uppercase">Cambiar Contraseña</p>
-              <input type="password" id="passActual" placeholder="Contraseña actual" class="w-full p-2 border rounded-xl outline-none">
-              <input type="password" id="passNueva" placeholder="Nueva contraseña" class="w-full p-2 border rounded-xl outline-none">
-              <input type="password" id="passConfirmar" placeholder="Repetir nueva contraseña" class="w-full p-2 border rounded-xl outline-none">
-            </div>
-
-            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md card-zoom">
-              Guardar Cambios
-            </button>
-          </form>
+        <div class="bg-indigo-50/50 p-2.5 rounded-xl border border-indigo-100 space-y-1">
+          <p class="font-bold text-indigo-900 uppercase text-[9px] tracking-wider">⚡ Reglas Básicas:</p>
+          <p id="fichaReglasBasicasText" class="text-slate-700 leading-relaxed text-xs"></p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- MODAL FORMULARIO DE EDICIÓN / ALTA -->
+  <!-- MODAL FORMULARIO DE ALTA / EDICIÓN -->
   <div id="modalForm" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
     <div class="bg-white rounded-2xl max-w-md w-full h-[90vh] max-h-[660px] flex flex-col shadow-2xl overflow-hidden relative border border-slate-100">
       <div class="p-3 border-b flex justify-between items-center bg-slate-50 shrink-0">
@@ -438,30 +167,26 @@
       </div>
 
       <div class="flex-grow overflow-y-auto p-3 space-y-3 text-xs">
+        
+        <!-- PREVIEW FOTO Y BLOQUE CONSULTA IA -->
         <div class="space-y-2 bg-slate-50 p-2.5 rounded-2xl border border-slate-200">
-          <div id="imagePreview" class="w-48 h-48 mx-auto bg-slate-900 rounded-xl flex items-center justify-center border-2 border-dashed border-slate-300 overflow-hidden relative shadow-inner">
-            <span class="text-slate-400 text-xs text-center px-2">Sin fotografía<br><span class="text-[10px] text-slate-500">(Se adaptará a 3:4 / 4:3)</span></span>
+          <div id="imagePreview" class="w-36 h-36 mx-auto bg-slate-900 rounded-xl flex items-center justify-center border-2 border-dashed border-slate-300 overflow-hidden relative shadow-inner">
+            <span class="text-slate-400 text-xs text-center px-2">Sin fotografía</span>
           </div>
 
-          <input type="file" id="inputCamara" accept="image/*" capture="environment" onchange="procesarFoto(event)" class="hidden">
-          <input type="file" id="inputGaleria" accept="image/*" onchange="procesarFoto(event)" class="hidden">
-
-          <div class="grid grid-cols-2 gap-2">
-            <button type="button" onclick="document.getElementById('inputCamara').click()" class="bg-white border text-slate-700 font-semibold py-1.5 px-2 rounded-xl text-[11px] flex items-center justify-center gap-1 shadow-sm">
-              📷 Cámara
-            </button>
-            <button type="button" onclick="document.getElementById('inputGaleria').click()" class="bg-white border text-slate-700 font-semibold py-1.5 px-2 rounded-xl text-[11px] flex items-center justify-center gap-1 shadow-sm">
-              🖼️ Galería
-            </button>
-          </div>
-
+          <!-- BLOQUE DE CONSULTA IA SIMPLIFICADO EN 3 CHECKBOXES -->
           <div class="bg-purple-50 p-2.5 rounded-xl border border-purple-200 space-y-2 mt-2">
-            <span class="font-bold text-purple-900 text-[11px] block">✨ Autorrellenar / Revisar con IA (BGG):</span>
-            <div class="grid grid-cols-2 gap-1.5 text-[10px]" id="checkboxesSeccionesIA">
-              <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="datos_basicos" checked class="rounded text-purple-600"> Datos Básicos</label>
-              <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="mecanicas" checked class="rounded text-purple-600"> Mecánicas BGG</label>
-              <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="reglas_basicas" checked class="rounded text-purple-600"> Reglas Básicas</label>
-              <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="reglas_completas" checked class="rounded text-purple-600"> Reglas Completas</label>
+            <span class="font-bold text-purple-900 text-[11px] block">✨ Autorrellenar con Gemini IA:</span>
+            <div class="grid grid-cols-3 gap-1.5 text-[10px]" id="checkboxesSeccionesIA">
+              <label class="flex items-center gap-1 cursor-pointer">
+                <input type="checkbox" value="datos_basicos" checked class="rounded text-purple-600"> Datos Básicos
+              </label>
+              <label class="flex items-center gap-1 cursor-pointer">
+                <input type="checkbox" value="mecanicas" checked class="rounded text-purple-600"> Mecánicas
+              </label>
+              <label class="flex items-center gap-1 cursor-pointer">
+                <input type="checkbox" value="reglas" checked class="rounded text-purple-600"> Reglas
+              </label>
             </div>
             <button type="button" onclick="analizarConIA()" id="btnIA" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 rounded-xl text-xs card-zoom shadow-sm">
               🤖 Consultar a Gemini IA
@@ -469,7 +194,7 @@
           </div>
         </div>
 
-        <form id="juegoForm" onsubmit="preprocesarGuardadoJuego(event)" class="space-y-3">
+        <form id="juegoForm" onsubmit="guardarJuego(event)" class="space-y-3">
           <input type="hidden" id="juegoId">
           <input type="hidden" id="juegoFotoBase64">
 
@@ -490,105 +215,55 @@
               </select>
             </div>
             <div>
-              <div class="flex justify-between items-center">
-                <label class="font-bold text-slate-600 uppercase text-[10px]">Ubicación <span class="text-rose-500">*</span></label>
-                <button type="button" onclick="crearNuevaUbicacionPrompt()" class="text-[9px] text-indigo-600 font-bold">＋ Crear</button>
-              </div>
-              <select id="ubicacionSelect" required class="w-full p-2 border rounded-xl outline-none mt-0.5 bg-white">
-                <option value="">Selecciona ubicación...</option>
+              <label class="font-bold text-slate-600 uppercase text-[10px]">Tipología / Formato <span class="text-rose-500">*</span></label>
+              <input type="text" id="tipologia" required placeholder="Ej. Cartas, Tablero, Dados" class="w-full p-2 border rounded-xl outline-none mt-0.5">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="font-bold text-slate-600 uppercase text-[10px]">Ubicación <span class="text-rose-500">*</span></label>
+              <input type="text" id="ubicacion" required placeholder="Ej. Armario Salón" class="w-full p-2 border rounded-xl outline-none mt-0.5">
+            </div>
+            <div>
+              <label class="font-bold text-slate-600 uppercase text-[10px]">Edad Recomendada <span class="text-rose-500">*</span></label>
+              <select id="edad" required class="w-full p-2 border rounded-xl outline-none mt-0.5 bg-white font-semibold">
+                <option value="+3">+3 años</option>
+                <option value="+6" selected>+6 años</option>
+                <option value="+8">+8 años</option>
+                <option value="+10">+10 años</option>
+                <option value="+12">+12 años</option>
               </select>
             </div>
           </div>
 
-          <div>
-            <label class="font-bold text-slate-600 uppercase text-[10px]">Edad Recomendada <span class="text-rose-500">*</span></label>
-            <select id="edad" required class="w-full p-2 border rounded-xl outline-none mt-0.5 bg-white font-semibold">
-              <option value="+3">+3 años</option>
-              <option value="+4">+4 años</option>
-              <option value="+6" selected>+6 años</option>
-              <option value="+8">+8 años</option>
-              <option value="+10">+10 años</option>
-              <option value="+12">+12 años</option>
-              <option value="+14">+14 años</option>
-              <option value="+16">+16 años</option>
-              <option value="+18">+18 años</option>
-            </select>
-          </div>
-
           <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-1.5">
-            <span class="font-bold text-slate-600 uppercase text-[10px] block">Nº de Jugadores Permitidos <span class="text-rose-500">*</span></span>
+            <span class="font-bold text-slate-600 uppercase text-[10px] block">Nº de Jugadores <span class="text-rose-500">*</span></span>
             <div class="grid grid-cols-2 gap-2">
-              <div>
-                <label class="text-[9px] text-slate-500 font-bold uppercase">Mínimo</label>
-                <select id="minJugadoresSelect" required class="w-full p-2 border rounded-xl outline-none mt-0.5 bg-white font-medium">
-                  <option value="1">1 jugador</option>
-                  <option value="2" selected>2 jugadores</option>
-                  <option value="3">3 jugadores</option>
-                  <option value="4">4 jugadores</option>
-                  <option value="5">5 jugadores</option>
-                  <option value="6">6 jugadores</option>
-                </select>
-              </div>
-              <div>
-                <label class="text-[9px] text-slate-500 font-bold uppercase">Máximo</label>
-                <select id="maxJugadoresSelect" required class="w-full p-2 border rounded-xl outline-none mt-0.5 bg-white font-medium">
-                  <option value="1">1 jugador</option>
-                  <option value="2">2 jugadores</option>
-                  <option value="3">3 jugadores</option>
-                  <option value="4" selected>4 jugadores</option>
-                  <option value="5">5 jugadores</option>
-                  <option value="6">6 jugadores</option>
-                  <option value="8">8 jugadores</option>
-                  <option value="10">10 jugadores</option>
-                  <option value="12">12 jugadores</option>
-                  <option value="99">Sin límite (+)</option>
-                </select>
-              </div>
+              <input type="number" id="minJugadores" min="1" value="2" placeholder="Mín" required class="p-2 border rounded-xl outline-none bg-white">
+              <input type="number" id="maxJugadores" min="1" value="4" placeholder="Máx" required class="p-2 border rounded-xl outline-none bg-white">
             </div>
           </div>
 
           <div>
-            <label class="font-bold text-slate-600 uppercase text-[10px]">Mecánicas (Estándar BGG) <span class="text-rose-500">*</span></label>
-            <input type="text" id="mecanicas" required placeholder="Ej. Destreza manual, Gestión de mano, Memoria" class="w-full p-2 border rounded-xl outline-none mt-0.5">
+            <label class="font-bold text-slate-600 uppercase text-[10px]">Mecánicas (Máximo 3, separadas por coma) <span class="text-rose-500">*</span></label>
+            <input type="text" id="mecanicas" required placeholder="Ej. Gestión de mano, Fastidiar, Colección" class="w-full p-2 border rounded-xl outline-none mt-0.5">
           </div>
 
           <div>
-            <label class="font-bold text-slate-600 uppercase text-[10px]">Reglas Básicas (Resumen) <span class="text-rose-500">*</span></label>
-            <textarea id="instrucciones" required rows="2" placeholder="Resumen de 2 o 3 frases..." class="w-full p-2 border rounded-xl outline-none mt-0.5 text-xs"></textarea>
-          </div>
-
-          <div>
-            <label class="font-bold text-slate-600 uppercase text-[10px]">Reglas Completas Paso a Paso <span class="text-rose-500">*</span></label>
-            <textarea id="instruccionesCompletas" required rows="4" placeholder="Desarrollo oficial paso a paso..." class="w-full p-2 border rounded-xl outline-none mt-0.5 text-xs"></textarea>
-          </div>
-
-          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-2">
-            <span class="font-bold text-slate-600 uppercase text-[10px] block">📎 Enlaces de Recursos (PDF y Vídeo)</span>
-            <div>
-              <label class="text-[9px] text-slate-500 font-bold uppercase">Enlace PDF Instrucciones</label>
-              <input type="url" id="pdf_reglas_url" placeholder="https://ejemplo.com/manual.pdf" class="w-full p-2 border rounded-xl outline-none mt-0.5 bg-white text-xs">
-            </div>
-            <div>
-              <label class="text-[9px] text-slate-500 font-bold uppercase">Enlace Vídeo Explicativo YouTube</label>
-              <input type="url" id="video_tutorial_url" placeholder="https://www.youtube.com/watch?v=..." class="w-full p-2 border rounded-xl outline-none mt-0.5 bg-white text-xs">
-            </div>
+            <label class="font-bold text-slate-600 uppercase text-[10px]">Reglas Básicas <span class="text-rose-500">*</span></label>
+            <textarea id="instrucciones" required rows="2" placeholder="Resumen corto..." class="w-full p-2 border rounded-xl outline-none mt-0.5 text-xs"></textarea>
           </div>
 
           <button type="submit" id="btnGuardar" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-md card-zoom text-xs">
-            Guardar en la Nube
+            Guardar Juego
           </button>
-
-          <div id="contenedorBorradoEdicion" class="hidden border-t pt-2">
-            <button type="button" onclick="confirmarBorradoSeguro()" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold py-2 rounded-xl text-xs">
-              🗑️ Eliminar Juego Permanentemente
-            </button>
-          </div>
         </form>
       </div>
     </div>
   </div>
 
-  <!-- MODAL COMPARADOR IA ROBUSTO -->
+  <!-- MODAL COMPARADOR INTERACTIVO IA -->
   <div id="modalComparadorIA" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 hidden flex items-center justify-center p-3">
     <div class="bg-white rounded-2xl max-w-lg w-full h-[85vh] max-h-[620px] flex flex-col shadow-2xl overflow-hidden relative border border-purple-200">
       <div class="p-3 border-b bg-purple-900 text-white flex justify-between items-center shrink-0">
@@ -597,7 +272,7 @@
       </div>
 
       <div class="p-2.5 bg-purple-50 text-purple-900 text-[11px] font-medium shrink-0 border-b border-purple-100">
-        Toca directamente sobre la caja que prefieras conservar (Original o IA):
+        Toca sobre la opción que prefieras conservar (Original o IA):
       </div>
 
       <div class="flex-grow overflow-y-auto p-3 space-y-3 text-xs" id="contenedorCamposComparador"></div>
@@ -611,622 +286,71 @@
     </div>
   </div>
 
-  <!-- MODAL RULETA -->
-  <div id="modalRuleta" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
-    <div class="bg-white rounded-2xl max-w-md w-full p-4 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
-      <div class="flex justify-between items-center border-b pb-2">
-        <h3 class="font-bold text-lg text-slate-800 flex items-center gap-1">🎡 Ruleta de Selección</h3>
-        <button onclick="cerrarModalRuleta()" class="text-slate-400 font-bold text-xl px-2">✕</button>
-      </div>
-
-      <div id="pasoRuletaConfig" class="space-y-3 text-xs">
-        <div>
-          <label class="font-bold text-slate-600 uppercase text-[10px]">Modo de Selección:</label>
-          <select id="ruletaModo" class="w-full p-2.5 border rounded-xl outline-none font-bold text-indigo-700 bg-indigo-50 mt-1">
-            <option value="azar">🎲 Aleatorio Puro (Cualquier juego)</option>
-            <option value="descarte">🔄 Modo Descarte (Sin repetir hasta vaciar bolsa)</option>
-            <option value="compensado">⚖️ Modo Compensado (Prioriza poco jugados)</option>
-            <option value="rapida">⚡ Partida Rápida (&lt;20 min)</option>
-          </select>
-        </div>
-
-        <div class="bg-slate-50 p-2.5 rounded-xl border space-y-2">
-          <span class="font-bold text-slate-600 uppercase text-[10px] block">Condicionar por categoría:</span>
-          <div class="grid grid-cols-2 gap-1.5" id="checkboxesRuletaCat">
-            <label class="flex items-center gap-1.5"><input type="checkbox" value="Juego de Mesa" checked> Mesa</label>
-            <label class="flex items-center gap-1.5"><input type="checkbox" value="Construcción" checked> Construcción</label>
-            <label class="flex items-center gap-1.5"><input type="checkbox" value="Exterior" checked> Exterior</label>
-            <label class="flex items-center gap-1.5"><input type="checkbox" value="Consola" checked> Consola</label>
-          </div>
-        </div>
-
-        <button onclick="girarRuletaClasica()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-black py-3 rounded-xl shadow-lg card-zoom text-sm">
-          🎰 ¡GIRAR RULETA!
-        </button>
-      </div>
-
-      <div id="pasoRuletaAnimacion" class="hidden text-center py-6 space-y-4">
-        <div class="roulette-container">
-          <div class="roulette-pointer"></div>
-          <div class="roulette-wheel" id="rouletteWheelElem"></div>
-          <div class="roulette-center">🎮</div>
-        </div>
-        <p class="font-bold text-slate-600 animate-pulse text-xs">¡Girando la ruleta...</p>
-      </div>
-
-      <div id="pasoRuletaResultado" class="hidden space-y-3">
-        <div class="text-center">
-          <span class="text-[10px] bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full uppercase">🎉 ¡El juego elegido es!</span>
-          <h4 class="font-black text-xl text-indigo-900 mt-1" id="ruletaResultadoNombre">Juego</h4>
-        </div>
-
-        <div class="h-40 bg-slate-900 rounded-xl overflow-hidden relative flex items-center justify-center" id="ruletaResultadoImagen"></div>
-
-        <div class="flex gap-2 pt-1">
-          <button id="btnJugarRuleta" class="flex-grow bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs card-zoom shadow-md">
-            🟢 ¡Vamos a jugar!
-          </button>
-          <button id="btnVerFichaRuleta" class="bg-indigo-50 text-indigo-700 font-bold px-3 py-2.5 rounded-xl text-xs card-zoom">
-            📖 Ver Ficha
-          </button>
-        </div>
-
-        <button onclick="reiniciarRuleta()" class="w-full bg-slate-100 text-slate-600 font-bold py-2 rounded-xl text-xs">
-          🔄 Girar de nuevo
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL PARTIDAS -->
-  <div id="modalPartida" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
-    <div class="bg-white rounded-2xl max-w-md w-full p-5 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
-      <div class="flex justify-between items-center border-b pb-2">
-        <h3 class="font-bold text-base text-slate-800">🎲 ¡Vamos a Jugar!</h3>
-        <button onclick="cerrarModalPartida()" class="text-slate-400 font-bold text-xl px-2">✕</button>
-      </div>
-
-      <input type="hidden" id="partidaJuegoId">
-      <p class="font-bold text-indigo-700 text-sm text-center" id="partidaJuegoNombre">Juego</p>
-
-      <div id="pasoModoSelector" class="space-y-3">
-        <div class="grid grid-cols-2 gap-3">
-          <button type="button" onclick="elegirModoPartida('ahora')" class="bg-indigo-50 hover:bg-indigo-100 border-2 border-indigo-500 text-indigo-900 p-4 rounded-2xl font-bold text-center card-zoom">
-            ⏱️ <br>¡Jugar Ahora!
-            <span class="block text-[10px] font-normal text-slate-500 mt-1">Con cronómetro en directo</span>
-          </button>
-          <button type="button" onclick="elegirModoPartida('pasado')" class="bg-slate-50 hover:bg-slate-100 border-2 border-slate-300 text-slate-800 p-4 rounded-2xl font-bold text-center card-zoom">
-            📝 <br>Ya hemos jugado
-            <span class="block text-[10px] font-normal text-slate-500 mt-1">Introducir datos a mano</span>
-          </button>
-        </div>
-      </div>
-
-      <div id="pasoJugadoresSelector" class="space-y-3 hidden">
-        <div class="flex justify-between items-center">
-          <label class="text-xs font-bold text-slate-500 uppercase">Selecciona los participantes:</label>
-          <button type="button" onclick="abrirPromptInvitado()" class="text-xs bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold px-2 py-1 rounded-lg">
-            ＋ Añadir invitado
-          </button>
-        </div>
-        <div id="checkboxesJugadores" class="grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded-xl border max-h-40 overflow-y-auto text-xs"></div>
-
-        <div class="flex gap-2 pt-2">
-          <button type="button" onclick="volverSeleccionModo()" class="w-1/3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2.5 rounded-xl text-xs">Volver</button>
-          <button type="button" onclick="avanzarAFormularioFinal()" class="w-2/3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md">Siguiente ➔</button>
-        </div>
-      </div>
-
-      <div id="pasoCronometroActivo" class="space-y-4 text-center hidden py-4">
-        <div class="bg-slate-900 text-amber-400 font-mono text-4xl font-black py-6 rounded-2xl tracking-widest shadow-inner" id="cronometroDisplay">
-          00:00
-        </div>
-        <p class="text-xs text-slate-500 animate-pulse">Partida en curso... ¡Diviérteos!</p>
-        <button type="button" onclick="detenerCronometroYFinalizar()" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 rounded-xl text-sm shadow-lg card-zoom">
-          ⏹️ Terminar Partida
-        </button>
-      </div>
-
-      <div id="pasoResultadosFinales" class="space-y-3 hidden text-xs">
-        <div>
-          <label class="font-bold text-slate-600 uppercase">¿Cuántas partidas se han jugado?</label>
-          <input type="number" id="inputNumPartidas" value="1" min="1" onchange="generarSelectoresGanadores()" class="w-full p-2 border rounded-xl outline-none font-bold text-sm mt-1">
-        </div>
-
-        <div id="contenedorGanadoresPartidas" class="space-y-2 max-h-40 overflow-y-auto"></div>
-
-        <div id="campoDuracionManualContainer">
-          <label class="font-bold text-slate-600 uppercase">Duración total (opcional, en minutos)</label>
-          <input type="number" id="inputDuracionMinutos" placeholder="Ej. 30" class="w-full p-2 border rounded-xl outline-none mt-1">
-        </div>
-
-        <button type="button" onclick="guardarPartidaFinal()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-xs shadow-md card-zoom">
-          💾 Guardar Partida y Estadísticas
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <div id="modalAdmin" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
-    <div class="bg-white rounded-2xl max-w-lg w-full p-5 space-y-4 shadow-xl max-h-[85vh] overflow-y-auto">
-      <div class="flex justify-between items-center border-b pb-3">
-        <h3 class="font-bold text-lg text-slate-800">⚙️ Gestión Avanzada de Usuarios</h3>
-        <button onclick="cerrarAdminPanel()" class="text-slate-400 font-bold text-xl px-2">✕</button>
-      </div>
-      <div id="listaUsuarios" class="space-y-3 text-sm"></div>
-    </div>
-  </div>
-
-  <!-- SCRIPT FRONTEND -->
+  <!-- LÓGICA JAVASCRIPT FRONTEND -->
   <script>
-    const WORKER_URL = "https://backend-juegos.pabgartov.workers.dev";
-    let juegosCache = [];
-    let favoritosCache = [];
-    let ubicacionesCache = [];
-    let mecanicasDinamicasCache = [];
-    let bolsaDescarteRuleta = [];
+    // Datos de prueba iniciales
+    let juegosCache = [
+      {
+        id: "1",
+        nombre: "Jenga Classic",
+        categoria: "Juego de Mesa",
+        tipologia: "Bloques",
+        ubicacion: "Mueble Azul",
+        edad: "+6",
+        min_jugadores: 1,
+        max_jugadores: 8,
+        mecanicas: "Destreza, Apilamiento",
+        instrucciones: "Retira un bloque de madera en tu turno y colócalo en la parte superior sin derribar la torre.",
+        foto_base64: ""
+      },
+      {
+        id: "2",
+        nombre: "Virus!",
+        categoria: "Juego de Mesa",
+        tipologia: "Cartas",
+        ubicacion: "Armario Salón",
+        edad: "+8",
+        min_jugadores: 2,
+        max_jugadores: 6,
+        mecanicas: "Gestión de mano, Fastidiar, Colección",
+        instrucciones: "Consigue reunir 4 órganos completamente sanos en tu cuerpo para ganar la partida.",
+        foto_base64: ""
+      }
+    ];
+
     let categoriaActual = 'Todas';
-    let vistaActual = 'grid'; 
-    let currentUser = null;
-    let juegoActualFicha = null;
-    let cronometroInterval = null;
-    let segundosTranscurridos = 0;
-    let modoPartidaActual = '';
+    let vistaActual = 'grid';
     let datosAnalizadosIA = null;
     let seleccionesComparadorIA = {};
-    let seccionesMarcadasIA = [];
-    let audioCtx = null;
 
-    function formatearFechaCorta(fechaStr) {
-      if (!fechaStr) return '';
-      const d = new Date(fechaStr);
-      if (isNaN(d.getTime())) return '';
-      const dia = d.getDate().toString().padStart(2, '0');
-      const mes = (d.getMonth() + 1).toString().padStart(2, '0');
-      const anio = d.getFullYear();
-      return `${dia}/${mes}/${anio}`;
-    }
+    // FUNCIÓN AUXILIAR PARA NORMALIZAR MÁXIMO 3 MECÁNICAS
+    function normalizarMecanicas(cadena) {
+      if (!cadena) return '';
+      let lista = cadena.split(',')
+        .map(m => m.trim())
+        .filter(m => m.length > 0);
 
-    function obtenerEdadNumerica(juego) {
-      if (juego.min_edad !== undefined && juego.min_edad !== null && juego.min_edad > 0) {
-        return parseInt(juego.min_edad);
+      if (lista.length > 3) {
+        lista = lista.slice(0, 3);
       }
-      if (juego.edad) {
-        const num = parseInt(juego.edad.toString().replace(/[^0-9]/g, ''));
-        return isNaN(num) ? 0 : num;
-      }
-      return 0;
+      return lista.join(', ');
     }
 
-    function formatearTextoEdad(juego) {
-      const num = obtenerEdadNumerica(juego);
-      return num > 0 ? `+${num} años` : (juego.edad || 'N/A');
-    }
-
-    function formatearTextoJugadores(juego) {
-      const min = juego.min_jugadores || 1;
-      const max = juego.max_jugadores || 99;
-
-      if (juego.jugadores && juego.jugadores.trim().length > 0) {
-        return juego.jugadores;
-      }
-      if (min === max) {
-        return min === 1 ? '1 jugador' : `${min} jugadores`;
-      }
-      if (max >= 99) {
-        return `${min}+`;
-      }
-      return `${min}-${max}`;
-    }
-
-    function formatearGanadoresSimplificado(ganadorStr) {
-      if (!ganadorStr || ganadorStr === 'N/A' || ganadorStr === 'Sin ganador') return 'Sin datos';
-      return ganadorStr.replace(/P\d+:\s*/g, '').trim();
-    }
-
-    function reproducirSonidoClick() {
-      try {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(120, audioCtx.currentTime + 0.04);
-        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.04);
-      } catch(e){}
-    }
-
-    function reproducirSonidoVictoria() {
-      try {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const notas = [523.25, 659.25, 783.99, 1046.50];
-        notas.forEach((freq, idx) => {
-          const osc = audioCtx.createOscillator();
-          const gain = audioCtx.createGain();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(freq, audioCtx.currentTime + (idx * 0.08));
-          gain.gain.setValueAtTime(0.3, audioCtx.currentTime + (idx * 0.08));
-          gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + (idx * 0.08) + 0.25);
-          osc.connect(gain);
-          gain.connect(audioCtx.destination);
-          osc.start(audioCtx.currentTime + (idx * 0.08));
-          osc.stop(audioCtx.currentTime + (idx * 0.08) + 0.25);
-        });
-      } catch(e){}
-    }
-
-    async function fetchSeguro(ruta, opciones = {}) {
-      const token = localStorage.getItem('auth_token');
-      const headers = {
-        'Content-Type': 'application/json',
-        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-      };
-      const res = await fetch(`${WORKER_URL}${ruta}`, { ...opciones, headers });
-      if (res.status === 401 || res.status === 403) {
-        cerrarSesion();
-        throw new Error("Sesión caducada o acceso denegado.");
-      }
-      return res;
-    }
-
-    window.onload = () => {
-      const savedUser = localStorage.getItem('session_user');
-      const savedToken = localStorage.getItem('auth_token');
-      if (savedUser && savedToken) {
-        currentUser = JSON.parse(savedUser);
-        iniciarApp();
-      }
-    };
-
-    async function iniciarApp() {
-      document.getElementById('authScreen').classList.add('hidden');
-      document.getElementById('mainApp').classList.remove('hidden');
-      
-      const userContainer = document.getElementById('userBadgeContainer');
-      const avatarHtml = currentUser.avatar_base64 
-        ? `<img src="${currentUser.avatar_base64}" class="w-7 h-7 rounded-full object-cover border border-amber-300">` 
-        : `👤`;
-
-      userContainer.innerHTML = `
-        <button onclick="abrirPerfilModal()" class="bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-[11px] sm:text-xs px-2.5 py-1.5 rounded-lg shadow-sm flex items-center gap-1.5 transition card-zoom truncate max-w-[130px] sm:max-w-none" title="Ver mi perfil">
-          ${avatarHtml} <span class="truncate">${currentUser.nick}</span>
-        </button>
-      `;
-
-      await cargarFavoritos();
-      await cargarUbicaciones();
-      await cargarMecanicasDinamicas();
-      cargarJuegos();
-    }
-
-    async function cargarFavoritos() {
-      try {
-        const res = await fetchSeguro(`/api/favoritos`);
-        favoritosCache = await res.json();
-      } catch (e) { favoritosCache = []; }
-    }
-
-    async function cargarUbicaciones() {
-      try {
-        const res = await fetchSeguro(`/api/ubicaciones`);
-        ubicacionesCache = await res.json();
-        poblarSelectUbicaciones();
-      } catch (e) { ubicacionesCache = []; }
-    }
-
-    async function cargarMecanicasDinamicas() {
-      try {
-        const res = await fetchSeguro(`/api/mecanicas-existentes`);
-        mecanicasDinamicasCache = await res.json();
-        
-        const cont = document.getElementById('checkboxesMecanicasDinamicas');
-        cont.innerHTML = '';
-        if (mecanicasDinamicasCache.length === 0) {
-          cont.innerHTML = `<span class="text-slate-400 text-[10px]">No hay mecánicas registradas.</span>`;
-          return;
-        }
-
-        mecanicasDinamicasCache.forEach(m => {
-          cont.innerHTML += `
-            <label class="bg-slate-100 px-2.5 py-1 rounded-lg border flex items-center gap-1 cursor-pointer hover:bg-slate-200 text-[11px]">
-              <input type="checkbox" value="${m}" onchange="filtrarJuegos()" class="rounded text-indigo-600"> ${m}
-            </label>
-          `;
-        });
-      } catch (e) { console.error(e); }
-    }
-
-    function poblarSelectUbicaciones(ubicacionSeleccionada = '') {
-      const select = document.getElementById('ubicacionSelect');
-      select.innerHTML = `<option value="">Selecciona ubicación...</option>`;
-      
-      ubicacionesCache.forEach(u => {
-        const selAttr = u === ubicacionSeleccionada ? 'selected' : '';
-        select.innerHTML += `<option value="${u}" ${selAttr}>${u}</option>`;
-      });
-    }
-
-    function crearNuevaUbicacionPrompt() {
-      const nueva = prompt("Introduce el nombre de la nueva ubicación (Ej. Armario Pasillo):");
-      if (nueva && nueva.trim()) {
-        const limpia = nueva.trim();
-        if (!ubicacionesCache.includes(limpia)) {
-          ubicacionesCache.push(limpia);
-          ubicacionesCache.sort();
-        }
-        poblarSelectUbicaciones(limpia);
-      }
-    }
-
-    async function toggleFavorito(juegoId) {
-      try {
-        const res = await fetchSeguro(`/api/favoritos`, {
-          method: 'POST',
-          body: JSON.stringify({ juego_id: juegoId })
-        });
-        const json = await res.json();
-        if (json.favorito) favoritosCache.push(juegoId);
-        else favoritosCache = favoritosCache.filter(id => id !== juegoId);
-        renderizarTarjetas();
-      } catch (err) { alert("Error al actualizar favoritos"); }
-    }
-
-    function togglePanelFiltros() {
-      document.getElementById('panelFiltrosAvanzados').classList.toggle('hidden');
-    }
-
-    // FICHA DETALLADA
-    async function abrirFichaDetallada(juegoId) {
-      juegoActualFicha = juegosCache.find(j => j.id === juegoId);
-      if (!juegoActualFicha) return;
-
-      document.getElementById('fichaTitulo').innerText = juegoActualFicha.nombre;
-      document.getElementById('fichaUbicacion').innerText = juegoActualFicha.ubicacion || 'Sin especificar';
-      
-      const fechaCreacionStr = formatearFechaCorta(juegoActualFicha.fecha_creacion);
-      let autoriaText = `👤 <b>Añadido por:</b> @${juegoActualFicha.creador_nick || 'Sistema'} · ${fechaCreacionStr}`;
-      
-      if (juegoActualFicha.modificador_nick && juegoActualFicha.fecha_modificacion) {
-        const fechaModStr = formatearFechaCorta(juegoActualFicha.fecha_modificacion);
-        autoriaText += `<br>✏️ <b>Actualizado por:</b> @${juegoActualFicha.modificador_nick} · ${fechaModStr}`;
-      }
-      document.getElementById('fichaAutoriaTexto').innerHTML = autoriaText;
-
-      document.getElementById('fichaEdad').innerText = formatearTextoEdad(juegoActualFicha);
-      document.getElementById('fichaJugadores').innerText = formatearTextoJugadores(juegoActualFicha);
-      document.getElementById('fichaMecanicas').innerText = juegoActualFicha.mecanicas || 'Sin mecánicas asociadas';
-      
-      document.getElementById('fichaReglasBasicasText').innerText = juegoActualFicha.instrucciones || 'Sin reglas básicas registradas.';
-      document.getElementById('fichaReglasCompletasText').innerText = juegoActualFicha.instrucciones_completas || juegoActualFicha.instrucciones || 'Sin instrucciones oficiales completas registradas.';
-
-      const imagenSrc = juegoActualFicha.foto_url || juegoActualFicha.foto_base64 || '';
-      const imgContainer = document.getElementById('fichaImagenContainer');
-      imgContainer.innerHTML = imagenSrc ? `<img src="${imagenSrc}" class="w-full h-full object-contain p-2">` : `<span class="text-slate-400 text-xs">Sin Foto</span>`;
-
-      actualizarBotonesRecursosFicha();
-
-      const btnEditar = document.getElementById('btnEditarDesdeFicha');
-      if (currentUser.rol === 'ADMIN' || currentUser.id === juegoActualFicha.creador_id) {
-        btnEditar.classList.remove('hidden');
-        btnEditar.onclick = () => { cerrarFichaModal(); abrirModalFormulario(juegoActualFicha); };
-      } else { btnEditar.classList.add('hidden'); }
-
-      document.getElementById('btnJugarDesdeFicha').onclick = () => {
-        cerrarFichaModal();
-        abrirModalPartida(juegoActualFicha.id, juegoActualFicha.nombre);
-      };
-
-      document.getElementById('statPartidas').innerText = juegoActualFicha.veces_jugado || 0;
-      if (juegoActualFicha.tiempo_medio_segundos && juegoActualFicha.tiempo_medio_segundos > 0) {
-        const mins = Math.floor(juegoActualFicha.tiempo_medio_segundos / 60);
-        const secs = juegoActualFicha.tiempo_medio_segundos % 60;
-        document.getElementById('statTiempoMedio').innerText = mins > 0 ? `~${mins}m ${secs}s` : `~${secs}s`;
-      } else { document.getElementById('statTiempoMedio').innerText = '0 min'; }
-
-      document.getElementById('modalFichaJuego').classList.remove('hidden');
-      cambiarTabFicha('info');
-
-      try {
-        const res = await fetchSeguro(`/api/juegos/${juegoId}/historial`);
-        const partidas = await res.json();
-        
-        const listHistorial = document.getElementById('listaPartidasJuego');
-        listHistorial.innerHTML = '';
-        const conteoGanadores = {};
-
-        if (partidas.length > 0) {
-          partidas.forEach(p => {
-            const fechaFormateada = formatearFechaCorta(p.fecha);
-            if (p.ganador && p.ganador !== 'Sin ganador' && p.ganador !== 'Empate / Sin ganador') {
-              p.ganador.split(' | ').forEach(gStr => {
-                const nickG = gStr.replace(/P\d+:\s*/, '').trim();
-                if (nickG && nickG !== 'Empate / Sin ganador') conteoGanadores[nickG] = (conteoGanadores[nickG] || 0) + 1;
-              });
-            }
-
-            listHistorial.innerHTML += `
-              <div class="bg-slate-50 p-2.5 rounded-xl border space-y-1 text-[11px]">
-                <div class="flex justify-between text-slate-400">
-                  <span>📅 ${fechaFormateada}</span>
-                  <span>🎮 ${p.num_partidas || 1} p.</span>
-                </div>
-                <p class="text-slate-700">👥 <b>Jugadores:</b> ${p.participantes}</p>
-                <p class="text-emerald-700 font-bold">🏆 ${p.ganador}</p>
-              </div>
-            `;
-          });
-        } else { listHistorial.innerHTML = `<p class="text-center text-slate-400 py-4">No hay partidas registradas.</p>`; }
-
-        const rankingCont = document.getElementById('listaRankingGanadores');
-        rankingCont.innerHTML = '';
-        const sortedGanadores = Object.entries(conteoGanadores).sort((a,b) => b[1] - a[1]);
-        if (sortedGanadores.length > 0) {
-          sortedGanadores.forEach(([nick, count], index) => {
-            const medalla = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '🎖️';
-            rankingCont.innerHTML += `
-              <div class="flex justify-between items-center bg-white p-2 rounded-lg border text-xs">
-                <span>${medalla} <b>${nick}</b></span>
-                <span class="font-bold text-amber-600">${count} victoria${count > 1 ? 's' : ''}</span>
-              </div>
-            `;
-          });
-        } else { rankingCont.innerHTML = `<p class="text-slate-400 text-[11px]">Sin victorias registradas aún.</p>`; }
-      } catch (err) { console.error(err); }
-    }
-
-    function actualizarBotonesRecursosFicha() {
-      const btnPdf = document.getElementById('btnAccionPdf');
-      const btnVid = document.getElementById('btnAccionVideo');
-      const visorVid = document.getElementById('visorVideoContainer');
-
-      if (juegoActualFicha.pdf_reglas_url) {
-        btnPdf.innerHTML = `📄 Abrir PDF Adjunto`;
-        btnPdf.onclick = () => window.open(juegoActualFicha.pdf_reglas_url, '_blank');
-      } else {
-        btnPdf.innerHTML = `📄 Subir PDF`;
-        btnPdf.onclick = () => document.getElementById('inputSubirPdfModal').click();
-      }
-
-      if (juegoActualFicha.video_tutorial_url) {
-        btnVid.innerHTML = `🎬 Ver Vídeo Explicativo`;
-        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-        const match = juegoActualFicha.video_tutorial_url.match(regExp);
-        if (match && match[2].length === 11) {
-          visorVid.innerHTML = `<iframe class="w-full h-full" src="https://www.youtube.com/embed/${match[2]}" frameborder="0" allowfullscreen></iframe>`;
-          visorVid.classList.remove('hidden');
-        } else {
-          visorVid.classList.add('hidden');
-          btnVid.onclick = () => window.open(juegoActualFicha.video_tutorial_url, '_blank');
-        }
-      } else {
-        visorVid.classList.add('hidden');
-        btnVid.innerHTML = `🎬 Añadir Vídeo YouTube`;
-        btnVid.onclick = () => agregarEnlaceYouTubePrompt();
-      }
-    }
-
-    async function subirPdfJuegoDirecto(e) {
-      const file = e.target.files[0];
-      if (!file || !juegoActualFicha) return;
-
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-        const base64Pdf = event.target.result;
-        try {
-          await fetchSeguro(`/api/juegos/${juegoActualFicha.id}/recursos`, {
-            method: 'PUT',
-            body: JSON.stringify({ pdf_reglas_url: base64Pdf })
-          });
-          juegoActualFicha.pdf_reglas_url = base64Pdf;
-          actualizarBotonesRecursosFicha();
-          alert("✅ Documento PDF guardado correctamente.");
-        } catch(err) { alert(err.message); }
-      };
-      reader.readAsDataURL(file);
-    }
-
-    async function agregarEnlaceYouTubePrompt() {
-      if (!juegoActualFicha) return;
-      const urlVideo = prompt("Introduce el enlace de YouTube del vídeo explicativo:");
-      if (urlVideo && urlVideo.trim()) {
-        try {
-          await fetchSeguro(`/api/juegos/${juegoActualFicha.id}/recursos`, {
-            method: 'PUT',
-            body: JSON.stringify({ video_tutorial_url: urlVideo.trim() })
-          });
-          juegoActualFicha.video_tutorial_url = urlVideo.trim();
-          actualizarBotonesRecursosFicha();
-          alert("✅ Enlace de vídeo guardado correctamente.");
-        } catch(err) { alert(err.message); }
-      }
-    }
-
-    function cambiarTabFicha(tab) {
-      document.getElementById('tabInfoContent').classList.toggle('hidden', tab !== 'info');
-      document.getElementById('tabReglasContent').classList.toggle('hidden', tab !== 'reglas');
-      document.getElementById('tabStatsContent').classList.toggle('hidden', tab !== 'stats');
-      document.getElementById('tabHistorialJuegoContent').classList.toggle('hidden', tab !== 'historial');
-
-      ['info', 'reglas', 'stats', 'historial'].forEach(t => {
-        const btn = document.getElementById(`tab${t.charAt(0).toUpperCase() + t.slice(1)}Btn`);
-        btn.className = t === tab ? 'flex-1 py-1.5 rounded-lg text-center transition bg-white text-indigo-700 font-bold shadow-sm' : 'flex-1 py-1.5 rounded-lg text-center transition';
-      });
-    }
-
-    function cerrarFichaModal() { document.getElementById('modalFichaJuego').classList.add('hidden'); }
-
-    async function consultarArbitroIA() {
-      const preg = document.getElementById('inputDudaIA').value;
-      if (!preg || !preg.trim() || !juegoActualFicha) return;
-
-      const btn = document.getElementById('btnConsultarIA');
-      const respBox = document.getElementById('respuestaArbitroIA');
-      btn.innerText = "⏳...";
-      btn.disabled = true;
-
-      try {
-        const res = await fetchSeguro(`/api/dudas-ia`, {
-          method: 'POST',
-          body: JSON.stringify({
-            juego_nombre: juegoActualFicha.nombre,
-            instrucciones: juegoActualFicha.instrucciones_completas || juegoActualFicha.instrucciones,
-            pregunta: preg
-          })
-        });
-        const json = await res.json();
-        respBox.innerText = json.respuesta || "Sin respuesta";
-        respBox.classList.remove('hidden');
-      } catch (err) { alert(err.message); }
-      finally { btn.innerText = "Preguntar"; btn.disabled = false; }
-    }
-
-    async function cargarJuegos() {
-      try {
-        const res = await fetchSeguro(`/api/juegos`); 
-        juegosCache = await res.json();
-        renderizarTarjetas();
-      } catch (err) {
-        document.getElementById('mainContainer').innerHTML = `<div class="text-center py-10 text-rose-500">${err.message}</div>`;
-      }
-    }
-
-    function cambiarVista(tipo) {
-      vistaActual = tipo;
-      document.getElementById('btnGrid').className = tipo === 'grid' ? 'px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-indigo-600 shadow-sm transition' : 'px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 transition';
-      document.getElementById('btnCompact').className = tipo === 'compact' ? 'px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-indigo-600 shadow-sm transition' : 'px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 transition';
-      renderizarTarjetas();
-    }
-
-    // RENDERIZADO AJUSTADO
+    // RENDERIZADO DE TARJETAS (GRID Y LISTA)
     function renderizarTarjetas() {
       const container = document.getElementById('mainContainer');
       const search = document.getElementById('searchInput').value.toLowerCase();
       const numJug = parseInt(document.getElementById('filtroNumJugadores').value) || 0;
-      const edadSeleccionada = parseInt(document.getElementById('filtroEdadMinima').value) || 0;
-      const orden = document.getElementById('filtroOrdenacion').value;
-      const mecsChecked = Array.from(document.querySelectorAll('#checkboxesMecanicasDinamicas input:checked')).map(el => el.value);
+      const tipologiaFiltro = document.getElementById('filtroTipologia').value;
 
       let filtrados = juegosCache.filter(j => {
-        let okCat = (categoriaActual === 'Favoritos') ? favoritosCache.includes(j.id) : (categoriaActual === 'Todas' || j.categoria === categoriaActual);
-        let okNom = j.nombre.toLowerCase().includes(search);
-        let okJug = numJug === 0 || ((j.min_jugadores || 1) <= numJug && (j.max_jugadores || 99) >= numJug);
-        
-        const edadJuego = obtenerEdadNumerica(j);
-        let okEdad = edadSeleccionada === 0 || (edadJuego <= edadSeleccionada);
-        let okMec = mecsChecked.length === 0 || mecsChecked.every(m => (j.mecanicas || '').includes(m));
+        let okCat = (categoriaActual === 'Todas' || j.categoria === categoriaActual);
+        let okNom = j.nombre.toLowerCase().includes(search) || (j.tipologia || '').toLowerCase().includes(search) || (j.mecanicas || '').toLowerCase().includes(search);
+        let okJug = numJug === 0 || (j.min_jugadores <= numJug && j.max_jugadores >= numJug);
+        let okTip = !tipologiaFiltro || (j.tipologia || '').toLowerCase() === tipologiaFiltro.toLowerCase();
 
-        return okCat && okNom && okJug && okEdad && okMec;
+        return okCat && okNom && okJug && okTip;
       });
-
-      if (orden === 'nombre_asc') filtrados.sort((a,b) => a.nombre.localeCompare(b.nombre));
-      else if (orden === 'mas_jugados') filtrados.sort((a,b) => (b.veces_jugado || 0) - (a.veces_jugado || 0));
-      else if (orden === 'menos_jugados') filtrados.sort((a,b) => (a.veces_jugado || 0) - (b.veces_jugado || 0));
-      else if (orden === 'recientes') filtrados.sort((a,b) => new Date(b.ultima_partida_fecha || 0) - new Date(a.ultima_partida_fecha || 0));
 
       if (filtrados.length === 0) {
         container.innerHTML = `<div class="text-center py-10 text-slate-400 text-xs">No hay juegos que coincidan con los filtros.</div>`;
@@ -1234,131 +358,56 @@
       }
 
       if (vistaActual === 'grid') {
-        let gridHTML = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="gridJuegos">';
+        let gridHTML = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
         filtrados.forEach(j => {
-          const imagenSrc = j.foto_url || j.foto_base64 || '';
-          const tieneImagen = imagenSrc && imagenSrc.trim().length > 0;
-          const esFav = favoritosCache.includes(j.id);
-
-          let tiempoMedioStr = "Sin dato";
-          if (j.tiempo_medio_segundos && j.tiempo_medio_segundos > 0) {
-            const m = Math.floor(j.tiempo_medio_segundos / 60);
-            const s = j.tiempo_medio_segundos % 60;
-            tiempoMedioStr = m > 0 ? `~${m}m ${s}s` : `~${s}s`;
-          }
-
-          let ultimaPartidaFechaStr = j.ultima_partida_fecha ? formatearFechaCorta(j.ultima_partida_fecha) : 'Sin partidas';
-          let ganadoresLimpios = formatearGanadoresSimplificado(j.ultima_partida_ganador);
-
           gridHTML += `
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between relative transition hover:shadow-md">
-              
-              <div class="p-3.5 space-y-3">
-                <!-- CABECERA: TÍTULO Y BADGE -->
-                <div class="flex justify-between items-start gap-2 border-b pb-2">
-                  <h4 onclick="abrirFichaDetallada('${j.id}')" class="font-black text-base text-slate-800 leading-snug cursor-pointer hover:text-indigo-600 transition truncate flex-grow" title="${j.nombre}">${j.nombre}</h4>
-                  <span class="bg-slate-900 text-white text-[10px] font-bold px-2.5 py-1 rounded-xl shrink-0 shadow-sm">${j.categoria}</span>
-                </div>
-
-                <!-- SECCIÓN CENTRAL: FOTO CUADRADA ESTRICTA (1:1) + DATOS Y STATS ALTURA IGUALADA -->
-                <div class="flex gap-3 items-stretch">
-                  
-                  <!-- FOTO ESTRICTAMENTE CUADRADA (ASPECT-SQUARE) -->
-                  <div onclick="abrirFichaDetallada('${j.id}')" class="w-5/12 aspect-square bg-slate-900 rounded-2xl relative flex items-center justify-center overflow-hidden cursor-pointer shrink-0 border border-slate-100 shadow-inner">
-                    <button onclick="event.stopPropagation(); toggleFavorito('${j.id}')" class="absolute top-2 left-2 w-7 h-7 bg-black/60 hover:bg-black/80 rounded-full flex items-center justify-center text-xs z-20 backdrop-blur-md card-zoom shadow-md text-white">
-                      ${esFav ? '❤️' : '🤍'}
-                    </button>
-
-                    ${tieneImagen ? `
-                      <div class="absolute inset-0 bg-cover bg-center filter blur-md opacity-35" style="background-image: url('${imagenSrc}')"></div>
-                      <img src="${imagenSrc}" class="w-full h-full object-contain relative z-10 p-1.5">
-                    ` : '<div class="text-slate-400 text-xs text-center p-2">Sin Foto</div>'}
-                  </div>
-
-                  <!-- DATOS SIMPLIFICADOS -->
-                  <div class="w-7/12 min-w-0 flex flex-col justify-between gap-1.5">
-                    
-                    <!-- BLOQUE FICHA TÉCNICA -->
-                    <div class="bg-slate-50 p-2 rounded-xl border border-slate-200/80 text-[11px] space-y-1 flex-1 flex flex-col justify-center">
-                      <p class="text-slate-700 truncate">👶 ${formatearTextoEdad(j)}</p>
-                      <p class="text-slate-700 truncate">👥 ${formatearTextoJugadores(j)}</p>
-                      <p class="text-slate-600 text-[10px] truncate" title="${j.mecanicas || 'Sin especificar'}">🧩 ${j.mecanicas || 'Sin especificar'}</p>
-                    </div>
-
-                    <!-- BLOQUE ESTADÍSTICAS -->
-                    <div class="bg-indigo-50/70 border border-indigo-100 p-2 rounded-xl text-[10px] space-y-0.5 text-indigo-950 flex-1 flex flex-col justify-center">
-                      <p class="font-bold text-indigo-700 truncate">🎮 ${j.veces_jugado || 0} partidas</p>
-                      <p class="truncate text-slate-600">⏱️ ${tiempoMedioStr}</p>
-                      <p class="truncate text-slate-600">🕒 ${ultimaPartidaFechaStr}</p>
-                      <p class="truncate text-emerald-800 font-bold">🏆 ${ganadoresLimpios}</p>
-                    </div>
-
-                  </div>
-                </div>
-
-                <!-- UBICACIÓN Y CREADOR -->
-                <div class="text-[10px] text-slate-500 pt-0.5 flex justify-between items-center border-t border-slate-100">
-                  <span class="truncate">📍 ${j.ubicacion || 'Sin sitio'}</span>
-                  <span class="truncate text-right shrink-0">👤 @${j.creador_nick || 'admin'}</span>
-                </div>
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between p-3.5 space-y-3">
+              <div class="flex justify-between items-start gap-2 border-b pb-2">
+                <h4 onclick="abrirFicha('${j.id}')" class="font-black text-base text-slate-800 cursor-pointer hover:text-indigo-600 truncate">${j.nombre}</h4>
+                <span class="bg-slate-900 text-white text-[10px] font-bold px-2 py-0.5 rounded-xl shrink-0">${j.categoria}</span>
               </div>
 
-              <!-- BOTÓN JUGAR -->
-              <div class="p-3.5 pt-0">
-                <button onclick="abrirModalPartida('${j.id}', '${j.nombre.replace(/'/g, "\\'")}')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs card-zoom shadow-md flex items-center justify-center gap-1.5">
-                  ¡Vamos a jugar!
-                </button>
-              </div>
+              <div class="flex gap-3 items-stretch">
+                <div class="w-5/12 aspect-square bg-slate-900 rounded-2xl flex items-center justify-center shrink-0 border border-slate-100">
+                  <span class="text-2xl">🎮</span>
+                </div>
 
+                <div class="w-7/12 min-w-0 flex flex-col justify-between gap-1">
+                  <div class="bg-slate-50 p-2 rounded-xl border text-[11px] space-y-0.5">
+                    <p class="font-bold text-indigo-600 truncate">🎴 ${j.tipologia || 'General'}</p>
+                    <p class="text-slate-700 truncate">👶 +${j.edad.replace('+','')} años • 👥 ${j.min_jugadores}-${j.max_jugadores}</p>
+                    <p class="text-slate-600 text-[10px] truncate" title="${j.mecanicas}">🧩 ${j.mecanicas || 'Sin especificar'}</p>
+                  </div>
+                  <div class="text-[10px] text-slate-500">📍 ${j.ubicacion}</div>
+                </div>
+              </div>
             </div>
           `;
         });
         gridHTML += '</div>';
         container.innerHTML = gridHTML;
-
       } else {
-        // MODO LISTA: FOTO CUADRADA COMPACTA Y ALINEADA A LAS DOS FILAS
+        // MODO LISTA COMPACTO
         let listHTML = '<div class="space-y-2.5 max-w-4xl mx-auto">';
         filtrados.forEach(j => {
-          const imagenSrc = j.foto_url || j.foto_base64 || '';
-          const tieneImagen = imagenSrc && imagenSrc.trim().length > 0;
-          const esFav = favoritosCache.includes(j.id);
-
           listHTML += `
             <div class="bg-white p-2.5 rounded-2xl shadow-sm border border-slate-200 flex gap-3 items-center hover:border-indigo-200 transition">
-              
-              <!-- FOTO CUADRADA PERFECTA (1:1) Y TAMAÑO ADECUADO A LAS 2 FILAS -->
-              <div onclick="abrirFichaDetallada('${j.id}')" class="w-16 h-16 aspect-square bg-slate-900 rounded-xl overflow-hidden shrink-0 flex items-center justify-center relative cursor-pointer border border-slate-100 shadow-inner">
-                <button onclick="event.stopPropagation(); toggleFavorito('${j.id}')" class="absolute top-1 left-1 w-5 h-5 bg-black/60 rounded-full flex items-center justify-center text-[10px] z-10 text-white">
-                  ${esFav ? '❤️' : '🤍'}
-                </button>
-                ${tieneImagen ? `<img src="${imagenSrc}" class="w-full h-full object-cover">` : '<span class="text-[9px] text-slate-400">Sin Foto</span>'}
+              <div class="w-16 h-16 aspect-square bg-slate-900 rounded-xl shrink-0 flex items-center justify-center text-xl">
+                🎮
               </div>
 
-              <!-- CONTENIDO A LA DERECHA (2 LÍNEAS EXACTAS) -->
-              <div class="flex-grow min-w-0 flex flex-col justify-between py-0.5 gap-1.5">
-                
-                <!-- LÍNEA 1: TÍTULO Y DATOS RÁPIDOS -->
-                <div class="min-w-0 cursor-pointer" onclick="abrirFichaDetallada('${j.id}')">
-                  <h4 class="font-black text-slate-800 text-sm leading-tight hover:text-indigo-600 transition truncate">${j.nombre}</h4>
-                  <p class="text-[11px] text-slate-500 truncate mt-0.5">
-                    📍 ${j.ubicacion || 'Sin sitio'} • 👶 ${formatearTextoEdad(j)} • 👥 ${formatearTextoJugadores(j)}
+              <div class="flex-grow min-w-0 flex flex-col justify-between gap-1">
+                <div class="cursor-pointer" onclick="abrirFicha('${j.id}')">
+                  <h4 class="font-black text-slate-800 text-sm truncate">${j.nombre}</h4>
+                  <p class="text-[11px] text-slate-500 truncate">
+                    📍 ${j.ubicacion} • 🎴 ${j.tipologia || 'General'} • 👶 ${j.edad} • 👥 ${j.min_jugadores}-${j.max_jugadores}
                   </p>
                 </div>
-
-                <!-- LÍNEA 2: CATEGORÍA A LA IZQUIERDA Y BOTÓN JUGAR A LA DERECHA -->
                 <div class="flex justify-between items-center pt-1 border-t border-slate-100">
-                  <span class="bg-slate-100 text-slate-700 text-[10px] font-bold px-2 py-0.5 rounded-md border border-slate-200 truncate max-w-[120px]">
-                    ${j.categoria}
-                  </span>
-
-                  <button onclick="abrirModalPartida('${j.id}', '${j.nombre.replace(/'/g, "\\'")}')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-3 py-1 rounded-xl text-xs card-zoom shadow-sm flex items-center gap-1 shrink-0">
-                    ¡Vamos a jugar!
-                  </button>
+                  <span class="text-[10px] text-slate-600 truncate max-w-[200px]">🧩 ${j.mecanicas}</span>
+                  <span class="bg-slate-100 text-slate-700 text-[10px] font-bold px-2 py-0.5 rounded-md border">${j.categoria}</span>
                 </div>
-
               </div>
-
             </div>
           `;
         });
@@ -1367,788 +416,177 @@
       }
     }
 
-    // FORMULARIO Y EDICIÓN COMPLETA
-    function abrirModalFormulario(juegoAEditar = null) {
-      const form = document.getElementById('juegoForm');
-      form.reset();
-      poblarSelectUbicaciones();
+    // FICHA DETALLADA
+    function abrirFicha(id) {
+      const j = juegosCache.find(x => x.id === id);
+      if (!j) return;
 
-      if (juegoAEditar) {
-        document.getElementById('modalTitulo').innerText = "Editar Ficha de Juego";
-        document.getElementById('juegoId').value = juegoAEditar.id;
-        document.getElementById('nombre').value = juegoAEditar.nombre || '';
-        document.getElementById('categoria').value = juegoAEditar.categoria || 'Juego de Mesa';
-        document.getElementById('ubicacionSelect').value = juegoAEditar.ubicacion || '';
-        document.getElementById('edad').value = juegoAEditar.edad || '+6';
-        
-        document.getElementById('minJugadoresSelect').value = juegoAEditar.min_jugadores || 1;
-        document.getElementById('maxJugadoresSelect').value = juegoAEditar.max_jugadores || 4;
+      document.getElementById('fichaTitulo').innerText = j.nombre;
+      document.getElementById('fichaTipologiaBadge').innerText = j.tipologia || 'General';
+      document.getElementById('fichaEdad').innerText = j.edad;
+      document.getElementById('fichaJugadores').innerText = `${j.min_jugadores} a ${j.max_jugadores} jugadores`;
+      document.getElementById('fichaMecanicas').innerText = j.mecanicas;
+      document.getElementById('fichaUbicacion').innerText = j.ubicacion;
+      document.getElementById('fichaReglasBasicasText').innerText = j.instrucciones;
 
-        document.getElementById('mecanicas').value = juegoAEditar.mecanicas || '';
-        document.getElementById('instrucciones').value = juegoAEditar.instrucciones || '';
-        document.getElementById('instruccionesCompletas').value = juegoAEditar.instrucciones_completas || '';
+      document.getElementById('modalFichaJuego').classList.remove('hidden');
+    }
 
-        document.getElementById('pdf_reglas_url').value = juegoAEditar.pdf_reglas_url || '';
-        document.getElementById('video_tutorial_url').value = juegoAEditar.video_tutorial_url || '';
+    function cerrarFichaModal() { document.getElementById('modalFichaJuego').classList.add('hidden'); }
 
-        const foto = juegoAEditar.foto_url || juegoAEditar.foto_base64 || '';
-        document.getElementById('juegoFotoBase64').value = foto;
-        document.getElementById('imagePreview').innerHTML = foto ? `<img src="${foto}" class="w-full h-full object-contain">` : `<span class="text-slate-400 text-xs">Sin fotografía</span>`;
+    // FILTROS
+    function togglePanelFiltros() { document.getElementById('panelFiltrosAvanzados').classList.toggle('hidden'); }
+    function cambiarVista(v) { vistaActual = v; renderizarTarjetas(); }
+    function filtrarCategoria(cat, e) {
+      categoriaActual = cat;
+      document.querySelectorAll('.cat-btn').forEach(b => b.className = "cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition");
+      e.target.className = "cat-btn bg-indigo-600 text-white px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition";
+      renderizarTarjetas();
+    }
+    function filtrarJuegos() { renderizarTarjetas(); }
 
-        document.getElementById('contenedorBorradoEdicion').classList.remove('hidden');
-      } else {
-        document.getElementById('modalTitulo').innerText = "Nuevo Juego / Juguete";
-        document.getElementById('juegoId').value = '';
-        document.getElementById('juegoFotoBase64').value = '';
-        document.getElementById('pdf_reglas_url').value = '';
-        document.getElementById('video_tutorial_url').value = '';
-        document.getElementById('imagePreview').innerHTML = `<span class="text-slate-400 text-xs text-center px-2">Sin fotografía<br><span class="text-[10px] text-slate-500">(Se adaptará a 3:4 / 4:3)</span></span>`;
-        document.getElementById('contenedorBorradoEdicion').classList.add('hidden');
-      }
-
+    // FORMULARIO CREAR / EDITAR
+    function abrirModalFormulario() {
+      document.getElementById('juegoForm').reset();
       document.getElementById('modalForm').classList.remove('hidden');
     }
-
     function cerrarModalFormulario() { document.getElementById('modalForm').classList.add('hidden'); }
 
-    async function preprocesarGuardadoJuego(e) {
+    function guardarJuego(e) {
       e.preventDefault();
-      const nombreInput = document.getElementById('nombre').value;
-      const juegoIdActual = document.getElementById('juegoId').value;
-
-      try {
-        const res = await fetchSeguro(`/api/juegos/comprobar-duplicado`, {
-          method: 'POST',
-          body: JSON.stringify({ nombre: nombreInput, id_actual: juegoIdActual })
-        });
-        const check = await res.json();
-
-        if (check.existe) {
-          const confirmarVariante = confirm(
-            `⚠️ ATENCIÓN: Ya existe un juego registrado con el nombre "${check.juego_existente}".\n\n` +
-            `Si se trata de una versión, expansión o variante diferente, presiona OK para guardarlo como una nueva ficha independiente.\n` +
-            `De lo contrario, pulsa Cancelar para modificar el nombre.`
-          );
-          if (!confirmarVariante) return;
-        }
-
-        guardarJuego();
-      } catch (err) { alert(err.message); }
-    }
-
-    async function guardarJuego() {
-      const btn = document.getElementById('btnGuardar');
-      btn.innerText = "Subiendo...";
-      btn.disabled = true;
-
-      const idActual = document.getElementById('juegoId').value;
-
-      const nuevoJuego = {
-        id: idActual || crypto.randomUUID(),
+      const nuevo = {
+        id: crypto.randomUUID(),
         nombre: document.getElementById('nombre').value,
         categoria: document.getElementById('categoria').value,
-        ubicacion: document.getElementById('ubicacionSelect').value,
+        tipologia: document.getElementById('tipologia').value,
+        ubicacion: document.getElementById('ubicacion').value,
         edad: document.getElementById('edad').value,
-        min_jugadores: document.getElementById('minJugadoresSelect').value,
-        max_jugadores: document.getElementById('maxJugadoresSelect').value,
-        mecanicas: document.getElementById('mecanicas').value,
-        instrucciones: document.getElementById('instrucciones').value,
-        instrucciones_completas: document.getElementById('instruccionesCompletas').value,
-        pdf_reglas_url: document.getElementById('pdf_reglas_url').value,
-        video_tutorial_url: document.getElementById('video_tutorial_url').value,
-        foto_base64: document.getElementById('juegoFotoBase64').value
+        min_jugadores: parseInt(document.getElementById('minJugadores').value) || 1,
+        max_jugadores: parseInt(document.getElementById('maxJugadores').value) || 4,
+        mecanicas: normalizarMecanicas(document.getElementById('mecanicas').value),
+        instrucciones: document.getElementById('instrucciones').value
       };
 
-      try {
-        const res = await fetchSeguro(`/api/juegos`, { method: 'POST', body: JSON.stringify(nuevoJuego) });
-        const json = await res.json();
-        if (json.error) throw new Error(json.error);
-
-        cerrarModalFormulario();
-        await cargarUbicaciones();
-        await cargarMecanicasDinamicas();
-        cargarJuegos();
-      } catch (err) { alert(err.message); }
-      finally { btn.innerText = "Guardar en la Nube"; btn.disabled = false; }
+      juegosCache.push(nuevo);
+      cerrarModalFormulario();
+      renderizarTarjetas();
     }
 
-    // CONSULTAR IA
-    async function analizarConIA() {
-      const base64 = document.getElementById('juegoFotoBase64').value;
-      const nombreActual = document.getElementById('nombre').value;
-      
-      seccionesMarcadasIA = Array.from(document.querySelectorAll('#checkboxesSeccionesIA input:checked')).map(el => el.value);
-      if (seccionesMarcadasIA.length === 0) return alert("Selecciona al menos una sección para consultar a la IA.");
+    // SIMULACIÓN CONSULTA GEMINI IA
+    function analizarConIA() {
+      const btn = document.getElementById('btnIA');
+      btn.innerText = "⏳ Consultando a Gemini...";
+      btn.disabled = true;
 
-      if (!base64 && !nombreActual) return alert("Sube una foto o escribe el nombre del juego para que Gemini pueda identificarlo.");
+      setTimeout(() => {
+        // Respuesta simulada obtenida del backend/Gemini
+        datosAnalizadosIA = {
+          nombre: "Virus!",
+          categoria: "Juego de Mesa",
+          tipologia: "Cartas",
+          edad: "+8",
+          min_jugadores: 2,
+          max_jugadores: 6,
+          mecanicas: "Gestión de mano, Fastidiar, Colección",
+          instrucciones: "Consigue 4 órganos sanos en tu cuerpo para ganar."
+        };
 
-      const btnIA = document.getElementById('btnIA');
-      btnIA.innerText = "⏳ Consultando a Gemini...";
-      btnIA.disabled = true;
-
-      try {
-        const response = await fetchSeguro(`/api/analizar-imagen`, {
-          method: 'POST',
-          body: JSON.stringify({ 
-            foto_base64: base64, 
-            secciones_solicitadas: seccionesMarcadasIA, 
-            nombre_juego_ref: nombreActual 
-          })
-        });
-        datosAnalizadosIA = await response.json();
-        if (datosAnalizadosIA.error) throw new Error(datosAnalizadosIA.error);
-
+        btn.innerText = "🤖 Consultar a Gemini IA";
+        btn.disabled = false;
         abrirComparadorIA();
-      } catch (err) { alert(err.message); }
-      finally { btnIA.innerText = "🤖 Consultar a Gemini IA"; btnIA.disabled = false; }
+      }, 1000);
     }
 
     function abrirComparadorIA() {
-      if (!datosAnalizadosIA) return;
-
-      const contenedor = document.getElementById('contenedorCamposComparador');
-      contenedor.innerHTML = '';
+      const cont = document.getElementById('contenedorCamposComparador');
+      cont.innerHTML = '';
       seleccionesComparadorIA = {};
 
-      const iaNormalizada = {
-        nombre: datosAnalizadosIA.nombre || '',
-        categoria: datosAnalizadosIA.categoria || '',
-        edad: datosAnalizadosIA.edad || '',
-        mecanicas: datosAnalizadosIA.mecanicas || '',
-        instrucciones: datosAnalizadosIA.instrucciones || datosAnalizadosIA.reglas_basicas || '',
-        instruccionesCompletas: datosAnalizadosIA.instrucciones_completas || datosAnalizadosIA.instruccionesCompletas || ''
-      };
+      const camposCheck = Array.from(document.querySelectorAll('#checkboxesSeccionesIA input:checked')).map(x => x.value);
 
-      const mapaCampos = [
-        { key: 'nombre', label: 'Nombre del Juego', idElem: 'nombre', grupo: 'datos_basicos' },
-        { key: 'categoria', label: 'Categoría', idElem: 'categoria', grupo: 'datos_basicos' },
-        { key: 'edad', label: 'Edad Recomendada', idElem: 'edad', grupo: 'datos_basicos' },
-        { key: 'mecanicas', label: 'Mecánicas (BGG)', idElem: 'mecanicas', grupo: 'mecanicas' },
-        { key: 'instrucciones', label: 'Reglas Básicas (Resumen)', idElem: 'instrucciones', grupo: 'reglas_basicas' },
-        { key: 'instruccionesCompletas', label: 'Reglas Completas Paso a Paso', idElem: 'instruccionesCompletas', grupo: 'reglas_completas' }
-      ];
-
-      let bloquesGenerados = 0;
-
-      mapaCampos.forEach(campo => {
-        if (!seccionesMarcadasIA.includes(campo.grupo)) return;
-
-        const valIA = iaNormalizada[campo.key];
-        const elemForm = document.getElementById(campo.idElem);
-        const valActual = elemForm ? elemForm.value : '';
-
-        if (valIA && valIA.toString().trim().length > 0) {
-          bloquesGenerados++;
-          seleccionesComparadorIA[campo.idElem] = 'ia';
-
-          contenedor.innerHTML += `
-            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-2">
-              <span class="font-bold text-slate-700 uppercase text-[10px] block border-b pb-1">${campo.label}</span>
-              
-              <div class="grid grid-cols-2 gap-2 text-[11px]">
-                <div id="card_orig_${campo.idElem}" onclick="seleccionarOpcionComparador('${campo.idElem}', 'original')" class="p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-white border-slate-200 opacity-60">
-                  <div>
-                    <span class="text-[9px] font-bold text-slate-400 block uppercase mb-1">📄 Original:</span>
-                    <p class="text-slate-700 whitespace-pre-line">${valActual || '(Vacío)'}</p>
-                  </div>
-                  <span id="check_orig_${campo.idElem}" class="text-[10px] font-bold text-slate-400 mt-2 block">✕ No seleccionado</span>
-                </div>
-
-                <div id="card_ia_${campo.idElem}" onclick="seleccionarOpcionComparador('${campo.idElem}', 'ia')" class="p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-purple-100 border-purple-500 shadow-sm">
-                  <div>
-                    <span class="text-[9px] font-bold text-purple-700 block uppercase mb-1">✨ Sugerido por IA:</span>
-                    <p class="text-purple-950 font-semibold whitespace-pre-line">${valIA}</p>
-                  </div>
-                  <span id="check_ia_${campo.idElem}" class="text-[10px] font-bold text-purple-700 mt-2 block">✓ Seleccionado</span>
-                </div>
-              </div>
-
-              <div class="pt-1">
-                <button type="button" onclick="toggleEdicionManualComparador('${campo.idElem}')" class="text-[10px] text-indigo-600 font-bold underline">
-                  ✏️ O combinar / editar manualmente
-                </button>
-                <textarea id="manual_${campo.idElem}" rows="2" class="w-full p-2 border rounded-lg outline-none text-xs hidden mt-1 bg-white" placeholder="Escribe tu texto combinado aquí...">${valIA}</textarea>
-              </div>
-            </div>
-          `;
-        }
-      });
-
-      if (seccionesMarcadasIA.includes('datos_basicos')) {
-        if (datosAnalizadosIA.min_jugadores) {
-          const elMin = document.getElementById('minJugadoresSelect');
-          if (elMin) elMin.value = datosAnalizadosIA.min_jugadores;
-        }
-        if (datosAnalizadosIA.max_jugadores) {
-          const elMax = document.getElementById('maxJugadoresSelect');
-          if (elMax) elMax.value = datosAnalizadosIA.max_jugadores;
-        }
+      if (camposCheck.includes('datos_basicos')) {
+        cont.innerHTML += crearBloqueComparador('datos_basicos', 'Datos Básicos (Nombre, Cat, Tipología, Edad, Jugadores)', 
+          `Nombre: ${document.getElementById('nombre').value || 'Vacío'}\nTipología: ${document.getElementById('tipologia').value || 'Vacía'}`,
+          `Nombre: ${datosAnalizadosIA.nombre}\nCategoría: ${datosAnalizadosIA.categoria}\nTipología: ${datosAnalizadosIA.tipologia}\nEdad: ${datosAnalizadosIA.edad}\nJugadores: ${datosAnalizadosIA.min_jugadores}-${datosAnalizadosIA.max_jugadores}`
+        );
       }
 
-      if (bloquesGenerados === 0) {
-        contenedor.innerHTML = `
-          <div class="text-center py-8 text-slate-500 space-y-2">
-            <p class="font-bold">⚠️ No se extrajeron textos comparables.</p>
-            <p class="text-xs">Gemini no devolvió información útil para las secciones marcadas.</p>
-          </div>
-        `;
+      if (camposCheck.includes('mecanicas')) {
+        cont.innerHTML += crearBloqueComparador('mecanicas', 'Mecánicas (Máx 3)',
+          document.getElementById('mecanicas').value || '(Vacío)',
+          datosAnalizadosIA.mecanicas
+        );
+      }
+
+      if (camposCheck.includes('reglas')) {
+        cont.innerHTML += crearBloqueComparador('reglas', 'Reglas Básicas',
+          document.getElementById('instrucciones').value || '(Vacío)',
+          datosAnalizadosIA.instrucciones
+        );
       }
 
       document.getElementById('modalComparadorIA').classList.remove('hidden');
     }
 
-    function seleccionarOpcionComparador(idElem, opcion) {
-      seleccionesComparadorIA[idElem] = opcion;
-
-      const cardOrig = document.getElementById(`card_orig_${idElem}`);
-      const cardIa = document.getElementById(`card_ia_${idElem}`);
-      const checkOrig = document.getElementById(`check_orig_${idElem}`);
-      const checkIa = document.getElementById(`check_ia_${idElem}`);
-
-      if (opcion === 'original') {
-        cardOrig.className = "p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-emerald-50 border-emerald-500 shadow-sm";
-        checkOrig.className = "text-[10px] font-bold text-emerald-700 mt-2 block";
-        checkOrig.innerText = "✓ Seleccionado";
-
-        cardIa.className = "p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-white border-slate-200 opacity-60";
-        checkIa.className = "text-[10px] font-bold text-slate-400 mt-2 block";
-        checkIa.innerText = "✕ No seleccionado";
-      } else {
-        cardIa.className = "p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-purple-100 border-purple-500 shadow-sm";
-        checkIa.className = "text-[10px] font-bold text-purple-700 mt-2 block";
-        checkIa.innerText = "✓ Seleccionado";
-
-        cardOrig.className = "p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-white border-slate-200 opacity-60";
-        checkOrig.className = "text-[10px] font-bold text-slate-400 mt-2 block";
-        checkOrig.innerText = "✕ No seleccionado";
-      }
+    function crearBloqueComparador(key, titulo, valOrig, valIA) {
+      seleccionesComparadorIA[key] = 'ia';
+      return `
+        <div class="bg-slate-50 p-2.5 rounded-xl border space-y-2">
+          <span class="font-bold text-slate-700 uppercase text-[10px] block border-b pb-1">${titulo}</span>
+          <div class="grid grid-cols-2 gap-2 text-[11px]">
+            <div onclick="seleccionarOpcionIA('${key}', 'orig')" id="card_orig_${key}" class="p-2 rounded-xl border bg-white border-slate-200 opacity-60 cursor-pointer">
+              <span class="text-[9px] font-bold text-slate-400 block uppercase">Original:</span>
+              <p class="whitespace-pre-line text-slate-700">${valOrig}</p>
+            </div>
+            <div onclick="seleccionarOpcionIA('${key}', 'ia')" id="card_ia_${key}" class="p-2 rounded-xl border bg-purple-100 border-purple-500 shadow-sm cursor-pointer">
+              <span class="text-[9px] font-bold text-purple-700 block uppercase">✨ Sugerido IA:</span>
+              <p class="whitespace-pre-line text-purple-950 font-semibold">${valIA}</p>
+            </div>
+          </div>
+        </div>
+      `;
     }
 
-    function toggleEdicionManualComparador(idElem) {
-      const area = document.getElementById(`manual_${idElem}`);
-      area.classList.toggle('hidden');
-      if (!area.classList.contains('hidden')) seleccionesComparadorIA[idElem] = 'manual';
+    function seleccionarOpcionIA(key, opcion) {
+      seleccionesComparadorIA[key] = opcion;
+      const elOrig = document.getElementById(`card_orig_${key}`);
+      const elIa = document.getElementById(`card_ia_${key}`);
+
+      if (opcion === 'orig') {
+        elOrig.className = "p-2 rounded-xl border bg-emerald-50 border-emerald-500 shadow-sm cursor-pointer";
+        elIa.className = "p-2 rounded-xl border bg-white border-slate-200 opacity-60 cursor-pointer";
+      } else {
+        elIa.className = "p-2 rounded-xl border bg-purple-100 border-purple-500 shadow-sm cursor-pointer";
+        elOrig.className = "p-2 rounded-xl border bg-white border-slate-200 opacity-60 cursor-pointer";
+      }
     }
 
     function cerrarComparadorIA() { document.getElementById('modalComparadorIA').classList.add('hidden'); }
 
     function aplicarSeleccionComparador() {
-      const mapaCampos = [
-        { key: 'nombre', idElem: 'nombre' },
-        { key: 'categoria', idElem: 'categoria' },
-        { key: 'edad', idElem: 'edad' },
-        { key: 'mecanicas', idElem: 'mecanicas' },
-        { key: 'instrucciones', idElem: 'instrucciones' },
-        { key: 'instruccionesCompletas', idElem: 'instruccionesCompletas' }
-      ];
+      if (seleccionesComparadorIA['datos_basicos'] === 'ia') {
+        document.getElementById('nombre').value = datosAnalizadosIA.nombre;
+        document.getElementById('categoria').value = datosAnalizadosIA.categoria;
+        document.getElementById('tipologia').value = datosAnalizadosIA.tipologia;
+        document.getElementById('edad').value = datosAnalizadosIA.edad;
+        document.getElementById('minJugadores').value = datosAnalizadosIA.min_jugadores;
+        document.getElementById('maxJugadores').value = datosAnalizadosIA.max_jugadores;
+      }
 
-      mapaCampos.forEach(campo => {
-        const modo = seleccionesComparadorIA[campo.idElem];
-        const targetElem = document.getElementById(campo.idElem);
+      if (seleccionesComparadorIA['mecanicas'] === 'ia') {
+        document.getElementById('mecanicas').value = datosAnalizadosIA.mecanicas;
+      }
 
-        if (modo === 'ia') {
-          const valIA = datosAnalizadosIA[campo.key] || datosAnalizadosIA.instrucciones_completas;
-          if (valIA) targetElem.value = valIA;
-        } else if (modo === 'manual') {
-          const areaManual = document.getElementById(`manual_${campo.idElem}`);
-          if (areaManual && areaManual.value.trim()) targetElem.value = areaManual.value;
-        }
-      });
+      if (seleccionesComparadorIA['reglas'] === 'ia') {
+        document.getElementById('instrucciones').value = datosAnalizadosIA.instrucciones;
+      }
 
       cerrarComparadorIA();
-      alert("✅ Cambios de la IA aplicados al formulario.");
+      alert("✅ Datos aplicados al formulario.");
     }
 
-    async function confirmarBorradoSeguro() {
-      const id = document.getElementById('juegoId').value;
-      if (!id) return;
-
-      if (!confirm("⚠️ ¿Estás COMPLETAMENTE seguro de que deseas eliminar permanentemente este juego y todo su historial?")) return;
-
-      try {
-        await fetchSeguro(`/api/juegos/${id}`, { method: 'DELETE' });
-        cerrarModalFormulario();
-        cargarJuegos();
-        alert("El juego ha sido eliminado.");
-      } catch (err) { alert(err.message); }
-    }
-
-    // PROCESAMIENTO DE FOTO
-    function procesarFoto(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          const esVertical = img.height >= img.width;
-          const targetRatio = esVertical ? (3 / 4) : (4 / 3);
-
-          const canvas = document.createElement('canvas');
-          const canvasSize = 800;
-          canvas.width = canvasSize;
-          canvas.height = canvasSize;
-          const ctx = canvas.getContext('2d');
-
-          ctx.fillStyle = '#0f172a';
-          ctx.fillRect(0, 0, canvasSize, canvasSize);
-
-          let drawW, drawH;
-          if (esVertical) {
-            drawH = canvasSize * 0.92;
-            drawW = drawH * targetRatio;
-          } else {
-            drawW = canvasSize * 0.92;
-            drawH = drawW / targetRatio;
-          }
-
-          const offsetX = (canvasSize - drawW) / 2;
-          const offsetY = (canvasSize - drawH) / 2;
-
-          ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
-
-          const resizedBase64 = canvas.toDataURL('image/jpeg', 0.85);
-          document.getElementById('juegoFotoBase64').value = resizedBase64;
-          document.getElementById('imagePreview').innerHTML = `<img src="${resizedBase64}" class="w-full h-full object-contain">`;
-        };
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
-
-    // RULETA
-    function abrirModalRuleta() {
-      document.getElementById('pasoRuletaConfig').classList.remove('hidden');
-      document.getElementById('pasoRuletaAnimacion').classList.add('hidden');
-      document.getElementById('pasoRuletaResultado').classList.add('hidden');
-      document.getElementById('modalRuleta').classList.remove('hidden');
-    }
-
-    function cerrarModalRuleta() { document.getElementById('modalRuleta').classList.add('hidden'); }
-
-    function girarRuletaClasica() {
-      const modo = document.getElementById('ruletaModo').value;
-      const catsElegidas = Array.from(document.querySelectorAll('#checkboxesRuletaCat input:checked')).map(el => el.value);
-
-      let elegibles = juegosCache.filter(j => catsElegidas.includes(j.categoria));
-      if (elegibles.length === 0) return alert("No hay juegos disponibles con las categorías seleccionadas.");
-
-      if (modo === 'descarte') {
-        if (bolsaDescarteRuleta.length === 0) bolsaDescarteRuleta = [...elegibles.map(j => j.id)];
-        elegibles = elegibles.filter(j => bolsaDescarteRuleta.includes(j.id));
-      } else if (modo === 'rapida') {
-        const rapidos = elegibles.filter(j => (j.tiempo_medio_segundos || 0) <= 1200);
-        if (rapidos.length > 0) elegibles = rapidos;
-      }
-
-      let seleccionado = null;
-      if (modo === 'compensado') {
-        elegibles.sort((a,b) => (a.veces_jugado || 0) - (b.veces_jugado || 0));
-        seleccionado = elegibles[0];
-      } else {
-        seleccionado = elegibles[Math.floor(Math.random() * elegibles.length)];
-      }
-
-      if (modo === 'descarte') {
-        bolsaDescarteRuleta = bolsaDescarteRuleta.filter(id => id !== seleccionado.id);
-      }
-
-      document.getElementById('pasoRuletaConfig').classList.add('hidden');
-      document.getElementById('pasoRuletaAnimacion').classList.remove('hidden');
-
-      const wheel = document.getElementById('rouletteWheelElem');
-      wheel.style.transition = 'none';
-      wheel.style.transform = 'rotate(0deg)';
-      
-      setTimeout(() => {
-        const vueltasGrados = 1440 + Math.floor(Math.random() * 360);
-        wheel.style.transition = 'transform 3.5s cubic-bezier(0.15, 0.85, 0.35, 1.02)';
-        wheel.style.transform = `rotate(${vueltasGrados}deg)`;
-
-        let clicks = 0;
-        const soundInterval = setInterval(() => {
-          reproducirSonidoClick();
-          clicks++;
-          if (clicks > 28) clearInterval(soundInterval);
-        }, 120);
-
-        setTimeout(() => {
-          reproducirSonidoVictoria();
-
-          document.getElementById('ruletaResultadoNombre').innerText = seleccionado.nombre;
-          const imgCont = document.getElementById('ruletaResultadoImagen');
-          const imgSrc = seleccionado.foto_url || seleccionado.foto_base64 || '';
-          imgCont.innerHTML = imgSrc ? `<img src="${imgSrc}" class="w-full h-full object-contain p-2">` : `<span class="text-slate-400 text-xs">Sin Foto</span>`;
-
-          document.getElementById('btnJugarRuleta').onclick = () => {
-            cerrarModalRuleta();
-            abrirModalPartida(seleccionado.id, seleccionado.nombre);
-          };
-          document.getElementById('btnVerFichaRuleta').onclick = () => {
-            cerrarModalRuleta();
-            abrirFichaDetallada(seleccionado.id);
-          };
-
-          document.getElementById('pasoRuletaAnimacion').classList.add('hidden');
-          document.getElementById('pasoRuletaResultado').classList.remove('hidden');
-        }, 3600);
-      }, 50);
-    }
-
-    function reiniciarRuleta() {
-      document.getElementById('pasoRuletaResultado').classList.add('hidden');
-      document.getElementById('pasoRuletaConfig').classList.remove('hidden');
-    }
-
-    // PERFIL Y AUTENTICACIÓN
-    async function procesarLogin(e) {
-      e.preventDefault();
-      const nick = document.getElementById('loginNick').value;
-      const password = document.getElementById('loginPassword').value;
-
-      try {
-        const res = await fetch(`${WORKER_URL}/api/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ nick, password })
-        });
-        const json = await res.json();
-        if (json.error) throw new Error(json.error);
-
-        currentUser = json.usuario;
-        localStorage.setItem('session_user', JSON.stringify(currentUser));
-        localStorage.setItem('auth_token', json.token); 
-        iniciarApp();
-      } catch (err) { alert(err.message); }
-    }
-
-    async function procesarRegistro(e) {
-      e.preventDefault();
-      const nombre = document.getElementById('regNombre').value;
-      const nick = document.getElementById('regNick').value;
-      const pass1 = document.getElementById('regPass1').value;
-      const pass2 = document.getElementById('regPass2').value;
-
-      if (pass1 !== pass2) return alert("Las contraseñas no coinciden");
-
-      try {
-        const res = await fetch(`${WORKER_URL}/api/registro`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ nombre, nick, password: pass1 })
-        });
-        const json = await res.json();
-        if (json.error) throw new Error(json.error);
-
-        alert("¡Solicitud enviada!\n\nTu cuenta se encuentra pendiente de activación por el Administrador.");
-        document.getElementById('registroForm').classList.add('hidden');
-        document.getElementById('codigoForm').classList.remove('hidden');
-      } catch (err) { alert(err.message); }
-    }
-
-    async function validarCodigoAcceso() {
-      const nick = document.getElementById('regNick').value;
-      const codigo = document.getElementById('valCodigo').value;
-
-      try {
-        const res = await fetch(`${WORKER_URL}/api/activar-usuario`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ nick, codigo })
-        });
-        const json = await res.json();
-        if (json.error) throw new Error(json.error);
-
-        alert("¡Cuenta activada! Inicia sesión.");
-        toggleAuthMode('login');
-      } catch (err) { alert(err.message); }
-    }
-
-    function toggleAuthMode(mode) {
-      document.getElementById('loginForm').classList.toggle('hidden', mode !== 'login');
-      document.getElementById('registroForm').classList.toggle('hidden', mode !== 'registro');
-      document.getElementById('codigoForm').classList.add('hidden');
-    }
-
-    async function abrirPerfilModal() {
-      document.getElementById('modalPerfil').classList.remove('hidden');
-      cambiarTabPerfil('historial');
-      
-      const adminIconCont = document.getElementById('adminIconContainer');
-      if (currentUser.rol === 'ADMIN') {
-        adminIconCont.innerHTML = `<button type="button" onclick="cerrarPerfilModal(); abrirAdminPanel();" class="text-amber-600 bg-amber-50 font-bold px-2 py-1 rounded-lg text-xs">⚙️ Gestión</button>`;
-      } else adminIconCont.innerHTML = '';
-
-      try {
-        const res = await fetchSeguro(`/api/usuario/perfil`);
-        const perfil = await res.json();
-
-        document.getElementById('perfilHeaderNombre').innerText = perfil.nombre || 'Usuario';
-        document.getElementById('perfilHeaderNick').innerText = `@${perfil.nick || 'nick'}`;
-        document.getElementById('perfilNombre').value = perfil.nombre || '';
-        document.getElementById('perfilNick').value = perfil.nick || '';
-        document.getElementById('perfilBio').value = perfil.bio || '';
-        document.getElementById('perfilAvatarBase64').value = perfil.avatar_base64 || '';
-
-        const preview = document.getElementById('avatarPreview');
-        preview.innerHTML = perfil.avatar_base64 ? `<img src="${perfil.avatar_base64}" class="w-full h-full object-cover">` : `<span class="text-slate-400 text-xs">Foto</span>`;
-
-        const historialCont = document.getElementById('miHistorialLista');
-        historialCont.innerHTML = '';
-        if (perfil.misPartidas && perfil.misPartidas.length > 0) {
-          perfil.misPartidas.forEach(p => {
-            const fechaFormateada = formatearFechaCorta(p.fecha);
-            historialCont.innerHTML += `
-              <div class="bg-slate-50 p-2.5 rounded-xl border space-y-1">
-                <div class="flex justify-between items-center">
-                  <span class="font-bold text-indigo-700">${p.juego_nombre} (${p.num_partidas || 1} part.)</span>
-                  <span class="text-[10px] text-slate-400">${fechaFormateada}</span>
-                </div>
-                <p class="text-[11px] text-slate-600">👥 <b>Participantes:</b> ${p.participantes}</p>
-                <p class="text-[11px] text-emerald-700 font-bold">🏆 ${p.ganador}</p>
-              </div>
-            `;
-          });
-        } else historialCont.innerHTML = `<p class="text-center text-slate-400 py-4">No hay partidas registradas.</p>`;
-
-        const misJuegosCont = document.getElementById('misJuegosLista');
-        misJuegosCont.innerHTML = '';
-        if (perfil.misJuegos && perfil.misJuegos.length > 0) {
-          perfil.misJuegos.forEach(j => {
-            misJuegosCont.innerHTML += `
-              <div class="bg-slate-50 p-2 rounded-xl border flex justify-between items-center text-xs">
-                <span class="font-bold text-slate-800">${j.nombre}</span>
-                <span class="text-[10px] text-indigo-600 font-medium">${j.categoria}</span>
-              </div>
-            `;
-          });
-        } else misJuegosCont.innerHTML = `<p class="text-center text-slate-400 py-4">No has subido ningún juego aún.</p>`;
-      } catch (err) { alert(err.message); }
-    }
-
-    function cambiarTabPerfil(tab) {
-      document.getElementById('tabHistorialPerfilContent').classList.toggle('hidden', tab !== 'historial');
-      document.getElementById('tabJuegosPerfilContent').classList.toggle('hidden', tab !== 'juegos');
-      document.getElementById('tabDatosPerfilContent').classList.toggle('hidden', tab !== 'datos');
-
-      ['historial', 'juegos', 'datos'].forEach(t => {
-        const btn = document.getElementById(`tab${t.charAt(0).toUpperCase() + t.slice(1)}PerfilBtn`);
-        btn.className = t === tab ? 'flex-1 py-1.5 rounded-lg text-center transition bg-white text-indigo-700 font-bold shadow-sm' : 'flex-1 py-1.5 rounded-lg text-center transition';
-      });
-    }
-
-    function cerrarPerfilModal() { document.getElementById('modalPerfil').classList.add('hidden'); }
-
-    function procesarAvatar(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          canvas.width = 200; canvas.height = 200;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, 200, 200);
-
-          const resizedBase64 = canvas.toDataURL('image/jpeg', 0.8);
-          document.getElementById('perfilAvatarBase64').value = resizedBase64;
-          document.getElementById('avatarPreview').innerHTML = `<img src="${resizedBase64}" class="w-full h-full object-cover">`;
-        };
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
-
-    async function guardarPerfil(e) {
-      e.preventDefault();
-      const nombre = document.getElementById('perfilNombre').value;
-      const nick = document.getElementById('perfilNick').value;
-      const bio = document.getElementById('perfilBio').value;
-      const avatar_base64 = document.getElementById('perfilAvatarBase64').value;
-
-      try {
-        const res = await fetchSeguro(`/api/usuario/perfil`, {
-          method: 'PUT',
-          body: JSON.stringify({ nombre, nick, bio, avatar_base64 })
-        });
-        const json = await res.json();
-        if (json.error) throw new Error(json.error);
-
-        currentUser = json.usuario;
-        localStorage.setItem('session_user', JSON.stringify(currentUser));
-        alert("Perfil actualizado correctamente");
-        iniciarApp();
-        cerrarPerfilModal();
-      } catch (err) { alert(err.message); }
-    }
-
-    // PARTIDAS Y CRONÓMETRO
-    async function abrirModalPartida(juegoId, juegoNombre) {
-      document.getElementById('partidaJuegoId').value = juegoId;
-      document.getElementById('partidaJuegoNombre').innerText = juegoNombre;
-      
-      document.getElementById('pasoModoSelector').classList.remove('hidden');
-      document.getElementById('pasoJugadoresSelector').classList.add('hidden');
-      document.getElementById('pasoCronometroActivo').classList.add('hidden');
-      document.getElementById('pasoResultadosFinales').classList.add('hidden');
-
-      document.getElementById('modalPartida').classList.remove('hidden');
-      await cargarJugadoresDisponibles();
-    }
-
-    async function cargarJugadoresDisponibles() {
-      try {
-        const res = await fetchSeguro(`/api/jugadores-disponibles`);
-        const jugadores = await res.json();
-        
-        const contenedor = document.getElementById('checkboxesJugadores');
-        contenedor.innerHTML = '';
-        jugadores.forEach(j => {
-          const marcado = (j === currentUser.nick) ? 'checked' : '';
-          contenedor.innerHTML += `
-            <label class="flex items-center gap-2 p-1.5 bg-white rounded-lg border cursor-pointer hover:bg-slate-100">
-              <input type="checkbox" name="jugadorCheck" value="${j}" ${marcado} class="rounded text-indigo-600">
-              <span class="truncate font-medium text-slate-700">${j}</span>
-            </label>
-          `;
-        });
-      } catch (e) { console.error(e); }
-    }
-
-    function abrirPromptInvitado() {
-      const nom = prompt("Introduce el nombre del invitado:");
-      if (nom && nom.trim()) {
-        fetchSeguro(`/api/invidados`, { method: 'POST', body: JSON.stringify({ nombre: nom.trim() }) })
-          .then(() => cargarJugadoresDisponibles());
-      }
-    }
-
-    function elegirModoPartida(modo) {
-      modoPartidaActual = modo;
-      document.getElementById('pasoModoSelector').classList.add('hidden');
-      document.getElementById('pasoJugadoresSelector').classList.remove('hidden');
-    }
-
-    function volverSeleccionModo() {
-      document.getElementById('pasoJugadoresSelector').classList.add('hidden');
-      document.getElementById('pasoModoSelector').classList.remove('hidden');
-    }
-
-    function avanzarAFormularioFinal() {
-      const seleccionados = Array.from(document.querySelectorAll('input[name="jugadorCheck"]:checked')).map(el => el.value);
-      if (seleccionados.length === 0) return alert("Selecciona al menos un jugador participante.");
-
-      document.getElementById('pasoJugadoresSelector').classList.add('hidden');
-
-      if (modoPartidaActual === 'ahora') {
-        document.getElementById('pasoCronometroActivo').classList.remove('hidden');
-        segundosTranscurridos = 0;
-        document.getElementById('cronometroDisplay').innerText = "00:00";
-        if (cronometroInterval) clearInterval(cronometroInterval);
-        
-        cronometroInterval = setInterval(() => {
-          segundosTranscurridos++;
-          const mins = Math.floor(segundosTranscurridos / 60).toString().padStart(2, '0');
-          const secs = (segundosTranscurridos % 60).toString().padStart(2, '0');
-          document.getElementById('cronometroDisplay').innerText = `${mins}:${secs}`;
-        }, 1000);
-      } else {
-        document.getElementById('campoDuracionManualContainer').classList.remove('hidden');
-        document.getElementById('pasoResultadosFinales').classList.remove('hidden');
-        document.getElementById('inputNumPartidas').value = 1;
-        generarSelectoresGanadores();
-      }
-    }
-
-    function detenerCronometroYFinalizar() {
-      clearInterval(cronometroInterval);
-      document.getElementById('pasoCronometroActivo').classList.add('hidden');
-      document.getElementById('campoDuracionManualContainer').classList.add('hidden');
-      document.getElementById('pasoResultadosFinales').classList.remove('hidden');
-      document.getElementById('inputNumPartidas').value = 1;
-      generarSelectoresGanadores();
-    }
-
-    function generarSelectoresGanadores() {
-      const numPartidas = parseInt(document.getElementById('inputNumPartidas').value) || 1;
-      const seleccionados = Array.from(document.querySelectorAll('input[name="jugadorCheck"]:checked')).map(el => el.value);
-      const contenedor = document.getElementById('contenedorGanadoresPartidas');
-      contenedor.innerHTML = '';
-
-      for (let i = 1; i <= numPartidas; i++) {
-        let opcionesHtml = `<option value="Empate / Sin ganador">Empate / Sin ganador</option>`;
-        seleccionados.forEach(j => { opcionesHtml += `<option value="${j}">${j}</option>`; });
-
-        contenedor.innerHTML += `
-          <div class="p-2 bg-slate-50 rounded-xl border flex items-center justify-between gap-2">
-            <span class="font-bold text-slate-700">🏆 Ganador Partida ${i}:</span>
-            <select id="ganadorPartida_${i}" class="p-1 border rounded-lg bg-white outline-none font-semibold text-indigo-700">
-              ${opcionesHtml}
-            </select>
-          </div>
-        `;
-      }
-    }
-
-    async function guardarPartidaFinal() {
-      const juego_id = document.getElementById('partidaJuegoId').value;
-      const seleccionados = Array.from(document.querySelectorAll('input[name="jugadorCheck"]:checked')).map(el => el.value);
-      const participantesStr = seleccionados.join(', ');
-      const numPartidas = parseInt(document.getElementById('inputNumPartidas').value) || 1;
-
-      let ganadoresList = [];
-      for (let i = 1; i <= numPartidas; i++) {
-        const g = document.getElementById(`ganadorPartida_${i}`).value;
-        ganadoresList.push(`P${i}: ${g}`);
-      }
-      const ganadorFinalResumen = ganadoresList.join(' | ');
-
-      let duracionTotalSegs = modoPartidaActual === 'ahora' ? segundosTranscurridos : (parseInt(document.getElementById('inputDuracionMinutos').value) || 0) * 60;
-
-      try {
-        const res = await fetchSeguro(`/api/partidas`, {
-          method: 'POST',
-          body: JSON.stringify({
-            juego_id,
-            participantes: participantesStr,
-            ganador: ganadorFinalResumen,
-            num_partidas: numPartidas,
-            duracion_total_segundos: duracionTotalSegs
-          })
-        });
-        const json = await res.json();
-        if (json.error) throw new Error(json.error);
-
-        cerrarModalPartida();
-        alert("¡Partida registrada y estadísticas actualizadas con éxito!");
-        cargarJuegos();
-      } catch (err) { alert(err.message); }
-    }
-
-    function cerrarModalPartida() {
-      if (cronometroInterval) clearInterval(cronometroInterval);
-      document.getElementById('modalPartida').classList.add('hidden');
-    }
-
-    function filtrarCategoria(cat, event) {
-      categoriaActual = cat;
-      document.querySelectorAll('.cat-btn').forEach(b => {
-        b.className = "cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition";
-      });
-      event.target.className = "cat-btn bg-indigo-600 text-white px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition";
-      renderizarTarjetas();
-    }
-
-    function filtrarJuegos() { renderizarTarjetas(); }
-
-    function cerrarSesion() {
-      localStorage.removeItem('session_user');
-      localStorage.removeItem('auth_token'); 
-      location.reload();
-    }
+    // Inicializar al cargar la página
+    window.onload = () => { renderizarTarjetas(); };
   </script>
 </body>
 </html>
