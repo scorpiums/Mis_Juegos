@@ -480,6 +480,7 @@
             <input type="text" id="nombre" required class="w-full p-2 border rounded-xl outline-none mt-0.5">
           </div>
 
+          <!-- FILA 1: CATEGORÍA Y TIPOLOGÍA -->
           <div class="grid grid-cols-2 gap-2">
             <div>
               <label class="font-bold text-slate-600 uppercase text-[10px]">Categoría <span class="text-rose-500">*</span></label>
@@ -497,16 +498,8 @@
             </div>
           </div>
 
+          <!-- FILA 2: EDAD RECOMENDADA (INTERCAMBIADA) Y UBICACIÓN -->
           <div class="grid grid-cols-2 gap-2">
-            <div>
-              <div class="flex justify-between items-center">
-                <label class="font-bold text-slate-600 uppercase text-[10px]">Ubicación <span class="text-rose-500">*</span></label>
-                <button type="button" onclick="crearNuevaUbicacionPrompt()" class="text-[9px] text-indigo-600 font-bold">＋ Crear</button>
-              </div>
-              <select id="ubicacionSelect" required class="w-full p-2 border rounded-xl outline-none mt-0.5 bg-white">
-                <option value="">Selecciona ubicación...</option>
-              </select>
-            </div>
             <div>
               <label class="font-bold text-slate-600 uppercase text-[10px]">Edad Recomendada <span class="text-rose-500">*</span></label>
               <select id="edad" required class="w-full p-2 border rounded-xl outline-none mt-0.5 bg-white font-semibold">
@@ -519,6 +512,16 @@
                 <option value="+14">+14 años</option>
                 <option value="+16">+16 años</option>
                 <option value="+18">+18 años</option>
+              </select>
+            </div>
+
+            <div>
+              <div class="flex justify-between items-center">
+                <label class="font-bold text-slate-600 uppercase text-[10px]">Ubicación <span class="text-rose-500">*</span></label>
+                <button type="button" onclick="crearNuevaUbicacionPrompt()" class="text-[9px] text-indigo-600 font-bold">＋ Crear</button>
+              </div>
+              <select id="ubicacionSelect" required class="w-full p-2 border rounded-xl outline-none mt-0.5 bg-white">
+                <option value="">Selecciona ubicación...</option>
               </select>
             </div>
           </div>
@@ -1517,7 +1520,7 @@
       finally { btnIA.innerText = "🤖 Consultar a Gemini IA"; btnIA.disabled = false; }
     }
 
-    // COMPARADOR IA CORREGIDO (SOLUCIONA DEFINITIVAMENTE [object Object] Y DESBORDAMIENTO)
+    // COMPARADOR IA COMPATIBLE Y SOLUCIONADO
     function abrirComparadorIA() {
       if (!datosAnalizadosIA) return;
 
@@ -1554,6 +1557,7 @@
         const elemForm = document.getElementById(campo.idElem);
         const valActual = elemForm ? elemForm.value : '';
 
+        // Renderizado del bloque comparativo
         if (valIA && valIA.trim().length > 0) {
           bloquesGenerados++;
           seleccionesComparadorIA[campo.idElem] = 'ia';
