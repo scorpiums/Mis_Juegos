@@ -14,7 +14,7 @@
       letter-spacing: -1px;
       text-shadow: 2px 2px 0px #000, -1px -1px 0px #000, 1px -1px 0px #000, -1px 1px 0px #000;
     }
-    /* ESTILOS DE LA RULETA CLÁSICA DE SELECCIÓN */
+    /* RULETA CLÁSICA CON EFECTO DE GIRO Y SONIDO */
     .roulette-container {
       position: relative;
       width: 200px;
@@ -140,7 +140,7 @@
   <!-- APLICACIÓN PRINCIPAL -->
   <div id="mainApp" class="hidden">
     <!-- CABECERA SUPERIOR FIJA -->
-    <header class="bg-indigo-600 text-white px-3 py-2.5 shadow-md sticky top-0 z-30 flex justify-between items-center gap-1">
+    <header class="bg-indigo-600 text-white px-3 py-2.5 shadow-md sticky top-0 z-40 flex justify-between items-center gap-1">
       <div class="flex items-center gap-2 shrink-0">
         <div class="w-8 h-8 bg-amber-400 rounded-xl border-2 border-black flex items-center justify-center shadow-md text-black font-black text-sm">🎮</div>
         <div class="leading-tight">
@@ -159,8 +159,8 @@
       </div>
     </header>
 
-    <!-- MENÚ SUPERIOR ANCLADO (STICKY HEADER PARA BÚSQUEDA Y FILTROS) -->
-    <div class="sticky top-12 z-20 bg-slate-100/95 backdrop-blur-md p-3 border-b border-slate-200/80 shadow-sm">
+    <!-- MENÚ SUPERIOR ANCLADO (STICKY Z-30 CON FONDO SÓLIDO PARA EVITAR TRANSPARENCIAS) -->
+    <div class="sticky top-[48px] z-30 bg-slate-100 p-3 border-b border-slate-200 shadow-md">
       <div class="max-w-4xl mx-auto space-y-2.5">
         <div class="flex gap-1.5">
           <input type="text" id="searchInput" oninput="filtrarJuegos()" placeholder="🔍 Buscar juego..." class="w-full p-2.5 rounded-xl border border-slate-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-xs sm:text-sm">
@@ -174,18 +174,19 @@
           </button>
         </div>
 
-        <!-- PANEL FILTROS AVANZADOS -->
+        <!-- PANEL FILTROS AVANZADOS CON MECÁNICAS DINÁMICAS DESDE LA BD -->
         <div id="panelFiltrosAvanzados" class="hidden bg-white p-3.5 rounded-2xl border border-slate-200 shadow-md space-y-3 text-xs">
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label class="font-bold text-slate-500 uppercase text-[10px]">👥 Nº de Jugadores</label>
               <select id="filtroNumJugadores" onchange="filtrarJuegos()" class="w-full p-2 border rounded-xl outline-none mt-1 bg-slate-50 font-medium">
                 <option value="">Cualquier número</option>
-                <option value="1">1 Jugador (Solitario)</option>
-                <option value="2">2 Jugadores (Pareja)</option>
-                <option value="3">3 Jugadores</option>
-                <option value="4">4 Jugadores</option>
-                <option value="5">5+ Jugadores (Grupo)</option>
+                <option value="1">1+ Jugadores</option>
+                <option value="2">2+ Jugadores</option>
+                <option value="3">3+ Jugadores</option>
+                <option value="4">4+ Jugadores</option>
+                <option value="5">5+ Jugadores</option>
+                <option value="6">6+ Jugadores</option>
               </select>
             </div>
 
@@ -212,23 +213,9 @@
           </div>
 
           <div>
-            <label class="font-bold text-slate-500 uppercase text-[10px] block mb-1">🧩 Componentes / Mecánicas</label>
-            <div class="flex flex-wrap gap-1.5" id="checkboxesMecanicas">
-              <label class="bg-slate-100 px-2.5 py-1 rounded-lg border flex items-center gap-1 cursor-pointer hover:bg-slate-200">
-                <input type="checkbox" value="Cartas" onchange="filtrarJuegos()" class="rounded text-indigo-600"> 🃏 Cartas
-              </label>
-              <label class="bg-slate-100 px-2.5 py-1 rounded-lg border flex items-center gap-1 cursor-pointer hover:bg-slate-200">
-                <input type="checkbox" value="Dados" onchange="filtrarJuegos()" class="rounded text-indigo-600"> 🎲 Dados
-              </label>
-              <label class="bg-slate-100 px-2.5 py-1 rounded-lg border flex items-center gap-1 cursor-pointer hover:bg-slate-200">
-                <input type="checkbox" value="Tablero" onchange="filtrarJuegos()" class="rounded text-indigo-600"> 🗺️ Tablero
-              </label>
-              <label class="bg-slate-100 px-2.5 py-1 rounded-lg border flex items-center gap-1 cursor-pointer hover:bg-slate-200">
-                <input type="checkbox" value="Pelota/Red" onchange="filtrarJuegos()" class="rounded text-indigo-600"> 🏸 Red/Pista
-              </label>
-              <label class="bg-slate-100 px-2.5 py-1 rounded-lg border flex items-center gap-1 cursor-pointer hover:bg-slate-200">
-                <input type="checkbox" value="Agilidad" onchange="filtrarJuegos()" class="rounded text-indigo-600"> ⚡ Agilidad
-              </label>
+            <label class="font-bold text-slate-500 uppercase text-[10px] block mb-1">🧩 Componentes y Mecánicas (Dinámicos):</label>
+            <div class="flex flex-wrap gap-1.5" id="checkboxesMecanicasDinamicas">
+              <span class="text-slate-400 text-[10px]">Cargando mecánicas...</span>
             </div>
           </div>
         </div>
@@ -252,7 +239,7 @@
       </div>
     </div>
 
-    <!-- CONTENEDOR DE TARJETAS -->
+    <!-- CONTENEDOR PRINCIPAL DE JUEGOS -->
     <main class="p-3 max-w-4xl mx-auto" id="mainContainer">
       <div class="text-center py-10 text-slate-400">Cargando colección desde la nube...</div>
     </main>
@@ -262,7 +249,7 @@
     </button>
   </div>
 
-  <!-- MODAL FICHA DETALLADA DEL JUEGO -->
+  <!-- MODAL FICHA DETALLADA DEL JUEGO CON ESTRUCTURA REORGANIZADA -->
   <div id="modalFichaJuego" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
     <div class="bg-white rounded-2xl max-w-md w-full h-[85vh] max-h-[620px] flex flex-col shadow-2xl overflow-hidden relative border border-slate-100">
       <div class="p-3 border-b flex justify-between items-center bg-slate-50 shrink-0">
@@ -275,6 +262,7 @@
 
       <div class="h-36 bg-slate-900 overflow-hidden relative flex items-center justify-center shrink-0 shadow-inner" id="fichaImagenContainer"></div>
 
+      <!-- PESTAÑAS FICHA UNIFICADAS -->
       <div class="flex bg-slate-100 p-1 text-[11px] font-bold text-slate-600 justify-between shrink-0 border-y border-slate-200">
         <button onclick="cambiarTabFicha('info')" id="tabInfoBtn" class="flex-1 py-1.5 rounded-lg text-center transition">Info</button>
         <button onclick="cambiarTabFicha('reglas')" id="tabReglasBtn" class="flex-1 py-1.5 rounded-lg text-center transition">Reglas & IA</button>
@@ -283,34 +271,50 @@
       </div>
 
       <div class="flex-grow overflow-y-auto p-3 space-y-3 text-xs">
+        <!-- TAB 1: INFO ESTRUCTURADA COMO LAS TARJETAS -->
         <div id="tabInfoContent" class="space-y-2.5">
-          <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1.5">
+          <div class="border-b pb-1.5 space-y-0.5">
             <p class="text-slate-700">📍 <b>Ubicación:</b> <span id="fichaUbicacion"></span></p>
-            <p class="text-slate-700">👶 <b>Edad Recomendada:</b> <span id="fichaEdad"></span></p>
-            <p class="text-slate-700">👥 <b>Jugadores:</b> <span id="fichaJugadores"></span></p>
-            <p class="text-indigo-900">👤 <b>Subido por:</b> <span id="fichaCreador"></span></p>
-            <p class="text-slate-600" id="fichaMecanicasCont">🧩 <b>Mecánicas:</b> <span id="fichaMecanicas"></span></p>
+            <p class="text-slate-600 text-[10px]" id="fichaAutoriaTexto"></p>
           </div>
 
-          <div class="bg-indigo-50/50 p-3 rounded-xl border border-indigo-100 space-y-1">
-            <p class="font-bold text-indigo-900 uppercase text-[10px] tracking-wider">⚡ Reglas Básicas (Resumen Rápido):</p>
+          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-1">
+            <span class="font-bold text-slate-500 uppercase text-[9px] block tracking-wider">📦 Ficha Técnica</span>
+            <p class="text-slate-700">👶 <b>Edad Recomendada:</b> <span id="fichaEdad"></span></p>
+            <p class="text-slate-700">👥 <b>Jugadores:</b> <span id="fichaJugadores"></span></p>
+            <p class="text-slate-700">🧩 <b>Mecánicas:</b> <span id="fichaMecanicas"></span></p>
+          </div>
+
+          <div class="bg-indigo-50/50 p-2.5 rounded-xl border border-indigo-100 space-y-1">
+            <p class="font-bold text-indigo-900 uppercase text-[9px] tracking-wider">⚡ Reglas Básicas (Resumen Rápido):</p>
             <p id="fichaReglasBasicasText" class="text-slate-700 leading-relaxed text-xs"></p>
           </div>
         </div>
 
+        <!-- TAB 2: REGLAS COMPLETAS, MULTIMEDIA Y ÁRBITRO IA -->
         <div id="tabReglasContent" class="space-y-3 hidden">
           <div class="space-y-1">
             <p class="font-bold text-slate-700 uppercase text-[10px] tracking-wider">📖 Instrucciones Oficiales Completas:</p>
-            <div id="fichaReglasCompletasText" class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-slate-700 leading-relaxed whitespace-pre-line text-xs max-h-44 overflow-y-auto"></div>
+            <div id="fichaReglasCompletasText" class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-slate-700 leading-relaxed whitespace-pre-line text-xs max-h-40 overflow-y-auto"></div>
           </div>
 
-          <div class="grid grid-cols-2 gap-2" id="contenedorRecursosEnlaces">
-            <a id="btnPdfReglas" href="#" target="_blank" class="hidden bg-rose-50 border border-rose-200 text-rose-700 font-bold p-2 rounded-xl text-center flex items-center justify-center gap-1">
-              📄 PDF Oficial
-            </a>
-            <a id="btnVideoReglas" href="#" target="_blank" class="hidden bg-red-50 border border-red-200 text-red-700 font-bold p-2 rounded-xl text-center flex items-center justify-center gap-1">
-              🎬 Vídeo Zacatrus
-            </a>
+          <!-- GESTIÓN DE DOCUMENTO PDF Y VÍDEO YOUTUBE -->
+          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-2">
+            <span class="font-bold text-slate-600 uppercase text-[9px] block">📎 Recursos Adjuntos</span>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <input type="file" id="inputSubirPdfModal" accept="application/pdf" onchange="subirPdfJuegoDirecto(event)" class="hidden">
+                <button onclick="document.getElementById('inputSubirPdfModal').click()" id="btnAccionPdf" class="w-full bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 font-bold p-2 rounded-xl text-center text-[10px] flex items-center justify-center gap-1">
+                  📄 Subir PDF
+                </button>
+              </div>
+              <div>
+                <button onclick="agregarEnlaceYouTubePrompt()" id="btnAccionVideo" class="w-full bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 font-bold p-2 rounded-xl text-center text-[10px] flex items-center justify-center gap-1">
+                  🎬 Añadir Vídeo
+                </button>
+              </div>
+            </div>
+            <div id="visorVideoContainer" class="hidden aspect-video w-full rounded-xl overflow-hidden border mt-1"></div>
           </div>
 
           <div class="bg-purple-50/80 p-3 rounded-2xl border border-purple-200 space-y-2">
@@ -325,6 +329,7 @@
           </div>
         </div>
 
+        <!-- TAB 3: ESTADÍSTICAS -->
         <div id="tabStatsContent" class="space-y-3 hidden">
           <div class="grid grid-cols-2 gap-2 text-center">
             <div class="bg-amber-50 border border-amber-200 p-2.5 rounded-xl">
@@ -343,6 +348,7 @@
           </div>
         </div>
 
+        <!-- TAB 4: HISTORIAL DE PARTIDAS -->
         <div id="tabHistorialJuegoContent" class="space-y-2 hidden">
           <div id="listaPartidasJuego" class="space-y-2"></div>
         </div>
@@ -428,7 +434,7 @@
     </div>
   </div>
 
-  <!-- MODAL FORMULARIO DE JUEGO & COMPARADOR IA -->
+  <!-- MODAL FORMULARIO DE JUEGO -->
   <div id="modalForm" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
     <div class="bg-white rounded-2xl max-w-md w-full h-[90vh] max-h-[660px] flex flex-col shadow-2xl overflow-hidden relative border border-slate-100">
       <div class="p-3 border-b flex justify-between items-center bg-slate-50 shrink-0">
@@ -454,6 +460,7 @@
             </button>
           </div>
 
+          <!-- AUTOREVISIÓN Y SELECCIÓN DE CAMPOS IA (SIN OPCIÓN DE PDF/VÍDEO) -->
           <div class="bg-purple-50 p-2.5 rounded-xl border border-purple-200 space-y-2 mt-2">
             <span class="font-bold text-purple-900 text-[11px] block">✨ Autorrellenar / Revisar con IA:</span>
             <div class="grid grid-cols-2 gap-1.5 text-[10px]" id="checkboxesSeccionesIA">
@@ -461,7 +468,6 @@
               <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="mecanicas" checked class="rounded text-purple-600"> Mecánicas</label>
               <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="reglas_basicas" checked class="rounded text-purple-600"> Reglas Básicas</label>
               <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="reglas_completas" checked class="rounded text-purple-600"> Reglas Completas</label>
-              <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="enlaces" checked class="rounded text-purple-600"> PDF / Vídeo</label>
             </div>
             <button type="button" onclick="analizarConIA()" id="btnIA" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 rounded-xl text-xs card-zoom shadow-sm">
               🤖 Consultar a Gemini IA
@@ -507,7 +513,16 @@
             </div>
             <div>
               <label class="font-bold text-slate-600 uppercase text-[10px]">Nº de Jugadores <span class="text-rose-500">*</span></label>
-              <input type="text" id="jugadores" required placeholder="Ej. 2-4 jugadores" class="w-full p-2 border rounded-xl outline-none mt-0.5">
+              <select id="jugadores" required class="w-full p-2 border rounded-xl outline-none mt-0.5 bg-white font-medium">
+                <option value="1+ jugadores">1+ jugadores</option>
+                <option value="2+ jugadores">2+ jugadores</option>
+                <option value="3+ jugadores">3+ jugadores</option>
+                <option value="4+ jugadores">4+ jugadores</option>
+                <option value="5+ jugadores">5+ jugadores</option>
+                <option value="6+ jugadores">6+ jugadores</option>
+                <option value="2-4 jugadores">2-4 jugadores</option>
+                <option value="2-6 jugadores">2-6 jugadores</option>
+              </select>
             </div>
           </div>
 
@@ -526,17 +541,6 @@
             <textarea id="instruccionesCompletas" required rows="4" placeholder="Desarrollo oficial paso a paso..." class="w-full p-2 border rounded-xl outline-none mt-0.5 text-xs"></textarea>
           </div>
 
-          <div class="grid grid-cols-2 gap-2 border-t pt-2">
-            <div>
-              <label class="font-bold text-slate-400 uppercase text-[9px]">URL PDF Reglas (Opcional)</label>
-              <input type="url" id="pdfReglasUrl" placeholder="https://..." class="w-full p-1.5 border rounded-lg outline-none text-[11px]">
-            </div>
-            <div>
-              <label class="font-bold text-slate-400 uppercase text-[9px]">URL Vídeo Zacatrus (Opcional)</label>
-              <input type="url" id="videoTutorialUrl" placeholder="https://..." class="w-full p-1.5 border rounded-lg outline-none text-[11px]">
-            </div>
-          </div>
-
           <button type="submit" id="btnGuardar" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-md card-zoom text-xs">
             Guardar en la Nube
           </button>
@@ -551,16 +555,16 @@
     </div>
   </div>
 
-  <!-- MODAL COMPARADOR Y REVISIÓN DE CAMBIOS IA -->
+  <!-- MODAL COMPARADOR IA INTERACTIVO MEDIANTE TAP/CLIC EN CAJAS -->
   <div id="modalComparadorIA" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 hidden flex items-center justify-center p-3">
     <div class="bg-white rounded-2xl max-w-lg w-full h-[85vh] max-h-[620px] flex flex-col shadow-2xl overflow-hidden relative border border-purple-200">
       <div class="p-3 border-b bg-purple-900 text-white flex justify-between items-center shrink-0">
-        <h3 class="font-bold text-sm flex items-center gap-1.5">✨ Comparador de Resultados IA</h3>
+        <h3 class="font-bold text-sm flex items-center gap-1.5">✨ Comparador Interactivo de IA</h3>
         <button onclick="cerrarComparadorIA()" class="text-purple-200 font-bold text-xl px-1">✕</button>
       </div>
 
       <div class="p-2.5 bg-purple-50 text-purple-900 text-[11px] font-medium shrink-0 border-b border-purple-100">
-        Revisa las diferencias entre la información existente y la sugerida por Gemini. Puedes elegir qué versión conservar para cada campo:
+        Toca directamente sobre la caja que prefieras conservar (Original o IA):
       </div>
 
       <div class="flex-grow overflow-y-auto p-3 space-y-3 text-xs" id="contenedorCamposComparador"></div>
@@ -608,7 +612,6 @@
         </button>
       </div>
 
-      <!-- VISTA DE ANIMACIÓN RULETA CIRCULAR -->
       <div id="pasoRuletaAnimacion" class="hidden text-center py-6 space-y-4">
         <div class="roulette-container">
           <div class="roulette-pointer"></div>
@@ -727,6 +730,7 @@
     let juegosCache = [];
     let favoritosCache = [];
     let ubicacionesCache = [];
+    let mecanicasDinamicasCache = [];
     let bolsaDescarteRuleta = [];
     let categoriaActual = 'Todas';
     let vistaActual = 'grid'; 
@@ -736,9 +740,21 @@
     let segundosTranscurridos = 0;
     let modoPartidaActual = '';
     let datosAnalizadosIA = null;
+    let seleccionesComparadorIA = {};
     let audioCtx = null;
 
-    // SINTETIZADOR DE SONIDOS PARA LA RULETA (Web Audio API)
+    // FORMATEO DE FECHAS A FORMATO CORTO DD/MM/YYYY
+    function formatearFechaCorta(fechaStr) {
+      if (!fechaStr) return '';
+      const d = new Date(fechaStr);
+      if (isNaN(d.getTime())) return '';
+      const dia = d.getDate().toString().padStart(2, '0');
+      const mes = (d.getMonth() + 1).toString().padStart(2, '0');
+      const anio = d.getFullYear();
+      return `${dia}/${mes}/${anio}`;
+    }
+
+    // SINTETIZADOR DE SONIDOS PARA LA RULETA
     function reproducirSonidoClick() {
       try {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -815,6 +831,7 @@
 
       await cargarFavoritos();
       await cargarUbicaciones();
+      await cargarMecanicasDinamicas();
       cargarJuegos();
     }
 
@@ -831,6 +848,28 @@
         ubicacionesCache = await res.json();
         poblarSelectUbicaciones();
       } catch (e) { ubicacionesCache = []; }
+    }
+
+    async function cargarMecanicasDinamicas() {
+      try {
+        const res = await fetchSeguro(`/api/mecanicas-existentes`);
+        mecanicasDinamicasCache = await res.json();
+        
+        const cont = document.getElementById('checkboxesMecanicasDinamicas');
+        cont.innerHTML = '';
+        if (mecanicasDinamicasCache.length === 0) {
+          cont.innerHTML = `<span class="text-slate-400 text-[10px]">No hay mecánicas registradas.</span>`;
+          return;
+        }
+
+        mecanicasDinamicasCache.forEach(m => {
+          cont.innerHTML += `
+            <label class="bg-slate-100 px-2.5 py-1 rounded-lg border flex items-center gap-1 cursor-pointer hover:bg-slate-200 text-[11px]">
+              <input type="checkbox" value="${m}" onchange="filtrarJuegos()" class="rounded text-indigo-600"> ${m}
+            </label>
+          `;
+        });
+      } catch (e) { console.error(e); }
     }
 
     function poblarSelectUbicaciones(ubicacionSeleccionada = '') {
@@ -879,12 +918,20 @@
 
       document.getElementById('fichaTitulo').innerText = juegoActualFicha.nombre;
       document.getElementById('fichaUbicacion').innerText = juegoActualFicha.ubicacion || 'Sin especificar';
+      
+      const fechaCreacionStr = formatearFechaCorta(juegoActualFicha.fecha_creacion);
+      let autoriaText = `👤 <b>Añadido por:</b> @${juegoActualFicha.creador_nick || 'Sistema'} · ${fechaCreacionStr}`;
+      
+      if (juegoActualFicha.modificador_nick && juegoActualFicha.fecha_modificacion) {
+        const fechaModStr = formatearFechaCorta(juegoActualFicha.fecha_modificacion);
+        autoriaText += `<br>✏️ <b>Actualizado por:</b> @${juegoActualFicha.modificador_nick} · ${fechaModStr}`;
+      }
+      document.getElementById('fichaAutoriaTexto').innerHTML = autoriaText;
+
       document.getElementById('fichaEdad').innerText = juegoActualFicha.edad || 'N/A';
       document.getElementById('fichaJugadores').innerText = juegoActualFicha.jugadores || 'N/A';
       document.getElementById('fichaMecanicas').innerText = juegoActualFicha.mecanicas || 'Sin mecánicas asociadas';
       
-      const fechaCreacionStr = juegoActualFicha.fecha_creacion ? new Date(juegoActualFicha.fecha_creacion).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }) : 'N/A';
-      document.getElementById('fichaCreador').innerText = `@${juegoActualFicha.creador_nick || 'Sistema'} (${fechaCreacionStr})`;
       document.getElementById('fichaReglasBasicasText').innerText = juegoActualFicha.instrucciones || 'Sin reglas básicas registradas.';
       document.getElementById('fichaReglasCompletasText').innerText = juegoActualFicha.instrucciones_completas || juegoActualFicha.instrucciones || 'Sin instrucciones oficiales completas registradas.';
 
@@ -892,10 +939,8 @@
       const imgContainer = document.getElementById('fichaImagenContainer');
       imgContainer.innerHTML = imagenSrc ? `<img src="${imagenSrc}" class="w-full h-full object-contain p-2">` : `<span class="text-slate-400 text-xs">Sin Foto</span>`;
 
-      const btnPdf = document.getElementById('btnPdfReglas');
-      const btnVid = document.getElementById('btnVideoReglas');
-      if (juegoActualFicha.pdf_reglas_url) { btnPdf.href = juegoActualFicha.pdf_reglas_url; btnPdf.classList.remove('hidden'); } else btnPdf.classList.add('hidden');
-      if (juegoActualFicha.video_tutorial_url) { btnVid.href = juegoActualFicha.video_tutorial_url; btnVid.classList.remove('hidden'); } else btnVid.classList.add('hidden');
+      // RECURSOS MULTIMEDIA (PDF Y VÍDEO)
+      actualizarBotonesRecursosFicha();
 
       const btnEditar = document.getElementById('btnEditarDesdeFicha');
       if (currentUser.rol === 'ADMIN' || currentUser.id === juegoActualFicha.creador_id) {
@@ -928,7 +973,7 @@
 
         if (partidas.length > 0) {
           partidas.forEach(p => {
-            const fechaFormateada = new Date(p.fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+            const fechaFormateada = formatearFechaCorta(p.fecha);
             if (p.ganador && p.ganador !== 'Sin ganador' && p.ganador !== 'Empate / Sin ganador') {
               p.ganador.split(' | ').forEach(gStr => {
                 const nickG = gStr.replace(/P\d+:\s*/, '').trim();
@@ -964,6 +1009,73 @@
           });
         } else { rankingCont.innerHTML = `<p class="text-slate-400 text-[11px]">Sin victorias registradas aún.</p>`; }
       } catch (err) { console.error(err); }
+    }
+
+    function actualizarBotonesRecursosFicha() {
+      const btnPdf = document.getElementById('btnAccionPdf');
+      const btnVid = document.getElementById('btnAccionVideo');
+      const visorVid = document.getElementById('visorVideoContainer');
+
+      if (juegoActualFicha.pdf_reglas_url) {
+        btnPdf.innerHTML = `📄 Abrir PDF Adjunto`;
+        btnPdf.onclick = () => window.open(juegoActualFicha.pdf_reglas_url, '_blank');
+      } else {
+        btnPdf.innerHTML = `📄 Subir PDF`;
+        btnPdf.onclick = () => document.getElementById('inputSubirPdfModal').click();
+      }
+
+      if (juegoActualFicha.video_tutorial_url) {
+        btnVid.innerHTML = `🎬 Ver Vídeo Explicativo`;
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const match = juegoActualFicha.video_tutorial_url.match(regExp);
+        if (match && match[2].length === 11) {
+          visorVid.innerHTML = `<iframe class="w-full h-full" src="https://www.youtube.com/embed/${match[2]}" frameborder="0" allowfullscreen></iframe>`;
+          visorVid.classList.remove('hidden');
+        } else {
+          visorVid.classList.add('hidden');
+          btnVid.onclick = () => window.open(juegoActualFicha.video_tutorial_url, '_blank');
+        }
+      } else {
+        visorVid.classList.add('hidden');
+        btnVid.innerHTML = `🎬 Añadir Vídeo YouTube`;
+        btnVid.onclick = () => agregarEnlaceYouTubePrompt();
+      }
+    }
+
+    async function subirPdfJuegoDirecto(e) {
+      const file = e.target.files[0];
+      if (!file || !juegoActualFicha) return;
+
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const base64Pdf = event.target.result;
+        try {
+          await fetchSeguro(`/api/juegos/${juegoActualFicha.id}/recursos`, {
+            method: 'PUT',
+            body: JSON.stringify({ pdf_reglas_url: base64Pdf })
+          });
+          juegoActualFicha.pdf_reglas_url = base64Pdf;
+          actualizarBotonesRecursosFicha();
+          alert("✅ Documento PDF guardado correctamente.");
+        } catch(err) { alert(err.message); }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function agregarEnlaceYouTubePrompt() {
+      if (!juegoActualFicha) return;
+      const urlVideo = prompt("Introduce el enlace de YouTube del vídeo explicativo:");
+      if (urlVideo && urlVideo.trim()) {
+        try {
+          await fetchSeguro(`/api/juegos/${juegoActualFicha.id}/recursos`, {
+            method: 'PUT',
+            body: JSON.stringify({ video_tutorial_url: urlVideo.trim() })
+          });
+          juegoActualFicha.video_tutorial_url = urlVideo.trim();
+          actualizarBotonesRecursosFicha();
+          alert("✅ Enlace de vídeo guardado correctamente.");
+        } catch(err) { alert(err.message); }
+      }
     }
 
     function cambiarTabFicha(tab) {
@@ -1005,7 +1117,7 @@
       finally { btn.innerText = "Preguntar"; btn.disabled = false; }
     }
 
-    // --- RENDERIZADO PRINCIPAL (TARJETAS REDISEÑADAS Y COMPACTAS) ---
+    // --- RENDERIZADO PRINCIPAL (TARJETAS AJUSTADAS Z-INDEX Y MECÁNICAS) ---
     async function cargarJuegos() {
       try {
         const res = await fetchSeguro(`/api/juegos`); 
@@ -1029,7 +1141,7 @@
       const numJug = parseInt(document.getElementById('filtroNumJugadores').value) || 0;
       const edadMin = parseInt(document.getElementById('filtroEdadMinima').value) || 0;
       const orden = document.getElementById('filtroOrdenacion').value;
-      const mecsChecked = Array.from(document.querySelectorAll('#checkboxesMecanicas input:checked')).map(el => el.value);
+      const mecsChecked = Array.from(document.querySelectorAll('#checkboxesMecanicasDinamicas input:checked')).map(el => el.value);
 
       let filtrados = juegosCache.filter(j => {
         let okCat = (categoriaActual === 'Favoritos') ? favoritosCache.includes(j.id) : (categoriaActual === 'Todas' || j.categoria === categoriaActual);
@@ -1057,8 +1169,15 @@
           const imagenSrc = j.foto_url || j.foto_base64 || '';
           const tieneImagen = imagenSrc && imagenSrc.trim().length > 0;
           const esFav = favoritosCache.includes(j.id);
-          const fechaCreacionStr = j.fecha_creacion ? new Date(j.fecha_creacion).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }) : 'N/A';
           
+          const fechaCreacionStr = formatearFechaCorta(j.fecha_creacion);
+          let autoriaText = `👤 <b>Añadido por:</b> @${j.creador_nick || 'Sistema'} · ${fechaCreacionStr}`;
+          
+          if (j.modificador_nick && j.fecha_modificacion) {
+            const fechaModStr = formatearFechaCorta(j.fecha_modificacion);
+            autoriaText += ` <br>✏️ <b>Actualizado por:</b> @${j.modificador_nick} · ${fechaModStr}`;
+          }
+
           let tiempoMedioStr = "Sin datos";
           if (j.tiempo_medio_segundos && j.tiempo_medio_segundos > 0) {
             const m = Math.floor(j.tiempo_medio_segundos / 60);
@@ -1066,12 +1185,12 @@
             tiempoMedioStr = m > 0 ? `~${m} min ${s} seg` : `~${s} seg`;
           }
 
-          let ultimaPartidaFechaStr = j.ultima_partida_fecha ? new Date(j.ultima_partida_fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Sin partidas';
+          let ultimaPartidaFechaStr = j.ultima_partida_fecha ? formatearFechaCorta(j.ultima_partida_fecha) : 'Sin partidas';
           let ultimaPartidaGanadorStr = j.ultima_partida_ganador || 'N/A';
 
           gridHTML += `
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between relative">
-              <button onclick="toggleFavorito('${j.id}')" class="absolute top-2 left-2 w-7 h-7 bg-black/60 hover:bg-black/80 rounded-full flex items-center justify-center text-xs z-20 backdrop-blur-md card-zoom shadow-md text-white">
+              <button onclick="toggleFavorito('${j.id}')" class="absolute top-2 left-2 w-7 h-7 bg-black/60 hover:bg-black/80 rounded-full flex items-center justify-center text-xs z-10 backdrop-blur-md card-zoom shadow-md text-white">
                 ${esFav ? '❤️' : '🤍'}
               </button>
 
@@ -1081,7 +1200,7 @@
                     <div class="absolute inset-0 bg-cover bg-center filter blur-md opacity-40 scale-110 group-hover:scale-125 transition duration-300" style="background-image: url('${imagenSrc}')"></div>
                     <img src="${imagenSrc}" class="w-full h-full object-contain relative z-10 p-1 group-hover:scale-105 transition duration-300">
                   ` : '<div class="text-slate-400 text-xs">Sin Foto</div>'}
-                  <span class="absolute top-2 right-2 bg-black/70 text-white text-[9px] px-2 py-0.5 rounded-md backdrop-blur-md z-20 font-bold">${j.categoria}</span>
+                  <span class="absolute top-2 right-2 bg-black/70 text-white text-[9px] px-2 py-0.5 rounded-md backdrop-blur-md z-10 font-bold">${j.categoria}</span>
                 </div>
 
                 <div class="p-3 space-y-2">
@@ -1091,16 +1210,17 @@
                       <span class="text-[9px] bg-indigo-50 text-indigo-700 font-bold px-1.5 py-0.5 rounded-md shrink-0">🎮 ${j.veces_jugado || 0} p.</span>
                     </div>
                     <p class="text-[10px] text-slate-600 truncate">📍 <b>Ubicación:</b> ${j.ubicacion || 'Sin especificar'}</p>
-                    <p class="text-[9px] text-slate-400 truncate">👤 <b>Añadido por:</b> @${j.creador_nick || 'Sistema'} · ${fechaCreacionStr}</p>
+                    <p class="text-[9px] text-slate-400 leading-tight">${autoriaText}</p>
                   </div>
 
-                  <!-- SECCIÓN 1: FICHA TÉCNICA -->
-                  <div class="bg-slate-50 p-2 rounded-xl border border-slate-100 space-y-0.5 text-[10px] text-slate-700">
+                  <!-- SECCIÓN 1: FICHA TÉCNICA CON MECÁNICAS -->
+                  <div class="bg-slate-50 p-2 rounded-xl border border-slate-100 space-y-1 text-[10px] text-slate-700">
                     <span class="font-bold text-slate-500 uppercase text-[8px] block tracking-wider">📦 Ficha Técnica</span>
                     <div class="flex justify-between">
                       <span>👶 <b>Edad:</b> ${j.edad || 'N/A'}</span>
                       <span>👥 <b>Jugadores:</b> ${j.jugadores || 'N/A'}</span>
                     </div>
+                    <p class="truncate text-slate-600">🧩 <b>Mecánicas:</b> ${j.mecanicas || 'Sin especificar'}</p>
                   </div>
 
                   <!-- SECCIÓN 2: ESTADÍSTICAS Y ACTIVIDAD -->
@@ -1154,7 +1274,131 @@
       }
     }
 
-    // --- CONTROL DE DUPLICADOS Y GUARDADO ---
+    // --- COMPARADOR DE IA INTERACTIVO MEDIANTE TAP/CLIC ---
+    function abrirComparadorIA() {
+      if (!datosAnalizadosIA) return;
+
+      const contenedor = document.getElementById('contenedorCamposComparador');
+      contenedor.innerHTML = '';
+      seleccionesComparadorIA = {};
+
+      const mapaCampos = [
+        { key: 'nombre', label: 'Nombre del Juego', idElem: 'nombre' },
+        { key: 'categoria', label: 'Categoría', idElem: 'categoria' },
+        { key: 'edad', label: 'Edad Recomendada', idElem: 'edad' },
+        { key: 'jugadores', label: 'Nº de Jugadores', idElem: 'jugadores' },
+        { key: 'mecanicas', label: 'Mecánicas', idElem: 'mecanicas' },
+        { key: 'instrucciones', label: 'Reglas Básicas (Resumen)', idElem: 'instrucciones' },
+        { key: 'instrucciones_completas', label: 'Reglas Completas Paso a Paso', idElem: 'instruccionesCompletas' }
+      ];
+
+      mapaCampos.forEach(campo => {
+        const valIA = datosAnalizadosIA[campo.key] || '';
+        const elemForm = document.getElementById(campo.idElem);
+        const valActual = elemForm ? elemForm.value : '';
+
+        if (valIA && valIA.toString().trim().length > 0) {
+          seleccionesComparadorIA[campo.idElem] = 'ia'; // Por defecto seleccionada IA
+
+          contenedor.innerHTML += `
+            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-2">
+              <span class="font-bold text-slate-700 uppercase text-[10px] block border-b pb-1">${campo.label}</span>
+              
+              <div class="grid grid-cols-2 gap-2 text-[11px]">
+                <div id="card_orig_${campo.idElem}" onclick="seleccionarOpcionComparador('${campo.idElem}', 'original')" class="p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-white border-slate-200">
+                  <div>
+                    <span class="text-[9px] font-bold text-slate-400 block uppercase mb-1">📄 Original:</span>
+                    <p class="text-slate-700 whitespace-pre-line">${valActual || '(Vacío)'}</p>
+                  </div>
+                  <span id="check_orig_${campo.idElem}" class="text-[10px] font-bold text-slate-400 mt-2 block">✕ No seleccionado</span>
+                </div>
+
+                <div id="card_ia_${campo.idElem}" onclick="seleccionarOpcionComparador('${campo.idElem}', 'ia')" class="p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-purple-100 border-purple-500 shadow-sm">
+                  <div>
+                    <span class="text-[9px] font-bold text-purple-700 block uppercase mb-1">✨ Sugerido por IA:</span>
+                    <p class="text-purple-950 font-semibold whitespace-pre-line">${valIA}</p>
+                  </div>
+                  <span id="check_ia_${campo.idElem}" class="text-[10px] font-bold text-purple-700 mt-2 block">✓ Seleccionado</span>
+                </div>
+              </div>
+
+              <div class="pt-1">
+                <button type="button" onclick="toggleEdicionManualComparador('${campo.idElem}')" class="text-[10px] text-indigo-600 font-bold underline">
+                  ✏️ O combinar / editar manualmente
+                </button>
+                <textarea id="manual_${campo.idElem}" rows="2" class="w-full p-2 border rounded-lg outline-none text-xs hidden mt-1 bg-white" placeholder="Escribe tu texto combinado aquí...">${valIA}</textarea>
+              </div>
+            </div>
+          `;
+        }
+      });
+
+      document.getElementById('modalComparadorIA').classList.remove('hidden');
+    }
+
+    function seleccionarOpcionComparador(idElem, opcion) {
+      seleccionesComparadorIA[idElem] = opcion;
+
+      const cardOrig = document.getElementById(`card_orig_${idElem}`);
+      const cardIa = document.getElementById(`card_ia_${idElem}`);
+      const checkOrig = document.getElementById(`check_orig_${idElem}`);
+      const checkIa = document.getElementById(`check_ia_${idElem}`);
+
+      if (opcion === 'original') {
+        cardOrig.className = "p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-emerald-50 border-emerald-500 shadow-sm";
+        checkOrig.className = "text-[10px] font-bold text-emerald-700 mt-2 block";
+        checkOrig.innerText = "✓ Seleccionado";
+
+        cardIa.className = "p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-white border-slate-200 opacity-60";
+        checkIa.className = "text-[10px] font-bold text-slate-400 mt-2 block";
+        checkIa.innerText = "✕ No seleccionado";
+      } else {
+        cardIa.className = "p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-purple-100 border-purple-500 shadow-sm";
+        checkIa.className = "text-[10px] font-bold text-purple-700 mt-2 block";
+        checkIa.innerText = "✓ Seleccionado";
+
+        cardOrig.className = "p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-white border-slate-200 opacity-60";
+        checkOrig.className = "text-[10px] font-bold text-slate-400 mt-2 block";
+        checkOrig.innerText = "✕ No seleccionado";
+      }
+    }
+
+    function toggleEdicionManualComparador(idElem) {
+      const area = document.getElementById(`manual_${idElem}`);
+      area.classList.toggle('hidden');
+      if (!area.classList.contains('hidden')) seleccionesComparadorIA[idElem] = 'manual';
+    }
+
+    function cerrarComparadorIA() { document.getElementById('modalComparadorIA').classList.add('hidden'); }
+
+    function aplicarSeleccionComparador() {
+      const mapaCampos = [
+        { key: 'nombre', idElem: 'nombre' },
+        { key: 'categoria', idElem: 'categoria' },
+        { key: 'edad', idElem: 'edad' },
+        { key: 'jugadores', idElem: 'jugadores' },
+        { key: 'mecanicas', idElem: 'mecanicas' },
+        { key: 'instrucciones', idElem: 'instrucciones' },
+        { key: 'instrucciones_completas', idElem: 'instruccionesCompletas' }
+      ];
+
+      mapaCampos.forEach(campo => {
+        const modo = seleccionesComparadorIA[campo.idElem];
+        const targetElem = document.getElementById(campo.idElem);
+
+        if (modo === 'ia') {
+          targetElem.value = datosAnalizadosIA[campo.key] || targetElem.value;
+        } else if (modo === 'manual') {
+          const areaManual = document.getElementById(`manual_${campo.idElem}`);
+          if (areaManual && areaManual.value.trim()) targetElem.value = areaManual.value;
+        }
+      });
+
+      cerrarComparadorIA();
+      alert("✅ Cambios de la IA aplicados al formulario.");
+    }
+
+    // --- FORMULARIO Y CONTROL DE DUPLICADOS ---
     async function preprocesarGuardadoJuego(e) {
       e.preventDefault();
       const nombreInput = document.getElementById('nombre').value;
@@ -1195,8 +1439,6 @@
         edad: document.getElementById('edad').value,
         jugadores: document.getElementById('jugadores').value,
         mecanicas: document.getElementById('mecanicas').value,
-        pdf_reglas_url: document.getElementById('pdfReglasUrl').value,
-        video_tutorial_url: document.getElementById('videoTutorialUrl').value,
         instrucciones: document.getElementById('instrucciones').value,
         instrucciones_completas: document.getElementById('instruccionesCompletas').value,
         foto_base64: document.getElementById('juegoFotoBase64').value
@@ -1209,6 +1451,7 @@
 
         cerrarModalFormulario();
         await cargarUbicaciones();
+        await cargarMecanicasDinamicas();
         cargarJuegos();
       } catch (err) { alert(err.message); }
       finally { btn.innerText = "Guardar en la Nube"; btn.disabled = false; }
@@ -1226,10 +1469,8 @@
         document.getElementById('categoria').value = juegoAEditar.categoria || 'Juego de Mesa';
         document.getElementById('ubicacionSelect').value = juegoAEditar.ubicacion || '';
         document.getElementById('edad').value = juegoAEditar.edad || '';
-        document.getElementById('jugadores').value = juegoAEditar.jugadores || '';
+        document.getElementById('jugadores').value = juegoAEditar.jugadores || '1+ jugadores';
         document.getElementById('mecanicas').value = juegoAEditar.mecanicas || '';
-        document.getElementById('pdfReglasUrl').value = juegoAEditar.pdf_reglas_url || '';
-        document.getElementById('videoTutorialUrl').value = juegoAEditar.video_tutorial_url || '';
         document.getElementById('instrucciones').value = juegoAEditar.instrucciones || '';
         document.getElementById('instruccionesCompletas').value = juegoAEditar.instrucciones_completas || '';
 
@@ -1275,104 +1516,6 @@
         abrirComparadorIA();
       } catch (err) { alert(err.message); }
       finally { btnIA.innerText = "🤖 Consultar a Gemini IA"; btnIA.disabled = false; }
-    }
-
-    function abrirComparadorIA() {
-      if (!datosAnalizadosIA) return;
-
-      const contenedor = document.getElementById('contenedorCamposComparador');
-      contenedor.innerHTML = '';
-
-      const mapaCampos = [
-        { key: 'nombre', label: 'Nombre del Juego', idElem: 'nombre' },
-        { key: 'categoria', label: 'Categoría', idElem: 'categoria' },
-        { key: 'edad', label: 'Edad Recomendada', idElem: 'edad' },
-        { key: 'jugadores', label: 'Nº de Jugadores', idElem: 'jugadores' },
-        { key: 'mecanicas', label: 'Mecánicas', idElem: 'mecanicas' },
-        { key: 'instrucciones', label: 'Reglas Básicas (Resumen)', idElem: 'instrucciones' },
-        { key: 'instrucciones_completas', label: 'Reglas Completas Paso a Paso', idElem: 'instruccionesCompletas' },
-        { key: 'pdf_reglas_url', label: 'URL PDF Reglas', idElem: 'pdfReglasUrl' },
-        { key: 'video_tutorial_url', label: 'URL Vídeo Zacatrus', idElem: 'videoTutorialUrl' }
-      ];
-
-      mapaCampos.forEach(campo => {
-        const valIA = datosAnalizadosIA[campo.key] || '';
-        const elemForm = document.getElementById(campo.idElem);
-        const valActual = elemForm ? elemForm.value : '';
-
-        if (valIA && valIA.toString().trim().length > 0) {
-          contenedor.innerHTML += `
-            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-2">
-              <span class="font-bold text-slate-700 uppercase text-[10px] block border-b pb-1">${campo.label}</span>
-              
-              <div class="grid grid-cols-2 gap-2 text-[11px]">
-                <div class="bg-white p-2 rounded-lg border border-slate-200 space-y-1">
-                  <span class="text-[9px] font-bold text-slate-400 block uppercase">Original:</span>
-                  <p class="text-slate-700 whitespace-pre-line">${valActual || '(Vacío)'}</p>
-                </div>
-                <div class="bg-purple-50 p-2 rounded-lg border border-purple-200 space-y-1">
-                  <span class="text-[9px] font-bold text-purple-600 block uppercase">Sugerido por IA:</span>
-                  <p class="text-purple-900 whitespace-pre-line font-medium">${valIA}</p>
-                </div>
-              </div>
-
-              <div class="space-y-1 pt-1">
-                <span class="text-[9px] font-bold text-slate-500 uppercase block">Opción a guardar:</span>
-                <select id="diff_${campo.idElem}" class="w-full p-2 border rounded-lg bg-white text-xs font-semibold text-purple-900 outline-none">
-                  <option value="ia" selected>✨ Usar sugerencia de la IA</option>
-                  <option value="original">📄 Mantener original</option>
-                  <option value="manual">✏️ Editar manualmente / Combinar</option>
-                </select>
-                <textarea id="manual_${campo.idElem}" rows="2" class="w-full p-2 border rounded-lg outline-none text-xs hidden mt-1" placeholder="Escribe o combina la información aquí...">${valIA}</textarea>
-              </div>
-            </div>
-          `;
-        }
-      });
-
-      document.querySelectorAll('#contenedorCamposComparador select').forEach(sel => {
-        sel.onchange = (e) => {
-          const fieldId = e.target.id.replace('diff_', '');
-          const areaManual = document.getElementById(`manual_${fieldId}`);
-          if (areaManual) areaManual.classList.toggle('hidden', e.target.value !== 'manual');
-        };
-      });
-
-      document.getElementById('modalComparadorIA').classList.remove('hidden');
-    }
-
-    function cerrarComparadorIA() { document.getElementById('modalComparadorIA').classList.add('hidden'); }
-
-    function aplicarSeleccionComparador() {
-      const mapaCampos = [
-        { key: 'nombre', idElem: 'nombre' },
-        { key: 'categoria', idElem: 'categoria' },
-        { key: 'edad', idElem: 'edad' },
-        { key: 'jugadores', idElem: 'jugadores' },
-        { key: 'mecanicas', idElem: 'mecanicas' },
-        { key: 'instrucciones', idElem: 'instrucciones' },
-        { key: 'instrucciones_completas', idElem: 'instruccionesCompletas' },
-        { key: 'pdf_reglas_url', idElem: 'pdfReglasUrl' },
-        { key: 'video_tutorial_url', idElem: 'videoTutorialUrl' }
-      ];
-
-      mapaCampos.forEach(campo => {
-        const selOption = document.getElementById(`diff_${campo.idElem}`);
-        if (selOption) {
-          const modo = selOption.value;
-          const targetElem = document.getElementById(campo.idElem);
-          
-          if (modo === 'ia') {
-            targetElem.value = datosAnalizadosIA[campo.key] || targetElem.value;
-          } else if (modo === 'manual') {
-            const areaManual = document.getElementById(`manual_${campo.idElem}`);
-            if (areaManual) targetElem.value = areaManual.value;
-          }
-        }
-      });
-
-      cerrarComparadorIA();
-      alert("✅ Datos de la IA aplicados al formulario.");
     }
 
     async function confirmarBorradoSeguro() {
@@ -1465,7 +1608,6 @@
         wheel.style.transition = 'transform 3.5s cubic-bezier(0.15, 0.85, 0.35, 1.02)';
         wheel.style.transform = `rotate(${vueltasGrados}deg)`;
 
-        // Efectos de sonido de los clics durante el giro
         let clicks = 0;
         const soundInterval = setInterval(() => {
           reproducirSonidoClick();
@@ -1598,7 +1740,7 @@
         historialCont.innerHTML = '';
         if (perfil.misPartidas && perfil.misPartidas.length > 0) {
           perfil.misPartidas.forEach(p => {
-            const fechaFormateada = new Date(p.fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+            const fechaFormateada = formatearFechaCorta(p.fecha);
             historialCont.innerHTML += `
               <div class="bg-slate-50 p-2.5 rounded-xl border space-y-1">
                 <div class="flex justify-between items-center">
