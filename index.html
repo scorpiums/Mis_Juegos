@@ -6,14 +6,19 @@
   <title>Mis Juegos y Juguetes</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    .card-zoom { transition: transform 0.2s ease-in-out; }
-    .card-zoom:active { transform: scale(0.97); }
+    .card-zoom { transition: transform 0.15s ease-in-out; }
+    .card-zoom:active { transform: scale(0.96); }
     .scrollbar-none::-webkit-scrollbar { display: none; }
     .logo-gaming {
       font-family: 'Impact', sans-serif;
       letter-spacing: -1px;
       text-shadow: 2px 2px 0px #000, -1px -1px 0px #000, 1px -1px 0px #000, -1px 1px 0px #000;
     }
+    @keyframes rouletteSpin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(1440deg); }
+    }
+    .spin-anim { animation: rouletteSpin 2.5s cubic-bezier(0.15, 0.85, 0.35, 1.2) forwards; }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen pb-20">
@@ -105,14 +110,80 @@
       </div>
     </header>
 
-    <div class="p-4 max-w-4xl mx-auto space-y-3">
-      <div class="flex gap-2">
-        <input type="text" id="searchInput" oninput="filtrarJuegos()" placeholder="🔍 Buscar por nombre..." class="w-full p-2.5 rounded-xl border border-slate-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
-        <button onclick="seleccionarAleatorio()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-3.5 py-2.5 rounded-xl shadow-md flex items-center gap-1 whitespace-nowrap card-zoom text-sm">
-          🎰 ¡Elegir!
+    <div class="p-3 max-w-4xl mx-auto space-y-2.5">
+      <!-- BARRA SUPERIOR CON BUSCADOR, FILTROS Y RULETA -->
+      <div class="flex gap-1.5">
+        <input type="text" id="searchInput" oninput="filtrarJuegos()" placeholder="🔍 Buscar juego..." class="w-full p-2.5 rounded-xl border border-slate-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-xs sm:text-sm">
+        
+        <button onclick="togglePanelFiltros()" id="btnToggleFiltros" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-3 py-2 rounded-xl shadow-sm flex items-center gap-1 whitespace-nowrap card-zoom text-xs">
+          🎛️ Filtros
+        </button>
+
+        <button onclick="abrirModalRuleta()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-3 py-2 rounded-xl shadow-md flex items-center gap-1 whitespace-nowrap card-zoom text-xs">
+          🎲 ¡Juego al Azar!
         </button>
       </div>
+
+      <!-- PANEL DESPLEGABLE DE FILTROS AVANZADOS Y ORDENACIÓN -->
+      <div id="panelFiltrosAvanzados" class="hidden bg-white p-3.5 rounded-2xl border border-slate-200 shadow-md space-y-3 text-xs">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="font-bold text-slate-500 uppercase text-[10px]">👥 Nº de Jugadores</label>
+            <select id="filtroNumJugadores" onchange="filtrarJuegos()" class="w-full p-2 border rounded-xl outline-none mt-1 bg-slate-50 font-medium">
+              <option value="">Cualquier número</option>
+              <option value="1">1 Jugador (Solitario)</option>
+              <option value="2">2 Jugadores (Pareja)</option>
+              <option value="3">3 Jugadores</option>
+              <option value="4">4 Jugadores</option>
+              <option value="5">5+ Jugadores (Grupo)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="font-bold text-slate-500 uppercase text-[10px]">👶 Edad Mínima</label>
+            <select id="filtroEdadMinima" onchange="filtrarJuegos()" class="w-full p-2 border rounded-xl outline-none mt-1 bg-slate-50 font-medium">
+              <option value="">Cualquier edad</option>
+              <option value="4">Para niños (<4 años)</option>
+              <option value="6">Infantil (6+ años)</option>
+              <option value="8">Familiar (8+ años)</option>
+              <option value="12">Adultos / Avanzado (12+ años)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="font-bold text-slate-500 uppercase text-[10px]">📊 Ordenar Por</label>
+            <select id="filtroOrdenacion" onchange="filtrarJuegos()" class="w-full p-2 border rounded-xl outline-none mt-1 bg-indigo-50 text-indigo-900 font-bold">
+              <option value="nombre_asc">Nombre (A - Z)</option>
+              <option value="mas_jugados">Más jugados primero</option>
+              <option value="menos_jugados">Menos jugados primero</option>
+              <option value="recientes">Partida reciente</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="font-bold text-slate-500 uppercase text-[10px] block mb-1">🧩 Componentes y Mecánicas</label>
+          <div class="flex flex-wrap gap-1.5" id="checkboxesMecanicas">
+            <label class="bg-slate-100 px-2.5 py-1 rounded-lg border flex items-center gap-1 cursor-pointer hover:bg-slate-200">
+              <input type="checkbox" value="Cartas" onchange="filtrarJuegos()" class="rounded text-indigo-600"> 🃏 Cartas
+            </label>
+            <label class="bg-slate-100 px-2.5 py-1 rounded-lg border flex items-center gap-1 cursor-pointer hover:bg-slate-200">
+              <input type="checkbox" value="Dados" onchange="filtrarJuegos()" class="rounded text-indigo-600"> 🎲 Dados
+            </label>
+            <label class="bg-slate-100 px-2.5 py-1 rounded-lg border flex items-center gap-1 cursor-pointer hover:bg-slate-200">
+              <input type="checkbox" value="Tablero" onchange="filtrarJuegos()" class="rounded text-indigo-600"> 🗺️ Tablero
+            </label>
+            <label class="bg-slate-100 px-2.5 py-1 rounded-lg border flex items-center gap-1 cursor-pointer hover:bg-slate-200">
+              <input type="checkbox" value="Red" onchange="filtrarJuegos()" class="rounded text-indigo-600"> 🏸 Red/Pista
+            </label>
+            <label class="bg-slate-100 px-2.5 py-1 rounded-lg border flex items-center gap-1 cursor-pointer hover:bg-slate-200">
+              <input type="checkbox" value="Agilidad" onchange="filtrarJuegos()" class="rounded text-indigo-600"> ⚡ Agilidad
+            </label>
+          </div>
+        </div>
+      </div>
       
+      <!-- BOTONES CATEGORÍAS RÁPIDAS Y VISTA -->
       <div class="flex justify-between items-center gap-2">
         <div class="flex gap-1.5 overflow-x-auto pb-1 text-xs scrollbar-none flex-grow" id="categoriasFiltro">
           <button onclick="filtrarCategoria('Todas', event)" class="cat-btn bg-indigo-600 text-white px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition">Todas</button>
@@ -130,7 +201,7 @@
       </div>
     </div>
 
-    <main class="p-4 max-w-4xl mx-auto" id="mainContainer">
+    <main class="p-3 max-w-4xl mx-auto" id="mainContainer">
       <div class="text-center py-10 text-slate-400">Cargando colección desde la nube...</div>
     </main>
 
@@ -139,63 +210,99 @@
     </button>
   </div>
 
-  <!-- MODAL FICHA DETALLADA DEL JUEGO -->
-  <div id="modalFichaJuego" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
-    <div class="bg-white rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
-      <div class="flex justify-between items-center border-b pb-2">
-        <h3 class="font-bold text-lg text-slate-800 truncate" id="fichaTitulo">Detalles del Juego</h3>
-        <button onclick="cerrarFichaModal()" class="text-slate-400 font-bold text-xl px-2">✕</button>
-      </div>
-
-      <div class="h-48 bg-slate-900 rounded-xl overflow-hidden relative flex items-center justify-center shadow-inner" id="fichaImagenContainer"></div>
-
-      <!-- PESTAÑAS DE LA FICHA -->
-      <div class="flex bg-slate-100 p-1 rounded-xl text-xs font-bold text-slate-600 justify-center gap-1">
-        <button onclick="cambiarTabFicha('info')" id="tabInfoBtn" class="px-3 py-1.5 rounded-lg bg-white text-indigo-700 shadow-sm transition">Info & Reglas</button>
-        <button onclick="cambiarTabFicha('stats')" id="tabStatsBtn" class="px-3 py-1.5 rounded-lg transition">Estadísticas</button>
-        <button onclick="cambiarTabFicha('historial')" id="tabHistorialBtn" class="px-3 py-1.5 rounded-lg transition">Historial</button>
-      </div>
-
-      <!-- TAB 1: INFO & REGLAS -->
-      <div id="tabInfoContent" class="space-y-3 text-xs">
-        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-1.5">
-          <p class="text-slate-700">📍 <b>Ubicación:</b> <span id="fichaUbicacion"></span></p>
-          <p class="text-slate-700">👶 <b>Edad Recomendada:</b> <span id="fichaEdad"></span></p>
-          <p class="text-slate-700">👥 <b>Jugadores:</b> <span id="fichaJugadores"></span></p>
-          <p class="text-indigo-900">👤 <b>Añadido por:</b> <span id="fichaCreador"></span></p>
-        </div>
-
-        <div class="space-y-1">
-          <p class="font-bold text-slate-700 uppercase text-[10px] tracking-wider">📖 Instrucciones / Reglas de Juego:</p>
-          <div id="fichaReglas" class="bg-indigo-50/50 p-3 rounded-xl border border-indigo-100 text-slate-700 leading-relaxed whitespace-pre-line text-xs max-h-48 overflow-y-auto"></div>
+  <!-- MODAL FICHA DETALLADA DEL JUEGO (4 PESTAÑAS Y ALTURA FIJA) -->
+  <div id="modalFichaJuego" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+    <div class="bg-white rounded-2xl max-w-md w-full h-[85vh] max-h-[620px] flex flex-col shadow-2xl overflow-hidden relative">
+      <!-- HEADER FICHA -->
+      <div class="p-3.5 border-b flex justify-between items-center bg-slate-50 shrink-0">
+        <h3 class="font-bold text-base text-slate-800 truncate pr-2" id="fichaTitulo">Detalles del Juego</h3>
+        <div class="flex items-center gap-1.5">
+          <button id="btnEditarDesdeFicha" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-2.5 py-1 rounded-lg transition">✏️ Editar</button>
+          <button onclick="cerrarFichaModal()" class="text-slate-400 font-bold text-xl px-1">✕</button>
         </div>
       </div>
 
-      <!-- TAB 2: ESTADÍSTICAS -->
-      <div id="tabStatsContent" class="space-y-3 hidden text-xs">
-        <div class="grid grid-cols-2 gap-2 text-center">
-          <div class="bg-amber-50 border border-amber-200 p-3 rounded-xl">
-            <span class="block text-xl font-black text-amber-600" id="statPartidas">0</span>
-            <span class="text-[10px] text-amber-800 font-bold uppercase">Partidas Jugadas</span>
-          </div>
-          <div class="bg-indigo-50 border border-indigo-200 p-3 rounded-xl">
-            <span class="block text-xl font-black text-indigo-600" id="statTiempoMedio">0 min</span>
-            <span class="text-[10px] text-indigo-800 font-bold uppercase">Tiempo Medio</span>
+      <!-- IMAGEN DEL JUEGO -->
+      <div class="h-36 bg-slate-900 overflow-hidden relative flex items-center justify-center shrink-0 shadow-inner" id="fichaImagenContainer"></div>
+
+      <!-- NAV PESTAÑAS -->
+      <div class="flex bg-slate-100 p-1 text-[11px] font-bold text-slate-600 justify-between shrink-0 border-y border-slate-200">
+        <button onclick="cambiarTabFicha('info')" id="tabInfoBtn" class="flex-1 py-1.5 rounded-lg text-center transition">Info</button>
+        <button onclick="cambiarTabFicha('reglas')" id="tabReglasBtn" class="flex-1 py-1.5 rounded-lg text-center transition">Reglas & IA</button>
+        <button onclick="cambiarTabFicha('stats')" id="tabStatsBtn" class="flex-1 py-1.5 rounded-lg text-center transition">Estadísticas</button>
+        <button onclick="cambiarTabFicha('historial')" id="tabHistorialBtn" class="flex-1 py-1.5 rounded-lg text-center transition">Historial</button>
+      </div>
+
+      <!-- CONTENIDO PRINCIPAL CON SCROLL INTERNO INDEPENDIENTE -->
+      <div class="flex-grow overflow-y-auto p-3 space-y-3 text-xs">
+        <!-- TAB 1: INFO -->
+        <div id="tabInfoContent" class="space-y-2.5">
+          <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-1.5">
+            <p class="text-slate-700">📍 <b>Ubicación:</b> <span id="fichaUbicacion"></span></p>
+            <p class="text-slate-700">👶 <b>Edad Recomendada:</b> <span id="fichaEdad"></span></p>
+            <p class="text-slate-700">👥 <b>Jugadores:</b> <span id="fichaJugadores"></span></p>
+            <p class="text-indigo-900">👤 <b>Añadido por:</b> <span id="fichaCreador"></span></p>
+            <p class="text-slate-600" id="fichaMecanicasCont">🧩 <b>Mecánicas:</b> <span id="fichaMecanicas"></span></p>
           </div>
         </div>
 
-        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-2">
-          <p class="font-bold text-slate-700 uppercase text-[10px] tracking-wider">🏆 Ránking de Victorias:</p>
-          <div id="listaRankingGanadores" class="space-y-1"></div>
+        <!-- TAB 2: REGLAS, PDF, VÍDEO Y ÁRBITRO IA -->
+        <div id="tabReglasContent" class="space-y-3 hidden">
+          <div class="space-y-1">
+            <p class="font-bold text-slate-700 uppercase text-[10px] tracking-wider">📖 Instrucciones completas:</p>
+            <div id="fichaReglasText" class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-slate-700 leading-relaxed whitespace-pre-line text-xs max-h-36 overflow-y-auto"></div>
+          </div>
+
+          <!-- ENLACES RECURSOS -->
+          <div class="grid grid-cols-2 gap-2" id="contenedorRecursosEnlaces">
+            <a id="btnPdfReglas" href="#" target="_blank" class="hidden bg-rose-50 border border-rose-200 text-rose-700 font-bold p-2 rounded-xl text-center flex items-center justify-center gap-1">
+              📄 Abrir PDF
+            </a>
+            <a id="btnVideoReglas" href="#" target="_blank" class="hidden bg-red-50 border border-red-200 text-red-700 font-bold p-2 rounded-xl text-center flex items-center justify-center gap-1">
+              🎬 Vídeo Tutorial
+            </a>
+          </div>
+
+          <!-- CONSULTA ÁRBITRO IA -->
+          <div class="bg-purple-50/80 p-3 rounded-2xl border border-purple-200 space-y-2">
+            <p class="font-bold text-purple-900 text-xs flex items-center gap-1">🤖 ¿Dudas sobre las reglas? Pregunta a la IA</p>
+            <div class="flex gap-1.5">
+              <input type="text" id="inputDudaIA" placeholder="Ej. ¿Qué pasa si hay empate?" class="w-full p-2 border border-purple-200 rounded-xl outline-none text-xs">
+              <button onclick="consultarArbitroIA()" id="btnConsultarIA" class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-3 py-2 rounded-xl text-xs card-zoom">
+                Preguntar
+              </button>
+            </div>
+            <div id="respuestaArbitroIA" class="hidden bg-white p-2.5 rounded-xl border border-purple-200 text-[11px] text-purple-900 leading-relaxed"></div>
+          </div>
+        </div>
+
+        <!-- TAB 3: ESTADÍSTICAS -->
+        <div id="tabStatsContent" class="space-y-3 hidden">
+          <div class="grid grid-cols-2 gap-2 text-center">
+            <div class="bg-amber-50 border border-amber-200 p-2.5 rounded-xl">
+              <span class="block text-lg font-black text-amber-600" id="statPartidas">0</span>
+              <span class="text-[9px] text-amber-800 font-bold uppercase">Partidas Jugadas</span>
+            </div>
+            <div class="bg-indigo-50 border border-indigo-200 p-2.5 rounded-xl">
+              <span class="block text-lg font-black text-indigo-600" id="statTiempoMedio">0 min</span>
+              <span class="text-[9px] text-indigo-800 font-bold uppercase">Tiempo Medio</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100 space-y-1.5">
+            <p class="font-bold text-slate-700 uppercase text-[10px] tracking-wider">🏆 Ránking de Victorias:</p>
+            <div id="listaRankingGanadores" class="space-y-1"></div>
+          </div>
+        </div>
+
+        <!-- TAB 4: HISTORIAL -->
+        <div id="tabHistorialJuegoContent" class="space-y-2 hidden">
+          <div id="listaPartidasJuego" class="space-y-2"></div>
         </div>
       </div>
 
-      <!-- TAB 3: HISTORIAL -->
-      <div id="tabHistorialJuegoContent" class="space-y-2 hidden max-h-60 overflow-y-auto text-xs">
-        <div id="listaPartidasJuego" class="space-y-2"></div>
-      </div>
-
-      <div class="pt-2">
+      <!-- FOOTER CON BOTÓN VAMOS A JUGAR ANCLADO -->
+      <div class="p-3 border-t bg-slate-50 shrink-0">
         <button id="btnJugarDesdeFicha" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs card-zoom shadow-md">
           ¡Vamos a jugar!
         </button>
@@ -203,7 +310,177 @@
     </div>
   </div>
 
-  <!-- MODAL PERFIL DE USUARIO -->
+  <!-- MODAL RULETA DE SELECCIÓN INTELIGENTE AL AZAR -->
+  <div id="modalRuleta" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+    <div class="bg-white rounded-2xl max-w-md w-full p-4 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b pb-2">
+        <h3 class="font-bold text-lg text-slate-800">🎰 Ruleta de Selección</h3>
+        <button onclick="cerrarModalRuleta()" class="text-slate-400 font-bold text-xl px-2">✕</button>
+      </div>
+
+      <!-- PASO 1: CONFIGURAR MODO Y FILTROS -->
+      <div id="pasoRuletaConfig" class="space-y-3 text-xs">
+        <div>
+          <label class="font-bold text-slate-600 uppercase text-[10px]">Modo de Selección:</label>
+          <select id="ruletaModo" class="w-full p-2.5 border rounded-xl outline-none font-bold text-indigo-700 bg-indigo-50 mt-1">
+            <option value="azar">🎲 Aleatorio Puro (Cualquier juego)</option>
+            <option value="descarte">🔄 Modo Descarte (Sin repetir hasta vaciar bolsa)</option>
+            <option value="compensado">⚖️ Modo Compensado (Prioriza poco jugados)</option>
+            <option value="rapida">⚡ Partida Rápida (<20 min)</option>
+          </select>
+        </div>
+
+        <div class="bg-slate-50 p-2.5 rounded-xl border space-y-2">
+          <span class="font-bold text-slate-600 uppercase text-[10px] block">Condicionar por categoría:</span>
+          <div class="grid grid-cols-2 gap-1.5" id="checkboxesRuletaCat">
+            <label class="flex items-center gap-1.5"><input type="checkbox" value="Juego de Mesa" checked> Mesa</label>
+            <label class="flex items-center gap-1.5"><input type="checkbox" value="Construcción" checked> Construcción</label>
+            <label class="flex items-center gap-1.5"><input type="checkbox" value="Exterior" checked> Exterior</label>
+            <label class="flex items-center gap-1.5"><input type="checkbox" value="Consola" checked> Consola</label>
+          </div>
+        </div>
+
+        <button onclick="girarRuletaInteligente()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-black py-3 rounded-xl shadow-lg card-zoom text-sm">
+          🎰 ¡GIRAR RULETA!
+        </button>
+      </div>
+
+      <!-- PASO 2: ANIMACIÓN RULETA -->
+      <div id="pasoRuletaAnimacion" class="hidden text-center py-8 space-y-4">
+        <div class="w-24 h-24 bg-gradient-to-tr from-amber-400 to-indigo-600 rounded-full mx-auto flex items-center justify-center text-4xl shadow-xl spin-anim border-4 border-white">
+          🎲
+        </div>
+        <p class="font-bold text-slate-600 animate-pulse">Eligiendo el mejor juego para hoy...</p>
+      </div>
+
+      <!-- PASO 3: RESULTADO FINAL -->
+      <div id="pasoRuletaResultado" class="hidden space-y-3">
+        <div class="text-center">
+          <span class="text-[10px] bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full uppercase">🎉 ¡El juego elegido es!</span>
+          <h4 class="font-black text-xl text-indigo-900 mt-1" id="ruletaResultadoNombre">Juego</h4>
+        </div>
+
+        <div class="h-40 bg-slate-900 rounded-xl overflow-hidden relative flex items-center justify-center" id="ruletaResultadoImagen"></div>
+
+        <div class="flex gap-2 pt-1">
+          <button id="btnJugarRuleta" class="flex-grow bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs card-zoom shadow-md">
+            🟢 ¡Vamos a jugar!
+          </button>
+          <button id="btnVerFichaRuleta" class="bg-indigo-50 text-indigo-700 font-bold px-3 py-2.5 rounded-xl text-xs card-zoom">
+            📖 Ver Ficha
+          </button>
+        </div>
+
+        <button onclick="reiniciarRuleta()" class="w-full bg-slate-100 text-slate-600 font-bold py-2 rounded-xl text-xs">
+          🔄 Girar de nuevo
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL FORMULARIO DE JUEGO (CREAR Y EDITAR) -->
+  <div id="modalForm" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-md w-full p-5 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b pb-2">
+        <h3 class="text-lg font-bold text-slate-800" id="modalTitulo">Nuevo Juego / Juguete</h3>
+        <button onclick="cerrarModalFormulario()" class="text-slate-400 text-xl font-bold">✕</button>
+      </div>
+
+      <div class="space-y-2">
+        <div id="imagePreview" class="w-full h-36 bg-slate-900 rounded-xl flex items-center justify-center border-2 border-dashed border-slate-300 overflow-hidden relative">
+          <span class="text-slate-400 text-sm">Sin fotografía</span>
+        </div>
+
+        <input type="file" id="inputCamara" accept="image/*" capture="environment" onchange="procesarFoto(event)" class="hidden">
+        <input type="file" id="inputGaleria" accept="image/*" onchange="procesarFoto(event)" class="hidden">
+
+        <div class="grid grid-cols-2 gap-2">
+          <button type="button" onclick="document.getElementById('inputCamara').click()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1">
+            📷 Cámara
+          </button>
+          <button type="button" onclick="document.getElementById('inputGaleria').click()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1">
+            🖼️ Galería
+          </button>
+        </div>
+
+        <button type="button" onclick="analizarConIA()" id="btnIA" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 rounded-xl text-sm hidden">
+          ✨ Autocompletar IA
+        </button>
+      </div>
+
+      <form id="juegoForm" onsubmit="guardarJuego(event)" class="space-y-3 text-xs">
+        <input type="hidden" id="juegoId">
+        <input type="hidden" id="juegoFotoBase64">
+
+        <div>
+          <label class="font-bold text-slate-500 uppercase">Nombre</label>
+          <input type="text" id="nombre" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="font-bold text-slate-500 uppercase">Categoría</label>
+            <select id="categoria" class="w-full p-2 border rounded-lg outline-none">
+              <option value="Juego de Mesa">Juego de Mesa</option>
+              <option value="Construcción">Construcción</option>
+              <option value="Exterior">Exterior</option>
+              <option value="Consola">Consola</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+          <div>
+            <label class="font-bold text-slate-500 uppercase">Ubicación</label>
+            <input type="text" id="ubicacion" placeholder="Ej. Estantería Salón" class="w-full p-2 border rounded-lg outline-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="font-bold text-slate-500 uppercase">Edad Recomendada</label>
+            <input type="text" id="edad" placeholder="Ej. 6+" class="w-full p-2 border rounded-lg outline-none">
+          </div>
+          <div>
+            <label class="font-bold text-slate-500 uppercase">Jugadores</label>
+            <input type="text" id="jugadores" placeholder="Ej. 2-4" class="w-full p-2 border rounded-lg outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="font-bold text-slate-500 uppercase">Mecánicas / Componentes (Separados por comas)</label>
+          <input type="text" id="mecanicas" placeholder="Ej. Cartas, Dados, Agilidad" class="w-full p-2 border rounded-lg outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 border-t pt-2">
+          <div>
+            <label class="font-bold text-slate-500 uppercase">URL PDF Reglas (Opcional)</label>
+            <input type="url" id="pdfReglasUrl" placeholder="https://..." class="w-full p-2 border rounded-lg outline-none">
+          </div>
+          <div>
+            <label class="font-bold text-slate-500 uppercase">URL Vídeo Zacatrus/YouTube</label>
+            <input type="url" id="videoTutorialUrl" placeholder="https://..." class="w-full p-2 border rounded-lg outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="font-bold text-slate-500 uppercase">Instrucciones / Reglas</label>
+          <textarea id="instrucciones" rows="3" placeholder="Resumen rápido de cómo se juega..." class="w-full p-2 border rounded-lg outline-none text-xs"></textarea>
+        </div>
+
+        <button type="submit" id="btnGuardar" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-lg">
+          Guardar en la Nube
+        </button>
+
+        <!-- BOTÓN DE BORRADO SEGURO SOLO EN MODO EDICIÓN -->
+        <div id="contenedorBorradoEdicion" class="hidden border-t pt-2">
+          <button type="button" onclick="confirmarBorradoSeguro()" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold py-2 rounded-xl text-xs">
+            🗑️ Eliminar Juego Permanentemente
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODALES PERFIL, PARTIDA Y ADMIN MANTENIDOS -->
   <div id="modalPerfil" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
     <div class="bg-white rounded-2xl max-w-lg w-full p-5 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b pb-2">
@@ -269,7 +546,6 @@
     </div>
   </div>
 
-  <!-- MODAL ¡VAMOS A JUGAR! -->
   <div id="modalPartida" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-md w-full p-5 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b pb-2">
@@ -338,7 +614,6 @@
     </div>
   </div>
 
-  <!-- MODAL ADMIN -->
   <div id="modalAdmin" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-lg w-full p-5 space-y-4 shadow-xl max-h-[85vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b pb-3">
@@ -349,92 +624,16 @@
     </div>
   </div>
 
-  <!-- MODAL FORMULARIO JUEGO -->
-  <div id="modalForm" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
-    <div class="bg-white rounded-2xl max-w-md w-full p-5 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
-      <div class="flex justify-between items-center border-b pb-2">
-        <h3 class="text-lg font-bold text-slate-800" id="modalTitulo">Nuevo Juego / Juguete</h3>
-        <button onclick="cerrarModalFormulario()" class="text-slate-400 text-xl font-bold">✕</button>
-      </div>
-
-      <div class="space-y-2">
-        <div id="imagePreview" class="w-full h-40 bg-slate-900 rounded-xl flex items-center justify-center border-2 border-dashed border-slate-300 overflow-hidden relative">
-          <span class="text-slate-400 text-sm">Sin fotografía</span>
-        </div>
-
-        <input type="file" id="inputCamara" accept="image/*" capture="environment" onchange="procesarFoto(event)" class="hidden">
-        <input type="file" id="inputGaleria" accept="image/*" onchange="procesarFoto(event)" class="hidden">
-
-        <div class="grid grid-cols-2 gap-2">
-          <button type="button" onclick="document.getElementById('inputCamara').click()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1">
-            📷 Cámara
-          </button>
-          <button type="button" onclick="document.getElementById('inputGaleria').click()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1">
-            🖼️ Galería
-          </button>
-        </div>
-
-        <button type="button" onclick="analizarConIA()" id="btnIA" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 rounded-xl text-sm hidden">
-          ✨ Autocompletar IA
-        </button>
-      </div>
-
-      <form id="juegoForm" onsubmit="guardarJuego(event)" class="space-y-3">
-        <input type="hidden" id="juegoId">
-        <input type="hidden" id="juegoFotoBase64">
-
-        <div>
-          <label class="text-xs font-bold text-slate-500 uppercase">Nombre</label>
-          <input type="text" id="nombre" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
-        </div>
-
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="text-xs font-bold text-slate-500 uppercase">Categoría</label>
-            <select id="categoria" class="w-full p-2 border rounded-lg outline-none">
-              <option value="Juego de Mesa">Juego de Mesa</option>
-              <option value="Construcción">Construcción</option>
-              <option value="Exterior">Exterior</option>
-              <option value="Consola">Consola</option>
-              <option value="Otro">Otro</option>
-            </select>
-          </div>
-          <div>
-            <label class="text-xs font-bold text-slate-500 uppercase">Ubicación</label>
-            <input type="text" id="ubicacion" placeholder="Ej. Estantería Salón" class="w-full p-2 border rounded-lg outline-none">
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="text-xs font-bold text-slate-500 uppercase">Edad Recomendada</label>
-            <input type="text" id="edad" placeholder="Ej. 6+" class="w-full p-2 border rounded-lg outline-none">
-          </div>
-          <div>
-            <label class="text-xs font-bold text-slate-500 uppercase">Jugadores</label>
-            <input type="text" id="jugadores" placeholder="Ej. 2-4" class="w-full p-2 border rounded-lg outline-none">
-          </div>
-        </div>
-
-        <div>
-          <label class="text-xs font-bold text-slate-500 uppercase">Instrucciones / Reglas</label>
-          <textarea id="instrucciones" rows="3" placeholder="Resumen rápido de cómo se juega..." class="w-full p-2 border rounded-lg outline-none text-sm"></textarea>
-        </div>
-
-        <button type="submit" id="btnGuardar" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-lg">
-          Guardar en la Nube
-        </button>
-      </form>
-    </div>
-  </div>
-
+  <!-- SCRIPT FRONTEND -->
   <script>
     const WORKER_URL = "https://backend-juegos.pabgartov.workers.dev";
     let juegosCache = [];
     let favoritosCache = [];
+    let bolsaDescarteRuleta = [];
     let categoriaActual = 'Todas';
     let vistaActual = 'grid'; 
     let currentUser = null;
+    let juegoActualFicha = null;
     let cronometroInterval = null;
     let segundosTranscurridos = 0;
     let modoPartidaActual = '';
@@ -486,9 +685,7 @@
       try {
         const res = await fetchSeguro(`/api/favoritos`);
         favoritosCache = await res.json();
-      } catch (e) {
-        favoritosCache = [];
-      }
+      } catch (e) { favoritosCache = []; }
     }
 
     async function toggleFavorito(juegoId) {
@@ -498,144 +695,72 @@
           body: JSON.stringify({ juego_id: juegoId })
         });
         const json = await res.json();
-        if (json.favorito) {
-          favoritosCache.push(juegoId);
-        } else {
-          favoritosCache = favoritosCache.filter(id => id !== juegoId);
-        }
+        if (json.favorito) favoritosCache.push(juegoId);
+        else favoritosCache = favoritosCache.filter(id => id !== juegoId);
         renderizarTarjetas();
-      } catch (err) {
-        alert("Error al actualizar favoritos");
-      }
+      } catch (err) { alert("Error al actualizar favoritos"); }
     }
 
-    async function procesarLogin(e) {
-      e.preventDefault();
-      const nick = document.getElementById('loginNick').value;
-      const password = document.getElementById('loginPassword').value;
-
-      try {
-        const res = await fetch(`${WORKER_URL}/api/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ nick, password })
-        });
-        const json = await res.json();
-        if (json.error) throw new Error(json.error);
-
-        currentUser = json.usuario;
-        localStorage.setItem('session_user', JSON.stringify(currentUser));
-        localStorage.setItem('auth_token', json.token); 
-        iniciarApp();
-      } catch (err) {
-        alert(err.message);
-      }
+    function togglePanelFiltros() {
+      const panel = document.getElementById('panelFiltrosAvanzados');
+      panel.classList.toggle('hidden');
     }
 
-    async function procesarRegistro(e) {
-      e.preventDefault();
-      const nombre = document.getElementById('regNombre').value;
-      const nick = document.getElementById('regNick').value;
-      const pass1 = document.getElementById('regPass1').value;
-      const pass2 = document.getElementById('regPass2').value;
-
-      if (pass1 !== pass2) return alert("Las contraseñas no coinciden");
-
-      try {
-        const res = await fetch(`${WORKER_URL}/api/registro`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ nombre, nick, password: pass1 })
-        });
-        const json = await res.json();
-        if (json.error) throw new Error(json.error);
-
-        alert("¡Solicitud enviada con éxito!\n\nTu cuenta se encuentra pendiente de aprobación por el Administrador.");
-        document.getElementById('registroForm').classList.add('hidden');
-        document.getElementById('codigoForm').classList.remove('hidden');
-      } catch (err) {
-        alert(err.message);
-      }
-    }
-
-    async function validarCodigoAcceso() {
-      const nick = document.getElementById('regNick').value;
-      const codigo = document.getElementById('valCodigo').value;
-
-      try {
-        const res = await fetch(`${WORKER_URL}/api/activar-usuario`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ nick, codigo })
-        });
-        const json = await res.json();
-        if (json.error) throw new Error(json.error);
-
-        alert("¡Cuenta activada! Inicia sesión.");
-        toggleAuthMode('login');
-      } catch (err) {
-        alert(err.message);
-      }
-    }
-
-    function toggleAuthMode(mode) {
-      document.getElementById('loginForm').classList.toggle('hidden', mode !== 'login');
-      document.getElementById('registroForm').classList.toggle('hidden', mode !== 'registro');
-      document.getElementById('codigoForm').classList.add('hidden');
-    }
-
-    function cerrarSesion() {
-      localStorage.removeItem('session_user');
-      localStorage.removeItem('auth_token'); 
-      location.reload();
-    }
-
-    // --- FICHA DETALLADA DEL JUEGO (MODAL INTERACTIVO) ---
+    // --- FICHA DETALLADA MODAL (4 PESTAÑAS Y ALTURA FIJA) ---
     async function abrirFichaDetallada(juegoId) {
-      const juego = juegosCache.find(j => j.id === juegoId);
-      if (!juego) return;
+      juegoActualFicha = juegosCache.find(j => j.id === juegoId);
+      if (!juegoActualFicha) return;
 
-      document.getElementById('fichaTitulo').innerText = juego.nombre;
-      document.getElementById('fichaUbicacion').innerText = juego.ubicacion || 'Sin especificar';
-      document.getElementById('fichaEdad').innerText = juego.edad || 'N/A';
-      document.getElementById('fichaJugadores').innerText = juego.jugadores || 'N/A';
+      document.getElementById('fichaTitulo').innerText = juegoActualFicha.nombre;
+      document.getElementById('fichaUbicacion').innerText = juegoActualFicha.ubicacion || 'Sin especificar';
+      document.getElementById('fichaEdad').innerText = juegoActualFicha.edad || 'N/A';
+      document.getElementById('fichaJugadores').innerText = juegoActualFicha.jugadores || 'N/A';
+      document.getElementById('fichaMecanicas').innerText = juegoActualFicha.mecanicas || 'Sin mecánicas asociadas';
       
-      const fechaCreacionStr = juego.fecha_creacion ? new Date(juego.fecha_creacion).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }) : 'N/A';
-      document.getElementById('fichaCreador').innerText = `@${juego.creador_nick || 'Sistema'} (${fechaCreacionStr})`;
-      document.getElementById('fichaReglas').innerText = juego.instrucciones || 'No hay instrucciones detalladas registradas para este juego.';
+      const fechaCreacionStr = juegoActualFicha.fecha_creacion ? new Date(juegoActualFicha.fecha_creacion).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }) : 'N/A';
+      document.getElementById('fichaCreador').innerText = `@${juegoActualFicha.creador_nick || 'Sistema'} (${fechaCreacionStr})`;
+      document.getElementById('fichaReglasText').innerText = juegoActualFicha.instrucciones || 'No hay instrucciones registradas.';
 
-      const imagenSrc = juego.foto_url || juego.foto_base64 || '';
+      // Imagen
+      const imagenSrc = juegoActualFicha.foto_url || juegoActualFicha.foto_base64 || '';
       const imgContainer = document.getElementById('fichaImagenContainer');
-      if (imagenSrc) {
-        imgContainer.innerHTML = `<img src="${imagenSrc}" class="w-full h-full object-contain p-2">`;
-      } else {
-        imgContainer.innerHTML = `<span class="text-slate-400 text-xs">Sin Foto</span>`;
-      }
+      imgContainer.innerHTML = imagenSrc ? `<img src="${imagenSrc}" class="w-full h-full object-contain p-2">` : `<span class="text-slate-400 text-xs">Sin Foto</span>`;
 
+      // Enlaces PDF y Vídeo
+      const btnPdf = document.getElementById('btnPdfReglas');
+      const btnVid = document.getElementById('btnVideoReglas');
+      if (juegoActualFicha.pdf_reglas_url) { btnPdf.href = juegoActualFicha.pdf_reglas_url; btnPdf.classList.remove('hidden'); } else btnPdf.classList.add('hidden');
+      if (juegoActualFicha.video_tutorial_url) { btnVid.href = juegoActualFicha.video_tutorial_url; btnVid.classList.remove('hidden'); } else btnVid.classList.add('hidden');
+
+      // Botón Editar
+      const btnEditar = document.getElementById('btnEditarDesdeFicha');
+      if (currentUser.rol === 'ADMIN' || currentUser.id === juegoActualFicha.creador_id) {
+        btnEditar.classList.remove('hidden');
+        btnEditar.onclick = () => { cerrarFichaModal(); abrirModalFormulario(juegoActualFicha); };
+      } else { btnEditar.classList.add('hidden'); }
+
+      // Botón ¡Vamos a jugar!
       document.getElementById('btnJugarDesdeFicha').onclick = () => {
         cerrarFichaModal();
-        abrirModalPartida(juego.id, juego.nombre);
+        abrirModalPartida(juegoActualFicha.id, juegoActualFicha.nombre);
       };
 
-      // Cargar estadísticas
-      document.getElementById('statPartidas').innerText = juego.veces_jugado || 0;
-      if (juego.tiempo_medio_segundos && juego.tiempo_medio_segundos > 0) {
-        const mins = Math.floor(juego.tiempo_medio_segundos / 60);
-        const secs = juego.tiempo_medio_segundos % 60;
+      // Stats
+      document.getElementById('statPartidas').innerText = juegoActualFicha.veces_jugado || 0;
+      if (juegoActualFicha.tiempo_medio_segundos && juegoActualFicha.tiempo_medio_segundos > 0) {
+        const mins = Math.floor(juegoActualFicha.tiempo_medio_segundos / 60);
+        const secs = juegoActualFicha.tiempo_medio_segundos % 60;
         document.getElementById('statTiempoMedio').innerText = mins > 0 ? `~${mins}m ${secs}s` : `~${secs}s`;
-      } else {
-        document.getElementById('statTiempoMedio').innerText = '0 min';
-      }
+      } else { document.getElementById('statTiempoMedio').innerText = '0 min'; }
 
       document.getElementById('modalFichaJuego').classList.remove('hidden');
       cambiarTabFicha('info');
 
-      // Cargar Historial desde la API
+      // Historial
       try {
         const res = await fetchSeguro(`/api/juegos/${juegoId}/historial`);
         const partidas = await res.json();
         
-        // Render Historial
         const listHistorial = document.getElementById('listaPartidasJuego');
         listHistorial.innerHTML = '';
         const conteoGanadores = {};
@@ -643,21 +768,16 @@
         if (partidas.length > 0) {
           partidas.forEach(p => {
             const fechaFormateada = new Date(p.fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-            
-            // Acumular victorias para el ránking
             if (p.ganador && p.ganador !== 'Sin ganador' && p.ganador !== 'Empate / Sin ganador') {
-              const partidosGanadores = p.ganador.split(' | ');
-              partidosGanadores.forEach(gStr => {
+              p.ganador.split(' | ').forEach(gStr => {
                 const nickG = gStr.replace(/P\d+:\s*/, '').trim();
-                if (nickG && nickG !== 'Empate / Sin ganador') {
-                  conteoGanadores[nickG] = (conteoGanadores[nickG] || 0) + 1;
-                }
+                if (nickG && nickG !== 'Empate / Sin ganador') conteoGanadores[nickG] = (conteoGanadores[nickG] || 0) + 1;
               });
             }
 
             listHistorial.innerHTML += `
-              <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100 space-y-1">
-                <div class="flex justify-between items-center text-[10px] text-slate-400">
+              <div class="bg-slate-50 p-2.5 rounded-xl border space-y-1 text-[11px]">
+                <div class="flex justify-between text-slate-400">
                   <span>📅 ${fechaFormateada}</span>
                   <span>🎮 ${p.num_partidas || 1} p.</span>
                 </div>
@@ -666,11 +786,9 @@
               </div>
             `;
           });
-        } else {
-          listHistorial.innerHTML = `<p class="text-center text-slate-400 py-4">No hay partidas registradas.</p>`;
-        }
+        } else { listHistorial.innerHTML = `<p class="text-center text-slate-400 py-4">No hay partidas registradas.</p>`; }
 
-        // Render Ránking
+        // Ránking
         const rankingCont = document.getElementById('listaRankingGanadores');
         rankingCont.innerHTML = '';
         const sortedGanadores = Object.entries(conteoGanadores).sort((a,b) => b[1] - a[1]);
@@ -684,42 +802,407 @@
               </div>
             `;
           });
-        } else {
-          rankingCont.innerHTML = `<p class="text-slate-400 text-[11px]">Sin ganadores registrados aún.</p>`;
-        }
-
-      } catch (err) {
-        console.error(err);
-      }
+        } else { rankingCont.innerHTML = `<p class="text-slate-400 text-[11px]">Sin victorias registradas aún.</p>`; }
+      } catch (err) { console.error(err); }
     }
 
     function cambiarTabFicha(tab) {
       document.getElementById('tabInfoContent').classList.toggle('hidden', tab !== 'info');
+      document.getElementById('tabReglasContent').classList.toggle('hidden', tab !== 'reglas');
       document.getElementById('tabStatsContent').classList.toggle('hidden', tab !== 'stats');
       document.getElementById('tabHistorialJuegoContent').classList.toggle('hidden', tab !== 'historial');
 
-      document.getElementById('tabInfoBtn').className = tab === 'info' ? 'px-3 py-1.5 rounded-lg bg-white text-indigo-700 shadow-sm transition font-bold' : 'px-3 py-1.5 rounded-lg transition';
-      document.getElementById('tabStatsBtn').className = tab === 'stats' ? 'px-3 py-1.5 rounded-lg bg-white text-indigo-700 shadow-sm transition font-bold' : 'px-3 py-1.5 rounded-lg transition';
-      document.getElementById('tabHistorialBtn').className = tab === 'historial' ? 'px-3 py-1.5 rounded-lg bg-white text-indigo-700 shadow-sm transition font-bold' : 'px-3 py-1.5 rounded-lg transition';
+      ['info', 'reglas', 'stats', 'historial'].forEach(t => {
+        const btn = document.getElementById(`tab${t.charAt(0).toUpperCase() + t.slice(1)}Btn`);
+        btn.className = t === tab ? 'flex-1 py-1.5 rounded-lg text-center transition bg-white text-indigo-700 font-bold shadow-sm' : 'flex-1 py-1.5 rounded-lg text-center transition';
+      });
     }
 
     function cerrarFichaModal() { document.getElementById('modalFichaJuego').classList.add('hidden'); }
 
-    // --- PERFIL Y PESTAÑAS ---
+    async function consultarArbitroIA() {
+      const preg = document.getElementById('inputDudaIA').value;
+      if (!preg || !preg.trim() || !juegoActualFicha) return;
+
+      const btn = document.getElementById('btnConsultarIA');
+      const respBox = document.getElementById('respuestaArbitroIA');
+      btn.innerText = "⏳...";
+      btn.disabled = true;
+
+      try {
+        const res = await fetchSeguro(`/api/dudas-ia`, {
+          method: 'POST',
+          body: JSON.stringify({
+            juego_nombre: juegoActualFicha.nombre,
+            instrucciones: juegoActualFicha.instrucciones,
+            pregunta: preg
+          })
+        });
+        const json = await res.json();
+        respBox.innerText = json.respuesta || "Sin respuesta";
+        respBox.classList.remove('hidden');
+      } catch (err) { alert(err.message); }
+      finally { btn.innerText = "Preguntar"; btn.disabled = false; }
+    }
+
+    // --- MÓDULO RULETA INTELIGENTE DE SELECCIÓN ---
+    function abrirModalRuleta() {
+      document.getElementById('pasoRuletaConfig').classList.remove('hidden');
+      document.getElementById('pasoRuletaAnimacion').classList.add('hidden');
+      document.getElementById('pasoRuletaResultado').classList.add('hidden');
+      document.getElementById('modalRuleta').classList.remove('hidden');
+    }
+
+    function cerrarModalRuleta() { document.getElementById('modalRuleta').classList.add('hidden'); }
+
+    function girarRuletaInteligente() {
+      const modo = document.getElementById('ruletaModo').value;
+      const catsElegidas = Array.from(document.querySelectorAll('#checkboxesRuletaCat input:checked')).map(el => el.value);
+
+      let elegibles = juegosCache.filter(j => catsElegidas.includes(j.categoria));
+      if (elegibles.length === 0) return alert("No hay juegos disponibles con las categorías seleccionadas.");
+
+      if (modo === 'descarte') {
+        if (bolsaDescarteRuleta.length === 0) bolsaDescarteRuleta = [...elegibles.map(j => j.id)];
+        elegibles = elegibles.filter(j => bolsaDescarteRuleta.includes(j.id));
+      } else if (modo === 'rapida') {
+        const rapidos = elegibles.filter(j => (j.tiempo_medio_segundos || 0) <= 1200);
+        if (rapidos.length > 0) elegibles = rapidos;
+      }
+
+      document.getElementById('pasoRuletaConfig').classList.add('hidden');
+      document.getElementById('pasoRuletaAnimacion').classList.remove('hidden');
+
+      setTimeout(() => {
+        let seleccionado = null;
+        if (modo === 'compensado') {
+          // Ponderación invertida por veces jugado
+          elegibles.sort((a,b) => (a.veces_jugado || 0) - (b.veces_jugado || 0));
+          seleccionado = elegibles[0];
+        } else {
+          seleccionado = elegibles[Math.floor(Math.random() * elegibles.length)];
+        }
+
+        if (modo === 'descarte') {
+          bolsaDescarteRuleta = bolsaDescarteRuleta.filter(id => id !== seleccionado.id);
+        }
+
+        document.getElementById('ruletaResultadoNombre').innerText = seleccionado.nombre;
+        const imgCont = document.getElementById('ruletaResultadoImagen');
+        const imgSrc = seleccionado.foto_url || seleccionado.foto_base64 || '';
+        imgCont.innerHTML = imgSrc ? `<img src="${imgSrc}" class="w-full h-full object-contain p-2">` : `<span class="text-slate-400 text-xs">Sin Foto</span>`;
+
+        document.getElementById('btnJugarRuleta').onclick = () => {
+          cerrarModalRuleta();
+          abrirModalPartida(seleccionado.id, seleccionado.nombre);
+        };
+        document.getElementById('btnVerFichaRuleta').onclick = () => {
+          cerrarModalRuleta();
+          abrirFichaDetallada(seleccionado.id);
+        };
+
+        document.getElementById('pasoRuletaAnimacion').classList.add('hidden');
+        document.getElementById('pasoRuletaResultado').classList.remove('hidden');
+      }, 2000);
+    }
+
+    function reiniciarRuleta() {
+      document.getElementById('pasoRuletaResultado').classList.add('hidden');
+      document.getElementById('pasoRuletaConfig').classList.remove('hidden');
+    }
+
+    // --- RENDERIZADO PRINCIPAL CON FILTROS ---
+    async function cargarJuegos() {
+      try {
+        const res = await fetchSeguro(`/api/juegos`); 
+        juegosCache = await res.json();
+        renderizarTarjetas();
+      } catch (err) {
+        document.getElementById('mainContainer').innerHTML = `<div class="text-center py-10 text-rose-500">${err.message}</div>`;
+      }
+    }
+
+    function cambiarVista(tipo) {
+      vistaActual = tipo;
+      document.getElementById('btnGrid').className = tipo === 'grid' ? 'px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-indigo-600 shadow-sm transition' : 'px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 transition';
+      document.getElementById('btnCompact').className = tipo === 'compact' ? 'px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-indigo-600 shadow-sm transition' : 'px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 transition';
+      renderizarTarjetas();
+    }
+
+    function renderizarTarjetas() {
+      const container = document.getElementById('mainContainer');
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const numJug = parseInt(document.getElementById('filtroNumJugadores').value) || 0;
+      const edadMin = parseInt(document.getElementById('filtroEdadMinima').value) || 0;
+      const orden = document.getElementById('filtroOrdenacion').value;
+      const mecsChecked = Array.from(document.querySelectorAll('#checkboxesMecanicas input:checked')).map(el => el.value);
+
+      let filtrados = juegosCache.filter(j => {
+        let okCat = (categoriaActual === 'Favoritos') ? favoritosCache.includes(j.id) : (categoriaActual === 'Todas' || j.categoria === categoriaActual);
+        let okNom = j.nombre.toLowerCase().includes(search);
+        let okJug = numJug === 0 || ((j.min_jugadores || 1) <= numJug && (j.max_jugadores || 99) >= numJug);
+        let okEdad = edadMin === 0 || (j.min_edad || 0) <= edadMin;
+        let okMec = mecsChecked.length === 0 || mecsChecked.every(m => (j.mecanicas || '').includes(m));
+
+        return okCat && okNom && okJug && okEdad && okMec;
+      });
+
+      // Ordenación
+      if (orden === 'nombre_asc') filtrados.sort((a,b) => a.nombre.localeCompare(b.nombre));
+      else if (orden === 'mas_jugados') filtrados.sort((a,b) => (b.veces_jugado || 0) - (a.veces_jugado || 0));
+      else if (orden === 'menos_jugados') filtrados.sort((a,b) => (a.veces_jugado || 0) - (b.veces_jugado || 0));
+      else if (orden === 'recientes') filtrados.sort((a,b) => new Date(b.ultima_partida_fecha || 0) - new Date(a.ultima_partida_fecha || 0));
+
+      if (filtrados.length === 0) {
+        container.innerHTML = `<div class="text-center py-10 text-slate-400 text-xs">No hay juegos que coincidan con los filtros.</div>`;
+        return;
+      }
+
+      if (vistaActual === 'grid') {
+        let gridHTML = '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="gridJuegos">';
+        filtrados.forEach(j => {
+          const imagenSrc = j.foto_url || j.foto_base64 || '';
+          const tieneImagen = imagenSrc && imagenSrc.trim().length > 0;
+          const esFav = favoritosCache.includes(j.id);
+          const fechaCreacionStr = j.fecha_creacion ? new Date(j.fecha_creacion).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }) : 'N/A';
+          
+          gridHTML += `
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between relative">
+              <button onclick="toggleFavorito('${j.id}')" class="absolute top-2 left-2 w-8 h-8 bg-black/60 hover:bg-black/80 rounded-full flex items-center justify-center text-sm z-20 backdrop-blur-md card-zoom shadow-md text-white">
+                ${esFav ? '❤️' : '🤍'}
+              </button>
+
+              <div>
+                <!-- IMAGEN COMPACTA H-32 EN MÓVIL Y H-36 EN PC -->
+                <div onclick="abrirFichaDetallada('${j.id}')" class="h-32 sm:h-36 bg-slate-900 relative flex items-center justify-center overflow-hidden cursor-pointer group">
+                  ${tieneImagen ? `
+                    <div class="absolute inset-0 bg-cover bg-center filter blur-md opacity-40 scale-110 group-hover:scale-125 transition duration-300" style="background-image: url('${imagenSrc}')"></div>
+                    <img src="${imagenSrc}" class="w-full h-full object-contain relative z-10 p-1 group-hover:scale-105 transition duration-300">
+                  ` : '<div class="text-slate-400 text-xs">Sin Foto</div>'}
+                  <span class="absolute top-2 right-2 bg-black/70 text-white text-[10px] px-2 py-0.5 rounded-md backdrop-blur-md z-20 font-bold">${j.categoria}</span>
+                </div>
+
+                <div class="p-3 space-y-2">
+                  <div class="flex justify-between items-start gap-1.5">
+                    <h4 onclick="abrirFichaDetallada('${j.id}')" class="font-bold text-sm sm:text-base text-slate-800 leading-tight cursor-pointer hover:text-indigo-600 transition flex-grow truncate">${j.nombre}</h4>
+                    <span class="text-[10px] bg-indigo-50 text-indigo-700 font-bold px-2 py-0.5 rounded-lg shrink-0">🎮 ${j.veces_jugado || 0} p.</span>
+                  </div>
+
+                  <!-- OP-A: UBICACIÓN Y CREADOR -->
+                  <div class="text-[11px] space-y-0.5 border-b pb-1.5">
+                    <p class="text-slate-600 truncate">📍 <b>Ubicación:</b> ${j.ubicacion || 'Sin especificar'}</p>
+                    <p class="text-slate-400 text-[10px]">👤 <b>Subido por:</b> @${j.creador_nick || 'Sistema'} (${fechaCreacionStr})</p>
+                  </div>
+
+                  <div class="bg-slate-50 p-2 rounded-xl border border-slate-100 text-[10px] text-slate-600 flex justify-between">
+                    <span>👶 <b>Edad:</b> ${j.edad || 'N/A'}</span>
+                    <span>👥 <b>Jugadores:</b> ${j.jugadores || 'N/A'}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="p-3 pt-0">
+                <button onclick="abrirModalPartida('${j.id}', '${j.nombre.replace(/'/g, "\\'")}')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs card-zoom shadow-sm">
+                  ¡Vamos a jugar!
+                </button>
+              </div>
+            </div>
+          `;
+        });
+        gridHTML += '</div>';
+        container.innerHTML = gridHTML;
+
+      } else {
+        <!-- VISTA LISTA REORGANIZADA EN 2 FILAS EN MÓVIL PARA MÁXIMA LEGIBILIDAD -->
+        let listHTML = '<div class="space-y-2 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden divide-y divide-slate-100 p-2">';
+        filtrados.forEach(j => {
+          const imagenSrc = j.foto_url || j.foto_base64 || '';
+          const tieneImagen = imagenSrc && imagenSrc.trim().length > 0;
+          const esFav = favoritosCache.includes(j.id);
+
+          listHTML += `
+            <div class="p-2 space-y-2 hover:bg-slate-50 transition">
+              <!-- FILA 1: FOTO, NOMBRE COMPLETO Y UBICACIÓN -->
+              <div class="flex items-center gap-2.5 min-w-0">
+                <button onclick="toggleFavorito('${j.id}')" class="text-base shrink-0">${esFav ? '❤️' : '🤍'}</button>
+                <div onclick="abrirFichaDetallada('${j.id}')" class="w-10 h-10 bg-slate-900 rounded-lg overflow-hidden shrink-0 flex items-center justify-center relative cursor-pointer">
+                  ${tieneImagen ? `<img src="${imagenSrc}" class="w-full h-full object-cover">` : '<span class="text-[9px] text-slate-400">Foto</span>'}
+                </div>
+                <div class="min-w-0 flex-grow cursor-pointer" onclick="abrirFichaDetallada('${j.id}')">
+                  <h4 class="font-bold text-slate-800 text-xs sm:text-sm leading-tight hover:text-indigo-600 transition truncate">${j.nombre}</h4>
+                  <p class="text-[10px] text-slate-500 truncate">📍 ${j.ubicacion || 'Sin sitio'} • 🕹️ ${j.categoria}</p>
+                </div>
+              </div>
+
+              <!-- FILA 2: PARTIDAS Y BOTÓN VAMOS A JUGAR -->
+              <div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-100 text-xs">
+                <span class="text-[10px] text-slate-500 font-medium">🎮 ${j.veces_jugado || 0} partidas jugadas</span>
+                <button onclick="abrirModalPartida('${j.id}', '${j.nombre.replace(/'/g, "\\'")}')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-3 py-1 rounded-lg text-[11px] card-zoom shadow-sm">
+                  ¡Vamos a jugar!
+                </button>
+              </div>
+            </div>
+          `;
+        });
+        listHTML += '</div>';
+        container.innerHTML = listHTML;
+      }
+    }
+
+    // --- FORMULARIO CREAR Y EDITAR FICHA ---
+    function abrirModalFormulario(juegoAEditar = null) {
+      const form = document.getElementById('juegoForm');
+      form.reset();
+
+      if (juegoAEditar) {
+        document.getElementById('modalTitulo').innerText = "Editar Ficha de Juego";
+        document.getElementById('juegoId').value = juegoAEditar.id;
+        document.getElementById('nombre').value = juegoAEditar.nombre || '';
+        document.getElementById('categoria').value = juegoAEditar.categoria || 'Juego de Mesa';
+        document.getElementById('ubicacion').value = juegoAEditar.ubicacion || '';
+        document.getElementById('edad').value = juegoAEditar.edad || '';
+        document.getElementById('jugadores').value = juegoAEditar.jugadores || '';
+        document.getElementById('mecanicas').value = juegoAEditar.mecanicas || '';
+        document.getElementById('pdfReglasUrl').value = juegoAEditar.pdf_reglas_url || '';
+        document.getElementById('videoTutorialUrl').value = juegoAEditar.video_tutorial_url || '';
+        document.getElementById('instrucciones').value = juegoAEditar.instrucciones || '';
+
+        const foto = juegoAEditar.foto_url || juegoAEditar.foto_base64 || '';
+        document.getElementById('juegoFotoBase64').value = foto;
+        document.getElementById('imagePreview').innerHTML = foto ? `<img src="${foto}" class="w-full h-full object-contain">` : `<span class="text-slate-400 text-sm">Sin fotografía</span>`;
+
+        document.getElementById('contenedorBorradoEdicion').classList.remove('hidden');
+      } else {
+        document.getElementById('modalTitulo').innerText = "Nuevo Juego / Juguete";
+        document.getElementById('juegoId').value = '';
+        document.getElementById('juegoFotoBase64').value = '';
+        document.getElementById('imagePreview').innerHTML = `<span class="text-slate-400 text-sm">Sin fotografía</span>`;
+        document.getElementById('contenedorBorradoEdicion').classList.add('hidden');
+      }
+
+      document.getElementById('modalForm').classList.remove('hidden');
+    }
+
+    function cerrarModalFormulario() { document.getElementById('modalForm').classList.add('hidden'); }
+
+    async function guardarJuego(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnGuardar');
+      btn.innerText = "Subiendo...";
+      btn.disabled = true;
+
+      const idActual = document.getElementById('juegoId').value;
+
+      const nuevoJuego = {
+        id: idActual || Date.now().toString(),
+        nombre: document.getElementById('nombre').value,
+        categoria: document.getElementById('categoria').value,
+        ubicacion: document.getElementById('ubicacion').value,
+        edad: document.getElementById('edad').value,
+        jugadores: document.getElementById('jugadores').value,
+        mecanicas: document.getElementById('mecanicas').value,
+        pdf_reglas_url: document.getElementById('pdfReglasUrl').value,
+        video_tutorial_url: document.getElementById('videoTutorialUrl').value,
+        instrucciones: document.getElementById('instrucciones').value,
+        foto_base64: document.getElementById('juegoFotoBase64').value
+      };
+
+      try {
+        await fetchSeguro(`/api/juegos`, { method: 'POST', body: JSON.stringify(nuevoJuego) });
+        cerrarModalFormulario();
+        cargarJuegos();
+      } catch (err) { alert(err.message); }
+      finally { btn.innerText = "Guardar en la Nube"; btn.disabled = false; }
+    }
+
+    async function confirmarBorradoSeguro() {
+      const id = document.getElementById('juegoId').value;
+      if (!id) return;
+
+      if (!confirm("⚠️ ¿Estás COMPLETAMENTE seguro de que deseas eliminar permanentemente este juego y todo su historial de partidas?")) return;
+
+      try {
+        await fetchSeguro(`/api/juegos/${id}`, { method: 'DELETE' });
+        cerrarModalFormulario();
+        cargarJuegos();
+        alert("El juego ha sido eliminado.");
+      } catch (err) { alert(err.message); }
+    }
+
+    function procesarFoto(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const maxDim = 800;
+          let width = img.width, height = img.height;
+          if (width > height) { if (width > maxDim) { height = Math.round((height * maxDim) / width); width = maxDim; } }
+          else { if (height > maxDim) { width = Math.round((width * maxDim) / height); height = maxDim; } }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width; canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          const resizedBase64 = canvas.toDataURL('image/jpeg', 0.85);
+          document.getElementById('juegoFotoBase64').value = resizedBase64;
+          document.getElementById('imagePreview').innerHTML = `<img src="${resizedBase64}" class="w-full h-full object-contain">`;
+          document.getElementById('btnIA').classList.remove('hidden');
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function analizarConIA() {
+      const base64 = document.getElementById('juegoFotoBase64').value;
+      if (!base64) return alert("Sube primero una foto.");
+
+      const btnIA = document.getElementById('btnIA');
+      btnIA.innerText = "⏳ Analizando...";
+      btnIA.disabled = true;
+
+      try {
+        const response = await fetchSeguro(`/api/analizar-imagen`, {
+          method: 'POST',
+          body: JSON.stringify({ foto_base64: base64 })
+        });
+        const json = await response.json();
+        if (json.error) throw new Error(json.error);
+
+        document.getElementById('nombre').value = json.nombre || '';
+        document.getElementById('categoria').value = json.categoria || 'Otro';
+        document.getElementById('edad').value = json.edad || '';
+        document.getElementById('jugadores').value = json.jugadores || '';
+        document.getElementById('mecanicas').value = json.mecanicas || '';
+        document.getElementById('instrucciones').value = json.instrucciones || '';
+      } catch (err) { alert(err.message); }
+      finally { btnIA.innerText = "✨ Autocompletar IA"; btnIA.disabled = false; }
+    }
+
+    function filtrarCategoria(cat, event) {
+      categoriaActual = cat;
+      document.querySelectorAll('.cat-btn').forEach(b => {
+        b.className = "cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition";
+      });
+      event.target.className = "cat-btn bg-indigo-600 text-white px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition";
+      renderizarTarjetas();
+    }
+
+    function filtrarJuegos() { renderizarTarjetas(); }
+
+    // PERFIL Y PARTIDAS MANTENIDOS
     async function abrirPerfilModal() {
       document.getElementById('modalPerfil').classList.remove('hidden');
       cambiarTabPerfil('historial');
       
       const adminIconCont = document.getElementById('adminIconContainer');
       if (currentUser.rol === 'ADMIN') {
-        adminIconCont.innerHTML = `
-          <button type="button" onclick="cerrarPerfilModal(); abrirAdminPanel();" class="text-amber-600 bg-amber-50 hover:bg-amber-100 font-bold px-2 py-1 rounded-lg text-xs flex items-center gap-1 card-zoom" title="Panel de Gestión de Usuarios">
-            ⚙️ Gestión
-          </button>
-        `;
-      } else {
-        adminIconCont.innerHTML = '';
-      }
+        adminIconCont.innerHTML = `<button type="button" onclick="cerrarPerfilModal(); abrirAdminPanel();" class="text-amber-600 bg-amber-50 font-bold px-2 py-1 rounded-lg text-xs">⚙️ Gestión</button>`;
+      } else adminIconCont.innerHTML = '';
 
       try {
         const res = await fetchSeguro(`/api/usuario/perfil`);
@@ -731,47 +1214,13 @@
         document.getElementById('perfilAvatarBase64').value = perfil.avatar_base64 || '';
 
         const preview = document.getElementById('avatarPreview');
-        if (perfil.avatar_base64) {
-          preview.innerHTML = `<img src="${perfil.avatar_base64}" class="w-full h-full object-cover">`;
-        } else {
-          preview.innerHTML = `<span class="text-slate-400 text-xs">Sin Foto</span>`;
-        }
-
-        const misJuegosCont = document.getElementById('misJuegosLista');
-        misJuegosCont.innerHTML = '';
-        if (perfil.misJuegos && perfil.misJuegos.length > 0) {
-          perfil.misJuegos.forEach(j => {
-            misJuegosCont.innerHTML += `
-              <div class="bg-slate-50 p-2.5 rounded-xl border flex justify-between items-center">
-                <div>
-                  <p class="font-bold text-slate-800">${j.nombre}</p>
-                  <p class="text-[10px] text-slate-500">📍 ${j.ubicacion || 'Sin ubicación'} • 🕹️ ${j.categoria}</p>
-                </div>
-                <span class="bg-indigo-50 text-indigo-700 font-semibold px-2 py-1 rounded">Subido</span>
-              </div>
-            `;
-          });
-        } else {
-          misJuegosCont.innerHTML = `<p class="text-center text-slate-400 py-4">Aún no has subido ningún juego.</p>`;
-        }
+        preview.innerHTML = perfil.avatar_base64 ? `<img src="${perfil.avatar_base64}" class="w-full h-full object-cover">` : `<span class="text-slate-400 text-xs">Sin Foto</span>`;
 
         const historialCont = document.getElementById('miHistorialLista');
         historialCont.innerHTML = '';
         if (perfil.misPartidas && perfil.misPartidas.length > 0) {
           perfil.misPartidas.forEach(p => {
             const fechaFormateada = new Date(p.fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-            
-            let duracionTexto = '';
-            if (p.duracion_total_segundos && p.duracion_total_segundos > 0) {
-              const mins = Math.floor(p.duracion_total_segundos / 60);
-              const secs = p.duracion_total_segundos % 60;
-              if (mins > 0) {
-                duracionTexto = `<p class="text-[10px] text-slate-500">⏱️ Duración: ~${mins} min${secs > 0 ? ` ${secs} seg` : ''}</p>`;
-              } else {
-                duracionTexto = `<p class="text-[10px] text-slate-500">⏱️ Duración: ~${secs} seg</p>`;
-              }
-            }
-
             historialCont.innerHTML += `
               <div class="bg-slate-50 p-2.5 rounded-xl border space-y-1">
                 <div class="flex justify-between items-center">
@@ -780,95 +1229,21 @@
                 </div>
                 <p class="text-[11px] text-slate-600">👥 <b>Participantes:</b> ${p.participantes}</p>
                 <p class="text-[11px] text-emerald-700 font-bold">🏆 ${p.ganador}</p>
-                ${duracionTexto}
               </div>
             `;
           });
-        } else {
-          historialCont.innerHTML = `<p class="text-center text-slate-400 py-4">No hay partidas registradas.</p>`;
-        }
-      } catch (err) {
-        alert(err.message);
-      }
+        } else historialCont.innerHTML = `<p class="text-center text-slate-400 py-4">No hay partidas registradas.</p>`;
+      } catch (err) { alert(err.message); }
     }
 
     function cambiarTabPerfil(tab) {
       document.getElementById('tabHistorialPerfilContent').classList.toggle('hidden', tab !== 'historial');
       document.getElementById('tabJuegosPerfilContent').classList.toggle('hidden', tab !== 'juegos');
       document.getElementById('tabDatosPerfilContent').classList.toggle('hidden', tab !== 'datos');
-
-      document.getElementById('tabHistorialPerfilBtn').className = tab === 'historial' ? 'px-4 py-2 rounded-lg bg-white text-indigo-700 shadow-sm transition font-bold' : 'px-4 py-2 rounded-lg transition';
-      document.getElementById('tabJuegosPerfilBtn').className = tab === 'juegos' ? 'px-4 py-2 rounded-lg bg-white text-indigo-700 shadow-sm transition font-bold' : 'px-4 py-2 rounded-lg transition';
-      document.getElementById('tabDatosPerfilBtn').className = tab === 'datos' ? 'px-4 py-2 rounded-lg bg-white text-indigo-700 shadow-sm transition font-bold' : 'px-4 py-2 rounded-lg transition';
     }
 
     function cerrarPerfilModal() { document.getElementById('modalPerfil').classList.add('hidden'); }
 
-    function procesarAvatar(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          const maxDim = 300;
-          let w = img.width, h = img.height;
-          if (w > h) { if (w > maxDim) { h = Math.round((h * maxDim) / w); w = maxDim; } }
-          else { if (h > maxDim) { w = Math.round((w * maxDim) / h); h = maxDim; } }
-
-          const canvas = document.createElement('canvas');
-          canvas.width = w; canvas.height = h;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, w, h);
-
-          const base64 = canvas.toDataURL('image/jpeg', 0.8);
-          document.getElementById('perfilAvatarBase64').value = base64;
-          document.getElementById('avatarPreview').innerHTML = `<img src="${base64}" class="w-full h-full object-cover">`;
-        };
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
-
-    async function guardarPerfil(e) {
-      e.preventDefault();
-      const nombre = document.getElementById('perfilNombre').value;
-      const nick = document.getElementById('perfilNick').value;
-      const bio = document.getElementById('perfilBio').value;
-      const avatar_base64 = document.getElementById('perfilAvatarBase64').value;
-      const passActual = document.getElementById('passActual').value;
-      const passNueva = document.getElementById('passNueva').value;
-      const passConfirmar = document.getElementById('passConfirmar').value;
-
-      try {
-        if (passNueva) {
-          if (!passActual) return alert("Introduce tu contraseña actual.");
-          if (passNueva !== passConfirmar) return alert("La nueva contraseña y su confirmación no coinciden.");
-          await fetchSeguro(`/api/usuario/password`, {
-            method: 'PUT',
-            body: JSON.stringify({ passwordActual: passActual, passwordNueva: passNueva })
-          });
-        }
-
-        const res = await fetchSeguro(`/api/usuario/perfil`, {
-          method: 'PUT',
-          body: JSON.stringify({ nombre, nick, bio, avatar_base64 })
-        });
-        const json = await res.json();
-        if (json.error) throw new Error(json.error);
-
-        currentUser = { ...currentUser, ...json.usuario };
-        localStorage.setItem('session_user', JSON.stringify(currentUser));
-        iniciarApp();
-        cerrarPerfilModal();
-        alert("¡Perfil actualizado con éxito!");
-      } catch (err) {
-        alert(err.message);
-      }
-    }
-
-    // --- FLUJO PARTIDA MEJORADO ---
     async function abrirModalPartida(juegoId, juegoNombre) {
       document.getElementById('partidaJuegoId').value = juegoId;
       document.getElementById('partidaJuegoNombre').innerText = juegoNombre;
@@ -898,27 +1273,7 @@
             </label>
           `;
         });
-      } catch (e) {
-        console.error(e);
-      }
-    }
-
-    async function abrirPromptInvitado() {
-      const nombreInv = prompt("Introduce el nick o nombre del nuevo jugador invitado:");
-      if (!nombreInv || !nombreInv.trim()) return;
-
-      try {
-        const res = await fetchSeguro(`/api/invidados`, {
-          method: 'POST',
-          body: JSON.stringify({ nombre: nombreInv.trim() })
-        });
-        const json = await res.json();
-        if (json.error) throw new Error(json.error);
-
-        await cargarJugadoresDisponibles();
-      } catch (err) {
-        alert(err.message);
-      }
+      } catch (e) { console.error(e); }
     }
 
     function elegirModoPartida(modo) {
@@ -975,9 +1330,7 @@
 
       for (let i = 1; i <= numPartidas; i++) {
         let opcionesHtml = `<option value="Empate / Sin ganador">Empate / Sin ganador</option>`;
-        seleccionados.forEach(j => {
-          opcionesHtml += `<option value="${j}">${j}</option>`;
-        });
+        seleccionados.forEach(j => { opcionesHtml += `<option value="${j}">${j}</option>`; });
 
         contenedor.innerHTML += `
           <div class="p-2 bg-slate-50 rounded-xl border flex items-center justify-between gap-2">
@@ -1003,13 +1356,7 @@
       }
       const ganadorFinalResumen = ganadoresList.join(' | ');
 
-      let duracionTotalSegs = 0;
-      if (modoPartidaActual === 'ahora') {
-        duracionTotalSegs = segundosTranscurridos;
-      } else {
-        const minsManual = parseInt(document.getElementById('inputDuracionMinutos').value) || 0;
-        duracionTotalSegs = minsManual * 60;
-      }
+      let duracionTotalSegs = modoPartidaActual === 'ahora' ? segundosTranscurridos : (parseInt(document.getElementById('inputDuracionMinutos').value) || 0) * 60;
 
       try {
         const res = await fetchSeguro(`/api/partidas`, {
@@ -1028,9 +1375,7 @@
         cerrarModalPartida();
         alert("¡Partida registrada y estadísticas actualizadas con éxito!");
         cargarJuegos();
-      } catch (err) {
-        alert(err.message);
-      }
+      } catch (err) { alert(err.message); }
     }
 
     function cerrarModalPartida() {
@@ -1038,361 +1383,10 @@
       document.getElementById('modalPartida').classList.add('hidden');
     }
 
-    // --- PANEL ADMIN ---
-    async function abrirAdminPanel() {
-      document.getElementById('modalAdmin').classList.remove('hidden');
-      try {
-        const res = await fetchSeguro(`/api/admin/usuarios`); 
-        const usuarios = await res.json();
-        const cont = document.getElementById('listaUsuarios');
-        cont.innerHTML = '';
-
-        usuarios.forEach(u => {
-          const esAdminRoot = u.id === 'admin-root';
-          const badgeEstado = u.estado === 'ACTIVO' 
-            ? '<span class="text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded">ACTIVO</span>' 
-            : `<span class="text-amber-600 font-bold bg-amber-50 px-2 py-0.5 rounded">PENDIENTE</span> <br><small class="text-indigo-600 font-mono font-bold">Código: ${u.codigo_verificacion || 'N/A'}</small>`;
-
-          cont.innerHTML += `
-            <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2">
-              <div class="flex justify-between items-start">
-                <div>
-                  <p class="font-bold text-slate-800 text-sm">${u.nombre} <span class="text-xs text-slate-500 font-normal">(@${u.nick})</span></p>
-                  <p class="text-xs text-slate-500 mt-0.5">Estado: ${badgeEstado}</p>
-                </div>
-                <div>
-                  <select onchange="cambiarRol('${u.id}', this.value)" ${esAdminRoot ? 'disabled' : ''} class="text-xs font-bold p-1 border rounded-lg bg-white text-indigo-700 outline-none">
-                    <option value="JUGADOR" ${u.rol==='JUGADOR'?'selected':''}>Jugador</option>
-                    <option value="ADMIN" ${u.rol==='ADMIN'?'selected':''}>Admin</option>
-                  </select>
-                </div>
-              </div>
-              ${!esAdminRoot ? `
-              <div class="flex flex-wrap gap-1.5 pt-2 border-t border-slate-200">
-                <button onclick="cambiarEstado('${u.id}', '${u.estado === 'ACTIVO' ? 'PENDIENTE' : 'ACTIVO'}')" class="text-[11px] bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold px-2.5 py-1 rounded-lg">
-                  ${u.estado === 'ACTIVO' ? '🔒 Desactivar' : '✅ Activar'}
-                </button>
-                <button onclick="generarPasswordTemporal('${u.id}', '${u.nick}')" class="text-[11px] bg-amber-100 hover:bg-amber-200 text-amber-700 font-semibold px-2.5 py-1 rounded-lg">
-                  🔑 Pass Temporal
-                </button>
-                <button onclick="borrarUsuario('${u.id}')" class="text-[11px] bg-rose-100 hover:bg-rose-200 text-rose-600 font-semibold px-2.5 py-1 rounded-lg ml-auto">
-                  🗑️ Borrar
-                </button>
-              </div>` : ''}
-            </div>
-          `;
-        });
-      } catch (err) {
-        alert(err.message);
-      }
-    }
-
-    async function cambiarRol(id, nuevoRol) {
-      await fetchSeguro(`/api/admin/usuarios/${id}/rol`, { method: 'PUT', body: JSON.stringify({ rol: nuevoRol }) });
-      abrirAdminPanel();
-    }
-
-    async function cambiarEstado(id, nuevoEstado) {
-      await fetchSeguro(`/api/admin/usuarios/${id}/estado`, { method: 'PUT', body: JSON.stringify({ estado: nuevoEstado }) });
-      abrirAdminPanel();
-    }
-
-    async function generarPasswordTemporal(id, nick) {
-      if (!confirm(`¿Generar contraseña temporal para @${nick}?`)) return;
-      const res = await fetchSeguro(`/api/admin/usuarios/${id}/password-temporal`, { method: 'PUT' });
-      const json = await res.json();
-      prompt(`Contraseña temporal generada para @${nick}:`, json.password_temporal);
-    }
-
-    async function borrarUsuario(id) {
-      if (!confirm("¿Eliminar usuario permanentemente?")) return;
-      await fetchSeguro(`/api/admin/usuarios/${id}`, { method: 'DELETE' });
-      abrirAdminPanel();
-    }
-
-    function cerrarAdminPanel() { document.getElementById('modalAdmin').classList.add('hidden'); }
-
-    // --- RENDERIZAR TARJETAS REORGANIZADAS ---
-    async function cargarJuegos() {
-      try {
-        const res = await fetchSeguro(`/api/juegos`); 
-        juegosCache = await res.json();
-        renderizarTarjetas();
-      } catch (err) {
-        document.getElementById('mainContainer').innerHTML = `<div class="text-center py-10 text-rose-500">${err.message}</div>`;
-      }
-    }
-
-    function cambiarVista(tipo) {
-      vistaActual = tipo;
-      document.getElementById('btnGrid').className = tipo === 'grid' ? 'px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-indigo-600 shadow-sm transition' : 'px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 transition';
-      document.getElementById('btnCompact').className = tipo === 'compact' ? 'px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-indigo-600 shadow-sm transition' : 'px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 transition';
-      renderizarTarjetas();
-    }
-
-    function renderizarTarjetas() {
-      const container = document.getElementById('mainContainer');
-      const search = document.getElementById('searchInput').value.toLowerCase();
-      container.innerHTML = '';
-
-      const filtrados = juegosCache.filter(j => {
-        let coincideCat = true;
-        if (categoriaActual === 'Favoritos') {
-          coincideCat = favoritosCache.includes(j.id);
-        } else if (categoriaActual !== 'Todas') {
-          coincideCat = j.categoria === categoriaActual;
-        }
-        const coincideNom = j.nombre.toLowerCase().includes(search);
-        return coincideCat && coincideNom;
-      });
-
-      if (filtrados.length === 0) {
-        container.innerHTML = `<div class="text-center py-10 text-slate-400">No hay juegos que mostrar aquí.</div>`;
-        return;
-      }
-
-      if (vistaActual === 'grid') {
-        let gridHTML = '<div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="gridJuegos">';
-        filtrados.forEach(j => {
-          const imagenSrc = j.foto_url || j.foto_base64 || '';
-          const tieneImagen = imagenSrc && imagenSrc.trim().length > 0;
-          const esFav = favoritosCache.includes(j.id);
-          const fechaCreacionStr = j.fecha_creacion ? new Date(j.fecha_creacion).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }) : 'N/A';
-          const ultimaPartidaStr = j.ultima_partida_fecha ? new Date(j.ultima_partida_fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Ninguna';
-          
-          let tiempoMedioTexto = '';
-          if (j.tiempo_medio_segundos && j.tiempo_medio_segundos > 0) {
-            const mins = Math.floor(j.tiempo_medio_segundos / 60);
-            const secs = j.tiempo_medio_segundos % 60;
-            tiempoMedioTexto = mins > 0 ? `~${mins} min${secs > 0 ? ` ${secs} seg` : ''}` : `~${secs} seg`;
-          } else {
-            tiempoMedioTexto = 'Sin registros';
-          }
-          
-          const puedeBorrar = currentUser.rol === 'ADMIN' || currentUser.id === j.creador_id;
-
-          gridHTML += `
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between relative">
-              <button onclick="toggleFavorito('${j.id}')" class="absolute top-2 left-2 w-9 h-9 bg-black/60 hover:bg-black/80 rounded-full flex items-center justify-center text-xl z-20 backdrop-blur-md card-zoom shadow-md" title="Marcar favorito">
-                ${esFav ? '❤️' : '🤍'}
-              </button>
-
-              <div>
-                <!-- IMAGEN CON CLICK PARA FICHA DETALLADA -->
-                <div onclick="abrirFichaDetallada('${j.id}')" class="h-52 bg-slate-900 relative flex items-center justify-center overflow-hidden cursor-pointer group">
-                  ${tieneImagen ? `
-                    <div class="absolute inset-0 bg-cover bg-center filter blur-md opacity-40 scale-110 group-hover:scale-125 transition duration-300" style="background-image: url('${imagenSrc}')"></div>
-                    <img src="${imagenSrc}" class="w-full h-full object-contain relative z-10 p-1 group-hover:scale-105 transition duration-300">
-                  ` : '<div class="text-slate-400 text-xs">Sin Foto</div>'}
-                  <span class="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded-md backdrop-blur-md z-20">${j.categoria}</span>
-                </div>
-
-                <div class="p-4 space-y-3">
-                  <!-- NOMBRE CON CLICK PARA FICHA DETALLADA -->
-                  <div class="flex justify-between items-start gap-2">
-                    <h4 onclick="abrirFichaDetallada('${j.id}')" class="font-bold text-lg text-slate-800 leading-tight cursor-pointer hover:text-indigo-600 transition flex-grow">${j.nombre}</h4>
-                    <span class="text-xs bg-indigo-50 text-indigo-700 font-bold px-2.5 py-1 rounded-lg shrink-0">🎮 ${j.veces_jugado || 0} p.</span>
-                  </div>
-
-                  <!-- CABECERA OPCIÓN A: UBICACIÓN Y CREADOR -->
-                  <div class="text-xs space-y-0.5 border-b pb-2">
-                    <p class="text-slate-600">📍 <b>Ubicación:</b> ${j.ubicacion || 'Sin especificar'}</p>
-                    <p class="text-slate-400 text-[11px]">👤 <b>Añadido por:</b> @${j.creador_nick || 'Sistema'} (${fechaCreacionStr})</p>
-                  </div>
-
-                  <!-- SECCIÓN 1: FICHA TÉCNICA CON DESPLEGABLE DE REGLAS DENTRO -->
-                  <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-[11px] text-slate-600 space-y-1.5">
-                    <div class="font-semibold text-slate-400 text-[9px] uppercase tracking-wider">📦 Ficha Técnica</div>
-                    <div class="grid grid-cols-2 gap-1">
-                      <span>👶 <b>Edad:</b> ${j.edad || 'N/A'}</span>
-                      <span>👥 <b>Jugadores:</b> ${j.jugadores || 'N/A'}</span>
-                    </div>
-                    ${j.instrucciones ? `
-                    <details class="pt-1 text-[11px] border-t border-slate-200/60">
-                      <summary class="font-bold cursor-pointer text-indigo-600 hover:text-indigo-800">📖 Ver Reglas</summary>
-                      <p class="mt-1 leading-relaxed text-slate-700 whitespace-pre-line">${j.instrucciones}</p>
-                    </details>` : ''}
-                  </div>
-
-                  <!-- SECCIÓN 2: ACTIVIDAD Y ESTADÍSTICAS -->
-                  <div class="bg-indigo-50/40 p-2.5 rounded-xl border border-indigo-100/60 text-[11px] text-slate-700 space-y-1">
-                    <div class="font-semibold text-indigo-400 text-[9px] uppercase tracking-wider">📊 Actividad y Estadísticas</div>
-                    <p class="text-amber-900 font-medium">⏱️ <b>Tiempo medio:</b> ${tiempoMedioTexto}</p>
-                    <p class="text-emerald-800">🕒 <b>Última vez:</b> ${ultimaPartidaStr} ${j.ultima_partida_ganador ? `<br><span class="text-[10px] text-emerald-900 font-bold">🏆 ${j.ultima_partida_ganador}</span>` : ''}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div class="p-4 pt-0 flex gap-2">
-                <button onclick="abrirModalPartida('${j.id}', '${j.nombre.replace(/'/g, "\\'")}')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs card-zoom shadow-sm">
-                  ¡Vamos a jugar!
-                </button>
-                ${puedeBorrar ? `
-                <button onclick="borrarJuego('${j.id}')" class="bg-rose-50 text-rose-600 hover:bg-rose-100 p-2.5 rounded-xl text-xs flex items-center justify-center shrink-0" title="Borrar juego">
-                  🗑️
-                </button>` : ''}
-              </div>
-            </div>
-          `;
-        });
-        gridHTML += '</div>';
-        container.innerHTML = gridHTML;
-
-      } else {
-        let listHTML = '<div class="space-y-2 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden divide-y divide-slate-100">';
-        filtrados.forEach(j => {
-          const imagenSrc = j.foto_url || j.foto_base64 || '';
-          const tieneImagen = imagenSrc && imagenSrc.trim().length > 0;
-          const esFav = favoritosCache.includes(j.id);
-          const puedeBorrar = currentUser.rol === 'ADMIN' || currentUser.id === j.creador_id;
-
-          listHTML += `
-            <div class="p-3 flex items-center justify-between gap-3 hover:bg-slate-50 transition">
-              <div class="flex items-center gap-3 min-w-0">
-                <button onclick="toggleFavorito('${j.id}')" class="text-lg shrink-0">${esFav ? '❤️' : '🤍'}</button>
-                <div onclick="abrirFichaDetallada('${j.id}')" class="w-12 h-12 bg-slate-900 rounded-xl overflow-hidden shrink-0 flex items-center justify-center relative cursor-pointer">
-                  ${tieneImagen ? `<img src="${imagenSrc}" class="w-full h-full object-cover">` : '<span class="text-[10px] text-slate-400">Foto</span>'}
-                </div>
-                <div class="min-w-0 cursor-pointer" onclick="abrirFichaDetallada('${j.id}')">
-                  <h4 class="font-bold text-slate-800 text-sm truncate hover:text-indigo-600 transition">${j.nombre}</h4>
-                  <p class="text-[11px] text-slate-500 truncate">📍 ${j.ubicacion || 'Sin sitio'} • 🕹️ ${j.veces_jugado || 0} partidas</p>
-                </div>
-              </div>
-              <div class="flex items-center gap-2 shrink-0">
-                <button onclick="abrirModalPartida('${j.id}', '${j.nombre.replace(/'/g, "\\'")}')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-3 py-1.5 rounded-lg text-xs card-zoom">
-                  ¡Vamos a jugar!
-                </button>
-                ${puedeBorrar ? `
-                <button onclick="borrarJuego('${j.id}')" class="bg-rose-50 text-rose-600 hover:bg-rose-100 p-2 rounded-lg text-xs" title="Borrar">
-                  🗑️
-                </button>` : ''}
-              </div>
-            </div>
-          `;
-        });
-        listHTML += '</div>';
-        container.innerHTML = listHTML;
-      }
-    }
-
-    function procesarFoto(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          const maxDim = 800;
-          let width = img.width, height = img.height;
-          if (width > height) { if (width > maxDim) { height = Math.round((height * maxDim) / width); width = maxDim; } }
-          else { if (height > maxDim) { width = Math.round((width * maxDim) / height); height = maxDim; } }
-
-          const canvas = document.createElement('canvas');
-          canvas.width = width; canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, width, height);
-
-          const resizedBase64 = canvas.toDataURL('image/jpeg', 0.85);
-          document.getElementById('juegoFotoBase64').value = resizedBase64;
-          document.getElementById('imagePreview').innerHTML = `<img src="${resizedBase64}" class="w-full h-full object-contain">`;
-          document.getElementById('btnIA').classList.remove('hidden');
-        };
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
-
-    async function analizarConIA() {
-      const base64 = document.getElementById('juegoFotoBase64').value;
-      if (!base64) return alert("Sube primero una foto.");
-
-      const btnIA = document.getElementById('btnIA');
-      btnIA.innerText = "⏳ Analizando...";
-      btnIA.disabled = true;
-
-      try {
-        const response = await fetchSeguro(`/api/analizar-imagen`, {
-          method: 'POST',
-          body: JSON.stringify({ foto_base64: base64 })
-        });
-        const json = await response.json();
-        if (json.error) throw new Error(json.error);
-
-        document.getElementById('nombre').value = json.nombre || '';
-        document.getElementById('categoria').value = json.categoria || 'Otro';
-        document.getElementById('edad').value = json.edad || '';
-        document.getElementById('jugadores').value = json.jugadores || '';
-        document.getElementById('instrucciones').value = json.instrucciones || '';
-      } catch (err) {
-        alert(err.message);
-      } finally {
-        btnIA.innerText = "✨ Autocompletar IA";
-        btnIA.disabled = false;
-      }
-    }
-
-    async function guardarJuego(e) {
-      e.preventDefault();
-      const btn = document.getElementById('btnGuardar');
-      btn.innerText = "Subiendo...";
-      btn.disabled = true;
-
-      const nuevoJuego = {
-        id: document.getElementById('juegoId').value || Date.now().toString(),
-        nombre: document.getElementById('nombre').value,
-        categoria: document.getElementById('categoria').value,
-        ubicacion: document.getElementById('ubicacion').value,
-        edad: document.getElementById('edad').value,
-        jugadores: document.getElementById('jugadores').value,
-        instrucciones: document.getElementById('instrucciones').value,
-        foto_base64: document.getElementById('juegoFotoBase64').value
-      };
-
-      try {
-        await fetchSeguro(`/api/juegos`, { method: 'POST', body: JSON.stringify(nuevoJuego) });
-        cerrarModalFormulario();
-        cargarJuegos();
-      } catch (err) {
-        alert(err.message);
-      } finally {
-        btn.innerText = "Guardar en la Nube";
-        btn.disabled = false;
-      }
-    }
-
-    async function borrarJuego(id) {
-      if (!confirm("¿Borrar juego de forma permanente?")) return;
-      try {
-        await fetchSeguro(`/api/juegos/${id}`, { method: 'DELETE' });
-        cargarJuegos();
-      } catch (err) {
-        alert(err.message);
-      }
-    }
-
-    function seleccionarAleatorio() {
-      if (juegosCache.length === 0) return alert("¡Añade primero algún juego!");
-      const seleccionado = juegosCache[Math.floor(Math.random() * juegosCache.length)];
-      alert(`🎉 ¡LA RULETA HA ELEGIDO!\n\n👉 ${seleccionado.nombre}\n📍 Ubicación: ${seleccionado.ubicacion || 'En su sitio'}`);
-    }
-
-    function filtrarCategoria(cat, event) {
-      categoriaActual = cat;
-      document.querySelectorAll('.cat-btn').forEach(b => {
-        b.className = "cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition";
-      });
-      event.target.className = "cat-btn bg-indigo-600 text-white px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition";
-      renderizarTarjetas();
-    }
-
-    function filtrarJuegos() { renderizarTarjetas(); }
-    function abrirModalFormulario() { document.getElementById('modalForm').classList.remove('hidden'); }
-    function cerrarModalFormulario() {
-      document.getElementById('modalForm').classList.add('hidden');
-      document.getElementById('juegoForm').reset();
-      document.getElementById('imagePreview').innerHTML = `<span class="text-slate-400 text-sm">Sin fotografía</span>`;
-      document.getElementById('juegoFotoBase64').value = '';
+    function cerrarSesion() {
+      localStorage.removeItem('session_user');
+      localStorage.removeItem('auth_token'); 
+      location.reload();
     }
   </script>
 </body>
