@@ -439,7 +439,6 @@
 
       <div class="flex-grow overflow-y-auto p-3 space-y-3 text-xs">
         <div class="space-y-2 bg-slate-50 p-2.5 rounded-2xl border border-slate-200">
-          <!-- PREVIEW DE FOTO CUADRADA -->
           <div id="imagePreview" class="w-48 h-48 mx-auto bg-slate-900 rounded-xl flex items-center justify-center border-2 border-dashed border-slate-300 overflow-hidden relative shadow-inner">
             <span class="text-slate-400 text-xs text-center px-2">Sin fotografía<br><span class="text-[10px] text-slate-500">(Se adaptará a 3:4 / 4:3)</span></span>
           </div>
@@ -1198,7 +1197,7 @@
       renderizarTarjetas();
     }
 
-    // RENDERIZADO OPTIMIZADO (FORMATO CUADRADO Y MEJOR BALANCE VISUAL)
+    // RENDERIZADO OPTIMIZADO (CORAZÓN FIX CON Z-INDEX SUPERIOR)
     function renderizarTarjetas() {
       const container = document.getElementById('mainContainer');
       const search = document.getElementById('searchInput').value.toLowerCase();
@@ -1261,7 +1260,9 @@
                 <div class="flex gap-3 items-start">
                   <!-- FOTO EN FORMATO CUADRADO PERFECTO (1:1) -->
                   <div onclick="abrirFichaDetallada('${j.id}')" class="w-5/12 aspect-square bg-slate-900 rounded-2xl relative flex items-center justify-center overflow-hidden cursor-pointer group shrink-0 border border-slate-100 shadow-inner">
-                    <button onclick="event.stopPropagation(); toggleFavorito('${j.id}')" class="absolute top-2 left-2 w-7 h-7 bg-black/60 hover:bg-black/80 rounded-full flex items-center justify-center text-xs z-10 backdrop-blur-md card-zoom shadow-md text-white">
+                    
+                    <!-- BOTÓN CORAZÓN (Z-20 PARA QUE NO QUEDE TAPADO) -->
+                    <button onclick="event.stopPropagation(); toggleFavorito('${j.id}')" class="absolute top-2 left-2 w-7 h-7 bg-black/60 hover:bg-black/80 rounded-full flex items-center justify-center text-xs z-20 backdrop-blur-md card-zoom shadow-md text-white">
                       ${esFav ? '❤️' : '🤍'}
                     </button>
 
@@ -1274,19 +1275,19 @@
                   <!-- COLUMNA DERECHA CON FICHA TÉCNICA Y ESTADÍSTICAS -->
                   <div class="w-7/12 flex flex-col justify-between text-[11px] space-y-2">
                     
-                    <!-- BLOQUE 1: FICHA TÉCNICA RÁPIDA -->
-                    <div class="bg-slate-50 p-2 rounded-xl border border-slate-200/80 space-y-1">
-                      <p class="text-slate-700 truncate">👶 <b>Edad:</b> ${formatearTextoEdad(j)}</p>
-                      <p class="text-slate-700 truncate">👥 <b>Jugadores:</b> ${formatearTextoJugadores(j)}</p>
-                      <p class="text-slate-600 text-[10px] truncate">🧩 <b>Mecánicas:</b> ${j.mecanicas || 'Sin especificar'}</p>
-                    </div>
-
-                    <!-- BLOQUE 2: ESTADÍSTICAS DE JUEGO -->
+                    <!-- BLOQUE 1: ESTADÍSTICAS DE JUEGO -->
                     <div class="bg-indigo-50/70 border border-indigo-100 p-2 rounded-xl space-y-0.5 text-[10px] text-indigo-950">
                       <p class="font-bold text-indigo-700 flex items-center gap-1">🎮 ${j.veces_jugado || 0} partidas</p>
                       <p class="truncate text-slate-600">⏱️ <b>Tiempo medio:</b> ${tiempoMedioStr}</p>
                       <p class="truncate text-slate-600">🕒 <b>Última partida:</b> ${ultimaPartidaFechaStr}</p>
                       <p class="truncate text-emerald-800 font-bold">🏆 <b>Ganador:</b> ${ultimaPartidaGanadorStr}</p>
+                    </div>
+
+                    <!-- BLOQUE 2: FICHA TÉCNICA RÁPIDA -->
+                    <div class="bg-slate-50 p-2 rounded-xl border border-slate-200/80 space-y-1">
+                      <p class="text-slate-700 truncate">👶 <b>Edad:</b> ${formatearTextoEdad(j)}</p>
+                      <p class="text-slate-700 truncate">👥 <b>Jugadores:</b> ${formatearTextoJugadores(j)}</p>
+                      <p class="text-slate-600 text-[10px] truncate">🧩 <b>Mecánicas:</b> ${j.mecanicas || 'Sin especificar'}</p>
                     </div>
 
                   </div>
@@ -1295,7 +1296,10 @@
                 <!-- UBICACIÓN Y AUTORÍA (ABAJO) -->
                 <div class="text-[10px] text-slate-500 pt-0.5 flex justify-between items-center border-t border-slate-100">
                   <span class="truncate">📍 <b>Ubicación:</b> ${j.ubicacion || 'Sin sitio'}</span>
-                  <span class="truncate shrink-0">👤 @${j.creador_nick || 'admin'}</span>
+                  <div class="truncate text-right shrink-0">
+                    <p class="truncate">👤 Añadido: @${j.creador_nick || 'admin'}</p>
+                    ${j.modificador_nick ? `<p class="truncate text-[9px] text-slate-400">✏️ Editado: @${j.modificador_nick}</p>` : ''}
+                  </div>
                 </div>
               </div>
 
@@ -1648,7 +1652,7 @@
       } catch (err) { alert(err.message); }
     }
 
-    // PROCESAMIENTO Y RECUPERACIÓN DE FOTO ADAPTADA A FORMATOS 3:4 O 4:3 EN CANVAS CUADRADO
+    // PROCESAMIENTO Y RECUPERACIÓN DE FOTO ADAPTADA
     function procesarFoto(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1657,28 +1661,25 @@
       reader.onload = (e) => {
         const img = new Image();
         img.onload = () => {
-          // Determinamos si es vertical (3:4) u horizontal (4:3)
           const esVertical = img.height >= img.width;
           const targetRatio = esVertical ? (3 / 4) : (4 / 3);
 
           const canvas = document.createElement('canvas');
-          const canvasSize = 800; // Tamaño base estándar
+          const canvasSize = 800;
           canvas.width = canvasSize;
           canvas.height = canvasSize;
           const ctx = canvas.getContext('2d');
 
-          // Fondo oscuro elegante
           ctx.fillStyle = '#0f172a';
           ctx.fillRect(0, 0, canvasSize, canvasSize);
 
-          // Calculamos dimensiones escaladas adaptadas al ratio 3:4 o 4:3
           let drawW, drawH;
           if (esVertical) {
             drawH = canvasSize * 0.92;
-            drawW = drawH * targetRatio; // Proporción 3:4
+            drawW = drawH * targetRatio;
           } else {
             drawW = canvasSize * 0.92;
-            drawH = drawW / targetRatio; // Proporción 4:3
+            drawH = drawW / targetRatio;
           }
 
           const offsetX = (canvasSize - drawW) / 2;
