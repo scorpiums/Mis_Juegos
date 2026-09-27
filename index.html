@@ -187,7 +187,6 @@
               </select>
             </div>
 
-            <!-- FILTRO DE EDAD ACTUALIZADO CON VALORES NORMALIZADOS +3, +4, +6... -->
             <div>
               <label class="font-bold text-slate-500 uppercase text-[10px]">👶 Apto para Edad</label>
               <select id="filtroEdadMinima" onchange="filtrarJuegos()" class="w-full p-2 border rounded-xl outline-none mt-1 bg-slate-50 font-medium">
@@ -430,7 +429,7 @@
     </div>
   </div>
 
-  <!-- MODAL FORMULARIO CON SELECCIÓN DE EDAD (+3, +4...) Y JUGADORES MÍN/MÁX -->
+  <!-- MODAL FORMULARIO DE EDICIÓN / ALTA Y RECURSOS -->
   <div id="modalForm" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
     <div class="bg-white rounded-2xl max-w-md w-full h-[90vh] max-h-[660px] flex flex-col shadow-2xl overflow-hidden relative border border-slate-100">
       <div class="p-3 border-b flex justify-between items-center bg-slate-50 shrink-0">
@@ -563,6 +562,19 @@
             <textarea id="instruccionesCompletas" required rows="4" placeholder="Desarrollo oficial paso a paso..." class="w-full p-2 border rounded-xl outline-none mt-0.5 text-xs"></textarea>
           </div>
 
+          <!-- SECCIÓN RECURSOS ADJUNTOS EN FORMULARIO -->
+          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-2">
+            <span class="font-bold text-slate-600 uppercase text-[10px] block">📎 Enlaces de Recursos (PDF y Vídeo)</span>
+            <div>
+              <label class="text-[9px] text-slate-500 font-bold uppercase">Enlace PDF Instrucciones</label>
+              <input type="url" id="pdf_reglas_url" placeholder="https://ejemplo.com/manual.pdf" class="w-full p-2 border rounded-xl outline-none mt-0.5 bg-white text-xs">
+            </div>
+            <div>
+              <label class="text-[9px] text-slate-500 font-bold uppercase">Enlace Vídeo Explicativo YouTube</label>
+              <input type="url" id="video_tutorial_url" placeholder="https://www.youtube.com/watch?v=..." class="w-full p-2 border rounded-xl outline-none mt-0.5 bg-white text-xs">
+            </div>
+          </div>
+
           <button type="submit" id="btnGuardar" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-md card-zoom text-xs">
             Guardar en la Nube
           </button>
@@ -577,7 +589,7 @@
     </div>
   </div>
 
-  <!-- MODAL COMPARADOR IA ROBUSTO -->
+  <!-- MODAL COMPARADOR IA ROBUSTO Y FILTRADO POR CHECKBOXES -->
   <div id="modalComparadorIA" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 hidden flex items-center justify-center p-3">
     <div class="bg-white rounded-2xl max-w-lg w-full h-[85vh] max-h-[620px] flex flex-col shadow-2xl overflow-hidden relative border border-purple-200">
       <div class="p-3 border-b bg-purple-900 text-white flex justify-between items-center shrink-0">
@@ -615,7 +627,7 @@
             <option value="azar">🎲 Aleatorio Puro (Cualquier juego)</option>
             <option value="descarte">🔄 Modo Descarte (Sin repetir hasta vaciar bolsa)</option>
             <option value="compensado">⚖️ Modo Compensado (Prioriza poco jugados)</option>
-            <option value="rapida">⚡ Partida Rápida (<20 min)</option>
+            <option value="rapida">⚡ Partida Rápida (&lt;20 min)</option>
           </select>
         </div>
 
@@ -763,6 +775,7 @@
     let modoPartidaActual = '';
     let datosAnalizadosIA = null;
     let seleccionesComparadorIA = {};
+    let seccionesMarcadasIA = [];
     let audioCtx = null;
 
     function formatearFechaCorta(fechaStr) {
@@ -775,7 +788,7 @@
       return `${dia}/${mes}/${anio}`;
     }
 
-    // EXTRAER EL VALOR NUMÉRICO DE LA EDAD MÍNIMA PARA FILTRADO
+    // NORMALIZACIÓN DE EDAD Y JUGADORES
     function obtenerEdadNumerica(juego) {
       if (juego.min_edad !== undefined && juego.min_edad !== null && juego.min_edad > 0) {
         return parseInt(juego.min_edad);
@@ -785,6 +798,27 @@
         return isNaN(num) ? 0 : num;
       }
       return 0;
+    }
+
+    function formatearTextoEdad(juego) {
+      const num = obtenerEdadNumerica(juego);
+      return num > 0 ? `+${num} años` : (juego.edad || 'N/A');
+    }
+
+    function formatearTextoJugadores(juego) {
+      const min = juego.min_jugadores || 1;
+      const max = juego.max_jugadores || 99;
+
+      if (juego.jugadores && juego.jugadores.trim().length > 0) {
+        return juego.jugadores;
+      }
+      if (min === max) {
+        return min === 1 ? 'Solo 1 jugador' : `${min} jugadores`;
+      }
+      if (max >= 99) {
+        return `${min} o más jugadores`;
+      }
+      return `${min} a ${max} jugadores`;
     }
 
     function reproducirSonidoClick() {
@@ -943,7 +977,7 @@
       document.getElementById('panelFiltrosAvanzados').classList.toggle('hidden');
     }
 
-    // --- FICHA DETALLADA DEL JUEGO ---
+    // FICHA DETALLADA
     async function abrirFichaDetallada(juegoId) {
       juegoActualFicha = juegosCache.find(j => j.id === juegoId);
       if (!juegoActualFicha) return;
@@ -960,8 +994,8 @@
       }
       document.getElementById('fichaAutoriaTexto').innerHTML = autoriaText;
 
-      document.getElementById('fichaEdad').innerText = juegoActualFicha.edad || 'N/A';
-      document.getElementById('fichaJugadores').innerText = juegoActualFicha.jugadores || 'N/A';
+      document.getElementById('fichaEdad').innerText = formatearTextoEdad(juegoActualFicha);
+      document.getElementById('fichaJugadores').innerText = formatearTextoJugadores(juegoActualFicha);
       document.getElementById('fichaMecanicas').innerText = juegoActualFicha.mecanicas || 'Sin mecánicas asociadas';
       
       document.getElementById('fichaReglasBasicasText').innerText = juegoActualFicha.instrucciones || 'Sin reglas básicas registradas.';
@@ -1148,7 +1182,7 @@
       finally { btn.innerText = "Preguntar"; btn.disabled = false; }
     }
 
-    // --- RENDERIZADO Y FILTRADO CON LÓGICA DE EDAD REVISADA ---
+    // CARGAR Y RENDERIZAR
     async function cargarJuegos() {
       try {
         const res = await fetchSeguro(`/api/juegos`); 
@@ -1179,7 +1213,6 @@
         let okNom = j.nombre.toLowerCase().includes(search);
         let okJug = numJug === 0 || ((j.min_jugadores || 1) <= numJug && (j.max_jugadores || 99) >= numJug);
         
-        // REVISIÓN DEL FILTRO DE EDAD: El juego es apto si su edad mínima recomendada es menor o igual que la edad elegida
         const edadJuego = obtenerEdadNumerica(j);
         let okEdad = edadSeleccionada === 0 || (edadJuego <= edadSeleccionada);
 
@@ -1199,18 +1232,18 @@
       }
 
       if (vistaActual === 'grid') {
-        let gridHTML = '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="gridJuegos">';
+        let gridHTML = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="gridJuegos">';
         filtrados.forEach(j => {
           const imagenSrc = j.foto_url || j.foto_base64 || '';
           const tieneImagen = imagenSrc && imagenSrc.trim().length > 0;
           const esFav = favoritosCache.includes(j.id);
           
           const fechaCreacionStr = formatearFechaCorta(j.fecha_creacion);
-          let autoriaText = `👤 <b>Añadido por:</b> @${j.creador_nick || 'Sistema'} · ${fechaCreacionStr}`;
+          let autoriaText = `Añadido por: @${j.creador_nick || 'Sistema'} · ${fechaCreacionStr}`;
           
           if (j.modificador_nick && j.fecha_modificacion) {
             const fechaModStr = formatearFechaCorta(j.fecha_modificacion);
-            autoriaText += ` <br>✏️ <b>Actualizado por:</b> @${j.modificador_nick} · ${fechaModStr}`;
+            autoriaText += ` <br>✏️ Editado por: @${j.modificador_nick} · ${fechaModStr}`;
           }
 
           let tiempoMedioStr = "Sin datos";
@@ -1224,53 +1257,64 @@
           let ultimaPartidaGanadorStr = j.ultima_partida_ganador || 'N/A';
 
           gridHTML += `
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between relative">
-              <button onclick="toggleFavorito('${j.id}')" class="absolute top-2 left-2 w-7 h-7 bg-black/60 hover:bg-black/80 rounded-full flex items-center justify-center text-xs z-10 backdrop-blur-md card-zoom shadow-md text-white">
-                ${esFav ? '❤️' : '🤍'}
-              </button>
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between relative transition hover:shadow-md">
+              
+              <div class="p-3 space-y-3">
+                <!-- CABECERA HORIZONTAL CON IMAGEN DESTACADA -->
+                <div class="flex gap-3 items-stretch">
+                  <div onclick="abrirFichaDetallada('${j.id}')" class="w-2/5 sm:w-1/2 min-h-[140px] max-h-[160px] bg-slate-900 rounded-xl relative flex items-center justify-center overflow-hidden cursor-pointer group shrink-0 border border-slate-200">
+                    <button onclick="event.stopPropagation(); toggleFavorito('${j.id}')" class="absolute top-2 left-2 w-7 h-7 bg-black/60 hover:bg-black/80 rounded-full flex items-center justify-center text-xs z-10 backdrop-blur-md card-zoom shadow-md text-white">
+                      ${esFav ? '❤️' : '🤍'}
+                    </button>
 
-              <div>
-                <div onclick="abrirFichaDetallada('${j.id}')" class="h-28 sm:h-32 bg-slate-900 relative flex items-center justify-center overflow-hidden cursor-pointer group">
-                  ${tieneImagen ? `
-                    <div class="absolute inset-0 bg-cover bg-center filter blur-md opacity-40 scale-110 group-hover:scale-125 transition duration-300" style="background-image: url('${imagenSrc}')"></div>
-                    <img src="${imagenSrc}" class="w-full h-full object-contain relative z-10 p-1 group-hover:scale-105 transition duration-300">
-                  ` : '<div class="text-slate-400 text-xs">Sin Foto</div>'}
-                  <span class="absolute top-2 right-2 bg-black/70 text-white text-[9px] px-2 py-0.5 rounded-md backdrop-blur-md z-10 font-bold">${j.categoria}</span>
+                    ${tieneImagen ? `
+                      <div class="absolute inset-0 bg-cover bg-center filter blur-md opacity-40 scale-110 group-hover:scale-125 transition duration-300" style="background-image: url('${imagenSrc}')"></div>
+                      <img src="${imagenSrc}" class="w-full h-full object-contain relative z-10 p-1 group-hover:scale-105 transition duration-300">
+                    ` : '<div class="text-slate-400 text-xs">Sin Foto</div>'}
+                    
+                    <span class="absolute bottom-1.5 left-1.5 bg-black/70 text-white text-[9px] px-2 py-0.5 rounded-md backdrop-blur-md z-10 font-bold truncate max-w-[90%]">${j.categoria}</span>
+                  </div>
+
+                  <div class="w-3/5 sm:w-1/2 flex flex-col justify-between py-0.5">
+                    <div class="space-y-1">
+                      <h4 onclick="abrirFichaDetallada('${j.id}')" class="font-bold text-sm text-slate-800 leading-snug cursor-pointer hover:text-indigo-600 transition line-clamp-2">${j.nombre}</h4>
+                      <p class="text-[10px] text-slate-600 leading-tight">📍 <b>Ubicación:</b> ${j.ubicacion || 'Sin especificar'}</p>
+                      <p class="text-[9px] text-slate-400 leading-tight">👤 ${autoriaText}</p>
+                    </div>
+
+                    <div class="flex justify-end pt-1">
+                      <span class="text-[10px] bg-indigo-50 text-indigo-700 font-bold px-2 py-0.5 rounded-lg border border-indigo-100 flex items-center gap-1">
+                        🎮 ${j.veces_jugado || 0} p.
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
-                <div class="p-3 space-y-2">
-                  <div class="border-b pb-1.5 space-y-0.5">
-                    <div class="flex justify-between items-start gap-1">
-                      <h4 onclick="abrirFichaDetallada('${j.id}')" class="font-bold text-sm text-slate-800 leading-tight cursor-pointer hover:text-indigo-600 transition flex-grow truncate">${j.nombre}</h4>
-                      <span class="text-[9px] bg-indigo-50 text-indigo-700 font-bold px-1.5 py-0.5 rounded-md shrink-0">🎮 ${j.veces_jugado || 0} p.</span>
-                    </div>
-                    <p class="text-[10px] text-slate-600 truncate">📍 <b>Ubicación:</b> ${j.ubicacion || 'Sin especificar'}</p>
-                    <p class="text-[9px] text-slate-400 leading-tight">${autoriaText}</p>
+                <!-- FICHA TÉCNICA NORMALIZADA -->
+                <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100 space-y-1 text-[10px] text-slate-700">
+                  <span class="font-bold text-slate-500 uppercase text-[8px] block tracking-wider">📦 Ficha Técnica</span>
+                  <div class="grid grid-cols-2 gap-2">
+                    <span>👶 <b>Edad:</b> ${formatearTextoEdad(j)}</span>
+                    <span>👥 <b>Jugadores:</b> ${formatearTextoJugadores(j)}</span>
                   </div>
+                  <p class="truncate text-slate-600 mt-0.5">🧩 <b>Mecánicas:</b> ${j.mecanicas || 'Sin especificar'}</p>
+                </div>
 
-                  <div class="bg-slate-50 p-2 rounded-xl border border-slate-100 space-y-1 text-[10px] text-slate-700">
-                    <span class="font-bold text-slate-500 uppercase text-[8px] block tracking-wider">📦 Ficha Técnica</span>
-                    <div class="flex justify-between">
-                      <span>👶 <b>Edad:</b> ${j.edad || 'N/A'}</span>
-                      <span>👥 <b>Jugadores:</b> ${j.jugadores || 'N/A'}</span>
-                    </div>
-                    <p class="truncate text-slate-600">🧩 <b>Mecánicas:</b> ${j.mecanicas || 'Sin especificar'}</p>
-                  </div>
-
-                  <div class="bg-indigo-50/50 p-2 rounded-xl border border-indigo-100 space-y-0.5 text-[10px] text-indigo-950">
-                    <span class="font-bold text-indigo-800 uppercase text-[8px] block tracking-wider">📊 Estadísticas y Actividad</span>
-                    <p class="truncate">⏱️ <b>Tiempo medio/partida:</b> ${tiempoMedioStr}</p>
-                    <p class="truncate">🕒 <b>Última partida:</b> ${ultimaPartidaFechaStr}</p>
-                    <p class="truncate text-emerald-800 font-semibold">🏆 <b>Ganador:</b> ${ultimaPartidaGanadorStr}</p>
-                  </div>
+                <!-- ESTADÍSTICAS Y ACTIVIDAD -->
+                <div class="bg-indigo-50/40 p-2.5 rounded-xl border border-indigo-100/70 space-y-0.5 text-[10px] text-indigo-950">
+                  <span class="font-bold text-indigo-800 uppercase text-[8px] block tracking-wider">📊 Estadísticas y Actividad</span>
+                  <p class="truncate">⏱️ <b>Tiempo medio/partida:</b> ${tiempoMedioStr}</p>
+                  <p class="truncate">🕒 <b>Última partida:</b> ${ultimaPartidaFechaStr}</p>
+                  <p class="truncate text-emerald-800 font-semibold">🏆 <b>Ganador:</b> ${ultimaPartidaGanadorStr}</p>
                 </div>
               </div>
 
               <div class="p-3 pt-0">
-                <button onclick="abrirModalPartida('${j.id}', '${j.nombre.replace(/'/g, "\\'")}')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs card-zoom shadow-sm">
+                <button onclick="abrirModalPartida('${j.id}', '${j.nombre.replace(/'/g, "\\'")}')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs card-zoom shadow-sm flex items-center justify-center gap-1.5">
                   ¡Vamos a jugar!
                 </button>
               </div>
+
             </div>
           `;
         });
@@ -1293,7 +1337,7 @@
                 </div>
                 <div class="min-w-0 flex-grow cursor-pointer" onclick="abrirFichaDetallada('${j.id}')">
                   <h4 class="font-bold text-slate-800 text-xs leading-tight hover:text-indigo-600 transition truncate">${j.nombre}</h4>
-                  <p class="text-[9px] text-slate-500 truncate">📍 ${j.ubicacion || 'Sin sitio'} • 🎮 ${j.veces_jugado || 0} p.</p>
+                  <p class="text-[9px] text-slate-500 truncate">📍 ${j.ubicacion || 'Sin sitio'} • 👶 ${formatearTextoEdad(j)} • 👥 ${formatearTextoJugadores(j)}</p>
                 </div>
                 <button onclick="abrirModalPartida('${j.id}', '${j.nombre.replace(/'/g, "\\'")}')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-2.5 py-1 rounded-lg text-[10px] card-zoom shadow-sm shrink-0">
                   ¡Jugar!
@@ -1307,7 +1351,7 @@
       }
     }
 
-    // --- FORMULARIO Y COMPARADOR IA CORREGIDO ---
+    // FORMULARIO Y EDICIÓN COMPLETA (INCLUYENDO CAMPOS PDF Y VÍDEO)
     function abrirModalFormulario(juegoAEditar = null) {
       const form = document.getElementById('juegoForm');
       form.reset();
@@ -1328,6 +1372,10 @@
         document.getElementById('instrucciones').value = juegoAEditar.instrucciones || '';
         document.getElementById('instruccionesCompletas').value = juegoAEditar.instrucciones_completas || '';
 
+        // CARGA DE CAMPOS RECURSOS PDF Y VÍDEO
+        document.getElementById('pdf_reglas_url').value = juegoAEditar.pdf_reglas_url || '';
+        document.getElementById('video_tutorial_url').value = juegoAEditar.video_tutorial_url || '';
+
         const foto = juegoAEditar.foto_url || juegoAEditar.foto_base64 || '';
         document.getElementById('juegoFotoBase64').value = foto;
         document.getElementById('imagePreview').innerHTML = foto ? `<img src="${foto}" class="w-full h-full object-contain">` : `<span class="text-slate-400 text-xs">Sin fotografía</span>`;
@@ -1337,6 +1385,8 @@
         document.getElementById('modalTitulo').innerText = "Nuevo Juego / Juguete";
         document.getElementById('juegoId').value = '';
         document.getElementById('juegoFotoBase64').value = '';
+        document.getElementById('pdf_reglas_url').value = '';
+        document.getElementById('video_tutorial_url').value = '';
         document.getElementById('imagePreview').innerHTML = `<span class="text-slate-400 text-xs">Sin fotografía</span>`;
         document.getElementById('contenedorBorradoEdicion').classList.add('hidden');
       }
@@ -1389,6 +1439,8 @@
         mecanicas: document.getElementById('mecanicas').value,
         instrucciones: document.getElementById('instrucciones').value,
         instrucciones_completas: document.getElementById('instruccionesCompletas').value,
+        pdf_reglas_url: document.getElementById('pdf_reglas_url').value,
+        video_tutorial_url: document.getElementById('video_tutorial_url').value,
         foto_base64: document.getElementById('juegoFotoBase64').value
       };
 
@@ -1405,12 +1457,13 @@
       finally { btn.innerText = "Guardar en la Nube"; btn.disabled = false; }
     }
 
+    // CONSULTAR Y EXTRAER CON IA RESPETANDO EXCLUSIVAMENTE LAS OPCIONES SELECCIONADAS
     async function analizarConIA() {
       const base64 = document.getElementById('juegoFotoBase64').value;
       const nombreActual = document.getElementById('nombre').value;
       
-      const seccionesChecked = Array.from(document.querySelectorAll('#checkboxesSeccionesIA input:checked')).map(el => el.value);
-      if (seccionesChecked.length === 0) return alert("Selecciona al menos una sección para consultar a la IA.");
+      seccionesMarcadasIA = Array.from(document.querySelectorAll('#checkboxesSeccionesIA input:checked')).map(el => el.value);
+      if (seccionesMarcadasIA.length === 0) return alert("Selecciona al menos una sección para consultar a la IA.");
 
       if (!base64 && !nombreActual) return alert("Sube una foto o escribe el nombre del juego para que Gemini pueda identificarlo.");
 
@@ -1421,7 +1474,11 @@
       try {
         const response = await fetchSeguro(`/api/analizar-imagen`, {
           method: 'POST',
-          body: JSON.stringify({ foto_base64: base64, secciones_solicitadas: seccionesChecked, nombre_juego_ref: nombreActual })
+          body: JSON.stringify({ 
+            foto_base64: base64, 
+            secciones_solicitadas: seccionesMarcadasIA, 
+            nombre_juego_ref: nombreActual 
+          })
         });
         datosAnalizadosIA = await response.json();
         if (datosAnalizadosIA.error) throw new Error(datosAnalizadosIA.error);
@@ -1431,7 +1488,6 @@
       finally { btnIA.innerText = "🤖 Consultar a Gemini IA"; btnIA.disabled = false; }
     }
 
-    // COMPARADOR IA ROBUSTO CON MANEJO DE FORMATOS CAMELCASE/SNAKE_CASE
     function abrirComparadorIA() {
       if (!datosAnalizadosIA) return;
 
@@ -1449,17 +1505,20 @@
       };
 
       const mapaCampos = [
-        { key: 'nombre', label: 'Nombre del Juego', idElem: 'nombre' },
-        { key: 'categoria', label: 'Categoría', idElem: 'categoria' },
-        { key: 'edad', label: 'Edad Recomendada', idElem: 'edad' },
-        { key: 'mecanicas', label: 'Mecánicas', idElem: 'mecanicas' },
-        { key: 'instrucciones', label: 'Reglas Básicas (Resumen)', idElem: 'instrucciones' },
-        { key: 'instruccionesCompletas', label: 'Reglas Completas Paso a Paso', idElem: 'instruccionesCompletas' }
+        { key: 'nombre', label: 'Nombre del Juego', idElem: 'nombre', grupo: 'datos_basicos' },
+        { key: 'categoria', label: 'Categoría', idElem: 'categoria', grupo: 'datos_basicos' },
+        { key: 'edad', label: 'Edad Recomendada', idElem: 'edad', grupo: 'datos_basicos' },
+        { key: 'mecanicas', label: 'Mecánicas', idElem: 'mecanicas', grupo: 'mecanicas' },
+        { key: 'instrucciones', label: 'Reglas Básicas (Resumen)', idElem: 'instrucciones', grupo: 'reglas_basicas' },
+        { key: 'instruccionesCompletas', label: 'Reglas Completas Paso a Paso', idElem: 'instruccionesCompletas', grupo: 'reglas_completas' }
       ];
 
       let bloquesGenerados = 0;
 
       mapaCampos.forEach(campo => {
+        // RENDERIZADO EXCLUSIVO SI LA SECCIÓN FUE MARCADA EN LOS CHECKBOXES
+        if (!seccionesMarcadasIA.includes(campo.grupo)) return;
+
         const valIA = iaNormalizada[campo.key];
         const elemForm = document.getElementById(campo.idElem);
         const valActual = elemForm ? elemForm.value : '';
@@ -1501,20 +1560,22 @@
         }
       });
 
-      if (datosAnalizadosIA.min_jugadores) {
-        const elMin = document.getElementById('minJugadoresSelect');
-        if (elMin) elMin.value = datosAnalizadosIA.min_jugadores;
-      }
-      if (datosAnalizadosIA.max_jugadores) {
-        const elMax = document.getElementById('maxJugadoresSelect');
-        if (elMax) elMax.value = datosAnalizadosIA.max_jugadores;
+      if (seccionesMarcadasIA.includes('datos_basicos')) {
+        if (datosAnalizadosIA.min_jugadores) {
+          const elMin = document.getElementById('minJugadoresSelect');
+          if (elMin) elMin.value = datosAnalizadosIA.min_jugadores;
+        }
+        if (datosAnalizadosIA.max_jugadores) {
+          const elMax = document.getElementById('maxJugadoresSelect');
+          if (elMax) elMax.value = datosAnalizadosIA.max_jugadores;
+        }
       }
 
       if (bloquesGenerados === 0) {
         contenedor.innerHTML = `
           <div class="text-center py-8 text-slate-500 space-y-2">
             <p class="font-bold">⚠️ No se extrajeron textos comparables.</p>
-            <p class="text-xs">Gemini ha identificado los parámetros básicos, pero no generó texto para las secciones seleccionadas.</p>
+            <p class="text-xs">Gemini no devolvió información útil para las secciones marcadas.</p>
           </div>
         `;
       }
@@ -1625,7 +1686,7 @@
       reader.readAsDataURL(file);
     }
 
-    // --- RULETA ---
+    // RULETA
     function abrirModalRuleta() {
       document.getElementById('pasoRuletaConfig').classList.remove('hidden');
       document.getElementById('pasoRuletaAnimacion').classList.add('hidden');
@@ -1709,7 +1770,7 @@
       document.getElementById('pasoRuletaConfig').classList.remove('hidden');
     }
 
-    // --- PERFIL Y AUTENTICACIÓN ---
+    // PERFIL Y AUTENTICACIÓN
     async function procesarLogin(e) {
       e.preventDefault();
       const nick = document.getElementById('loginNick').value;
@@ -1893,7 +1954,7 @@
       } catch (err) { alert(err.message); }
     }
 
-    // --- PARTIDAS Y CRONÓMETRO ---
+    // PARTIDAS Y CRONÓMETRO
     async function abrirModalPartida(juegoId, juegoNombre) {
       document.getElementById('partidaJuegoId').value = juegoId;
       document.getElementById('partidaJuegoNombre').innerText = juegoNombre;
