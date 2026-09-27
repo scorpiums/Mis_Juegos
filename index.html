@@ -282,7 +282,7 @@
             <p class="text-slate-700">🏷️ <b>Tipología:</b> <span id="fichaTipologia"></span></p>
             <p class="text-slate-700">👶 <b>Edad:</b> <span id="fichaEdad"></span></p>
             <p class="text-slate-700">👥 <b>Jugadores:</b> <span id="fichaJugadores"></span></p>
-            <p class="text-slate-700">🧩 <b>Mecánicas (máx 3):</b> <span id="fichaMecanicas"></span></p>
+            <p class="text-slate-700">🧩 <b>Mecánicas:</b> <span id="fichaMecanicas"></span></p>
           </div>
 
           <div class="bg-indigo-50/50 p-2.5 rounded-xl border border-indigo-100 space-y-1">
@@ -352,7 +352,7 @@
 
       <div class="p-3 border-t bg-slate-50 shrink-0">
         <button id="btnJugarDesdeFicha" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs card-zoom shadow-md">
-          ¡Vamos a jugar!
+          ¡Jugar!
         </button>
       </div>
     </div>
@@ -456,13 +456,14 @@
             </button>
           </div>
 
-          <!-- BLOQUE IA EN 3 CHECKBOXES -->
+          <!-- BLOQUE IA RESTAURADO EN 4 SECCIONES INDEPENDIENTES -->
           <div class="bg-purple-50 p-2.5 rounded-xl border border-purple-200 space-y-2 mt-2">
             <span class="font-bold text-purple-900 text-[11px] block">✨ Consultar / Completar con IA:</span>
-            <div class="grid grid-cols-3 gap-1.5 text-[10px]" id="checkboxesSeccionesIA">
+            <div class="grid grid-cols-2 gap-1.5 text-[10px]" id="checkboxesSeccionesIA">
               <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="datos_basicos" checked class="rounded text-purple-600"> Datos Básicos</label>
               <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="mecanicas" checked class="rounded text-purple-600"> Mecánicas</label>
-              <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="reglas" checked class="rounded text-purple-600"> Reglas</label>
+              <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="reglas_basicas" checked class="rounded text-purple-600"> Reglas Básicas</label>
+              <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="reglas_completas" checked class="rounded text-purple-600"> Reglas Completas</label>
             </div>
             <button type="button" onclick="analizarConIA()" id="btnIA" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 rounded-xl text-xs card-zoom shadow-sm">
               🤖 Consultar a Gemini IA
@@ -492,7 +493,7 @@
             </div>
             <div>
               <label class="font-bold text-slate-600 uppercase text-[10px]">Tipología / Formato <span class="text-rose-500">*</span></label>
-              <input type="text" id="tipologia" required placeholder="Ej. Cartas, Tablero, Dados" class="w-full p-2 border rounded-xl outline-none mt-0.5">
+              <input type="text" id="tipologia" required placeholder="Ej. Cartas, Tablero" class="w-full p-2 border rounded-xl outline-none mt-0.5">
             </div>
           </div>
 
@@ -595,7 +596,7 @@
     </div>
   </div>
 
-  <!-- MODAL COMPARADOR IA ROBUSTO -->
+  <!-- MODAL COMPARADOR IA ROBUSTO Y REPARADO -->
   <div id="modalComparadorIA" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 hidden flex items-center justify-center p-3">
     <div class="bg-white rounded-2xl max-w-lg w-full h-[85vh] max-h-[620px] flex flex-col shadow-2xl overflow-hidden relative border border-purple-200">
       <div class="p-3 border-b bg-purple-900 text-white flex justify-between items-center shrink-0">
@@ -671,7 +672,7 @@
 
         <div class="flex gap-2 pt-1">
           <button id="btnJugarRuleta" class="flex-grow bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs card-zoom shadow-md">
-            🟢 ¡Vamos a jugar!
+            🟢 ¡Jugar!
           </button>
           <button id="btnVerFichaRuleta" class="bg-indigo-50 text-indigo-700 font-bold px-3 py-2.5 rounded-xl text-xs card-zoom">
             📖 Ver Ficha
@@ -811,18 +812,16 @@
       return num > 0 ? `+${num} años` : (juego.edad || 'N/A');
     }
 
+    // FORMATEO SIMPLIFICADO A "1+" O "2-8"
     function formatearTextoJugadores(juego) {
-      const min = juego.min_jugadores || 1;
-      const max = juego.max_jugadores || 99;
+      const min = parseInt(juego.min_jugadores) || 1;
+      const max = parseInt(juego.max_jugadores) || 99;
 
-      if (juego.jugadores && juego.jugadores.trim().length > 0) {
-        return juego.jugadores;
-      }
-      if (min === max) {
-        return min === 1 ? '1 jugador' : `${min} jugadores`;
-      }
       if (max >= 99) {
         return `${min}+`;
+      }
+      if (min === max) {
+        return `${min}`;
       }
       return `${min}-${max}`;
     }
@@ -1211,7 +1210,7 @@
       renderizarTarjetas();
     }
 
-    // RENDERIZADO TARJETAS
+    // RENDERIZADO REPARADO Y OPTIMIZADO
     function renderizarTarjetas() {
       const container = document.getElementById('mainContainer');
       const search = document.getElementById('searchInput').value.toLowerCase();
@@ -1262,49 +1261,58 @@
           gridHTML += `
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between relative transition hover:shadow-md">
               
-              <div class="p-3.5 space-y-3">
-                <div class="flex justify-between items-start gap-2 border-b pb-2">
+              <div class="p-3.5 space-y-2.5">
+                <!-- TÍTULO PRINCIPAL -->
+                <div class="flex justify-between items-center gap-2 border-b pb-1.5">
                   <h4 onclick="abrirFichaDetallada('${j.id}')" class="font-black text-base text-slate-800 leading-snug cursor-pointer hover:text-indigo-600 transition truncate flex-grow" title="${j.nombre}">${j.nombre}</h4>
-                  <span class="bg-slate-900 text-white text-[10px] font-bold px-2.5 py-1 rounded-xl shrink-0 shadow-sm">${j.categoria}</span>
                 </div>
 
-                <div class="flex gap-3 items-stretch">
-                  <div onclick="abrirFichaDetallada('${j.id}')" class="w-5/12 aspect-square bg-slate-900 rounded-2xl relative flex items-center justify-center overflow-hidden cursor-pointer shrink-0 border border-slate-100 shadow-inner">
-                    <button onclick="event.stopPropagation(); toggleFavorito('${j.id}')" class="absolute top-2 left-2 w-7 h-7 bg-black/60 hover:bg-black/80 rounded-full flex items-center justify-center text-xs z-20 backdrop-blur-md card-zoom shadow-md text-white">
+                <!-- BLOQUE CENTRAL CON ALTO REPARTIDO Y FOTO CUADRADA RIGUROSA -->
+                <div class="flex gap-3 items-stretch h-36">
+                  
+                  <!-- FOTO CUADRADA RIGUROSA H-FULL W-AUTO ASPECT-SQUARE -->
+                  <div onclick="abrirFichaDetallada('${j.id}')" class="h-full aspect-square bg-slate-900 rounded-2xl relative flex items-center justify-center overflow-hidden cursor-pointer shrink-0 border border-slate-100 shadow-inner">
+                    <button onclick="event.stopPropagation(); toggleFavorito('${j.id}')" class="absolute top-1.5 left-1.5 w-6 h-6 bg-black/60 hover:bg-black/80 rounded-full flex items-center justify-center text-xs z-20 backdrop-blur-md card-zoom shadow-md text-white">
                       ${esFav ? '❤️' : '🤍'}
                     </button>
 
                     ${tieneImagen ? `
                       <div class="absolute inset-0 bg-cover bg-center filter blur-md opacity-35" style="background-image: url('${imagenSrc}')"></div>
-                      <img src="${imagenSrc}" class="w-full h-full object-contain relative z-10 p-1.5">
+                      <img src="${imagenSrc}" class="w-full h-full object-contain relative z-10 p-1">
                     ` : '<div class="text-slate-400 text-xs text-center p-2">Sin Foto</div>'}
                   </div>
 
-                  <div class="w-7/12 min-w-0 flex flex-col justify-between gap-1.5">
-                    <div class="bg-slate-50 p-2 rounded-xl border border-slate-200/80 text-[11px] space-y-1 flex-1 flex flex-col justify-center">
-                      <p class="text-slate-700 truncate">🏷️ ${j.tipologia || 'General'}</p>
-                      <p class="text-slate-700 truncate">👶 ${formatearTextoEdad(j)} • 👥 ${formatearTextoJugadores(j)}</p>
-                      <p class="text-slate-600 text-[10px] truncate" title="${j.mecanicas || 'Sin especificar'}">🧩 ${j.mecanicas || 'Sin especificar'}</p>
+                  <!-- DATOS DERECHA ALINEADOS CON LA ALTURA DE LA IMAGEN -->
+                  <div class="flex-grow min-w-0 flex flex-col justify-between gap-1 h-full">
+                    
+                    <!-- RECUADRO 1: CATEGORÍA Y MECÁNICAS (2 LÍNEAS RESERVADAS) -->
+                    <div class="bg-slate-50 p-1.5 rounded-xl border border-slate-200 text-[10px] space-y-0.5 min-h-[2.5rem] flex flex-col justify-center">
+                      <p class="text-slate-800 font-bold truncate">🏷️ ${j.categoria} • ${j.tipologia || 'General'}</p>
+                      <p class="text-slate-600 truncate" title="${j.mecanicas || 'Sin especificar'}">🧩 ${j.mecanicas || 'Sin mecánicas'}</p>
                     </div>
 
-                    <div class="bg-indigo-50/70 border border-indigo-100 p-2 rounded-xl text-[10px] space-y-0.5 text-indigo-950 flex-1 flex flex-col justify-center">
-                      <p class="font-bold text-indigo-700 truncate">🎮 ${j.veces_jugado || 0} partidas</p>
-                      <p class="truncate text-slate-600">⏱️ ${tiempoMedioStr}</p>
+                    <!-- RECUADRO 2: FICHA TÉCNICA Y STATS -->
+                    <div class="bg-indigo-50/70 border border-indigo-100 p-1.5 rounded-xl text-[10px] space-y-0.5 text-indigo-950 flex-1 flex flex-col justify-center">
+                      <p class="text-slate-700 font-medium truncate">👶 ${formatearTextoEdad(j)} • 👥 ${formatearTextoJugadores(j)}</p>
+                      <p class="font-bold text-indigo-700 truncate">🎮 ${j.veces_jugado || 0} part. • ⏱️ ${tiempoMedioStr}</p>
                       <p class="truncate text-slate-600">🕒 ${ultimaPartidaFechaStr}</p>
                       <p class="truncate text-emerald-800 font-bold">🏆 ${ganadoresLimpios}</p>
                     </div>
+
                   </div>
                 </div>
 
+                <!-- UBICACIÓN Y CREADOR -->
                 <div class="text-[10px] text-slate-500 pt-0.5 flex justify-between items-center border-t border-slate-100">
                   <span class="truncate">📍 ${j.ubicacion || 'Sin sitio'}</span>
                   <span class="truncate text-right shrink-0">👤 @${j.creador_nick || 'admin'}</span>
                 </div>
               </div>
 
+              <!-- BOTÓN JUGAR -->
               <div class="p-3.5 pt-0">
                 <button onclick="abrirModalPartida('${j.id}', '${j.nombre.replace(/'/g, "\\'")}')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs card-zoom shadow-md flex items-center justify-center gap-1.5">
-                  ¡Vamos a jugar!
+                  ¡Jugar!
                 </button>
               </div>
 
@@ -1315,6 +1323,7 @@
         container.innerHTML = gridHTML;
 
       } else {
+        // MODO LISTA COMPACTA
         let listHTML = '<div class="space-y-2.5 max-w-4xl mx-auto">';
         filtrados.forEach(j => {
           const imagenSrc = j.foto_url || j.foto_base64 || '';
@@ -1323,31 +1332,33 @@
 
           listHTML += `
             <div class="bg-white p-2.5 rounded-2xl shadow-sm border border-slate-200 flex gap-3 items-center hover:border-indigo-200 transition">
-              <div onclick="abrirFichaDetallada('${j.id}')" class="w-16 h-16 aspect-square bg-slate-900 rounded-xl overflow-hidden shrink-0 flex items-center justify-center relative cursor-pointer border border-slate-100 shadow-inner">
+              
+              <div onclick="abrirFichaDetallada('${j.id}')" class="w-14 h-14 aspect-square bg-slate-900 rounded-xl overflow-hidden shrink-0 flex items-center justify-center relative cursor-pointer border border-slate-100 shadow-inner">
                 <button onclick="event.stopPropagation(); toggleFavorito('${j.id}')" class="absolute top-1 left-1 w-5 h-5 bg-black/60 rounded-full flex items-center justify-center text-[10px] z-10 text-white">
                   ${esFav ? '❤️' : '🤍'}
                 </button>
                 ${tieneImagen ? `<img src="${imagenSrc}" class="w-full h-full object-cover">` : '<span class="text-[9px] text-slate-400">Sin Foto</span>'}
               </div>
 
-              <div class="flex-grow min-w-0 flex flex-col justify-between py-0.5 gap-1.5">
+              <div class="flex-grow min-w-0 flex flex-col justify-between py-0.5 gap-1">
                 <div class="min-w-0 cursor-pointer" onclick="abrirFichaDetallada('${j.id}')">
                   <h4 class="font-black text-slate-800 text-sm leading-tight hover:text-indigo-600 transition truncate">${j.nombre}</h4>
-                  <p class="text-[11px] text-slate-500 truncate mt-0.5">
+                  <p class="text-[10px] text-slate-500 truncate mt-0.5">
                     📍 ${j.ubicacion || 'Sin sitio'} • 🏷️ ${j.tipologia || 'General'} • 👶 ${formatearTextoEdad(j)} • 👥 ${formatearTextoJugadores(j)}
                   </p>
                 </div>
 
-                <div class="flex justify-between items-center pt-1 border-t border-slate-100">
-                  <span class="bg-slate-100 text-slate-700 text-[10px] font-bold px-2 py-0.5 rounded-md border border-slate-200 truncate max-w-[120px]">
+                <div class="flex justify-between items-center pt-1 border-t border-slate-100 gap-2">
+                  <span class="bg-slate-100 text-slate-700 text-[10px] font-bold px-2 py-0.5 rounded-md border border-slate-200 truncate">
                     ${j.categoria}
                   </span>
 
                   <button onclick="abrirModalPartida('${j.id}', '${j.nombre.replace(/'/g, "\\'")}')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-3 py-1 rounded-xl text-xs card-zoom shadow-sm flex items-center gap-1 shrink-0">
-                    ¡Vamos a jugar!
+                    ¡Jugar!
                   </button>
                 </div>
               </div>
+
             </div>
           `;
         });
@@ -1434,7 +1445,6 @@
 
       const idActual = document.getElementById('juegoId').value;
 
-      // Sanitizar mecánicas en el cliente (máximo 3)
       let mecsVal = document.getElementById('mecanicas').value || '';
       if (mecsVal) {
         mecsVal = mecsVal.split(',').map(m => m.trim()).filter(m => m.length > 0).slice(0, 3).join(', ');
@@ -1470,7 +1480,7 @@
       finally { btn.innerText = "Guardar en la Nube"; btn.disabled = false; }
     }
 
-    // CONSULTAR IA
+    // CONSULTAR IA CON LAS 4 SECCIONES COMPLETAS
     async function analizarConIA() {
       const base64 = document.getElementById('juegoFotoBase64').value;
       const nombreActual = document.getElementById('nombre').value;
@@ -1501,6 +1511,7 @@
       finally { btnIA.innerText = "🤖 Consultar a Gemini IA"; btnIA.disabled = false; }
     }
 
+    // MODAL COMPARADOR IA TOTALMENTE REPARADO
     function abrirComparadorIA() {
       if (!datosAnalizadosIA) return;
 
@@ -1514,8 +1525,8 @@
         tipologia: datosAnalizadosIA.tipologia || '',
         edad: datosAnalizadosIA.edad || '',
         mecanicas: datosAnalizadosIA.mecanicas || '',
-        instrucciones: datosAnalizadosIA.instrucciones || '',
-        instruccionesCompletas: datosAnalizadosIA.instrucciones_completas || ''
+        instrucciones: datosAnalizadosIA.instrucciones || datosAnalizadosIA.reglas_basicas || '',
+        instruccionesCompletas: datosAnalizadosIA.instrucciones_completas || datosAnalizadosIA.instruccionesCompletas || ''
       };
 
       const mapaCampos = [
@@ -1524,8 +1535,8 @@
         { key: 'tipologia', label: 'Tipología / Formato', idElem: 'tipologia', grupo: 'datos_basicos' },
         { key: 'edad', label: 'Edad Recomendada', idElem: 'edad', grupo: 'datos_basicos' },
         { key: 'mecanicas', label: 'Mecánicas (Máx 3)', idElem: 'mecanicas', grupo: 'mecanicas' },
-        { key: 'instrucciones', label: 'Reglas Básicas (Resumen)', idElem: 'instrucciones', grupo: 'reglas' },
-        { key: 'instruccionesCompletas', label: 'Reglas Completas Paso a Paso', idElem: 'instruccionesCompletas', grupo: 'reglas' }
+        { key: 'instrucciones', label: 'Reglas Básicas (Resumen)', idElem: 'instrucciones', grupo: 'reglas_basicas' },
+        { key: 'instruccionesCompletas', label: 'Reglas Completas Paso a Paso', idElem: 'instruccionesCompletas', grupo: 'reglas_completas' }
       ];
 
       let bloquesGenerados = 0;
