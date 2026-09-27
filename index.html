@@ -66,6 +66,12 @@
       font-weight: 900;
       box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen pb-20">
@@ -299,19 +305,16 @@
 
           <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-2">
             <span class="font-bold text-slate-600 uppercase text-[9px] block">📎 Recursos Adjuntos</span>
-            <div class="grid grid-cols-2 gap-2">
-              <div>
-                <input type="file" id="inputSubirPdfModal" accept="application/pdf" onchange="subirPdfJuegoDirecto(event)" class="hidden">
-                <button onclick="document.getElementById('inputSubirPdfModal').click()" id="btnAccionPdf" class="w-full bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 font-bold p-2 rounded-xl text-center text-[10px] flex items-center justify-center gap-1">
-                  📄 Subir PDF
-                </button>
-              </div>
-              <div>
-                <button onclick="agregarEnlaceYouTubePrompt()" id="btnAccionVideo" class="w-full bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 font-bold p-2 rounded-xl text-center text-[10px] flex items-center justify-center gap-1">
-                  🎬 Añadir Vídeo
-                </button>
-              </div>
+            
+            <!-- BOTÓN PDF OCUPANDO TODO EL ANCHO CUANDO EXISTE O PARA SUBIR -->
+            <div id="contenedorBotonPdf" class="w-full">
+              <input type="file" id="inputSubirPdfModal" accept="application/pdf" onchange="subirPdfJuegoDirecto(event)" class="hidden">
+              <button onclick="document.getElementById('inputSubirPdfModal').click()" id="btnAccionPdf" class="w-full bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 font-bold p-2.5 rounded-xl text-center text-xs flex items-center justify-center gap-1.5 shadow-sm">
+                📄 Subir PDF de Instrucciones
+              </button>
             </div>
+
+            <!-- VÍDEO EMBEBIDO SIN BOTÓN DUPLICADO -->
             <div id="visorVideoContainer" class="hidden aspect-video w-full rounded-xl overflow-hidden border mt-1"></div>
           </div>
 
@@ -498,7 +501,7 @@
             </div>
           </div>
 
-          <!-- FILA 2: EDAD RECOMENDADA (INTERCAMBIADA) Y UBICACIÓN -->
+          <!-- FILA 2: EDAD RECOMENDADA Y UBICACIÓN -->
           <div class="grid grid-cols-2 gap-2">
             <div>
               <label class="font-bold text-slate-600 uppercase text-[10px]">Edad Recomendada <span class="text-rose-500">*</span></label>
@@ -573,15 +576,28 @@
             <textarea id="instruccionesCompletas" required rows="4" placeholder="Desarrollo oficial paso a paso..." class="w-full p-2 border rounded-xl outline-none mt-0.5 text-xs"></textarea>
           </div>
 
-          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-2">
+          <!-- GESTIÓN MEJORADA DE RECURSOS (AÑADIR / BORRAR PDF Y VÍDEO) -->
+          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-2.5">
             <span class="font-bold text-slate-600 uppercase text-[10px] block">📎 Enlaces de Recursos (PDF y Vídeo)</span>
-            <div>
-              <label class="text-[9px] text-slate-500 font-bold uppercase">Enlace PDF Instrucciones</label>
-              <input type="url" id="pdf_reglas_url" placeholder="https://ejemplo.com/manual.pdf" class="w-full p-2 border rounded-xl outline-none mt-0.5 bg-white text-xs">
+            
+            <div class="space-y-1">
+              <div class="flex justify-between items-center">
+                <label class="text-[9px] text-slate-500 font-bold uppercase">Documento PDF Instrucciones</label>
+                <div class="flex gap-1">
+                  <input type="file" id="inputPdfForm" accept="application/pdf" onchange="cargarPdfEnFormulario(event)" class="hidden">
+                  <button type="button" onclick="document.getElementById('inputPdfForm').click()" class="text-[9px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-1.5 py-0.5 rounded">📄 Subir / Cambiar</button>
+                  <button type="button" onclick="borrarPdfFormulario()" class="text-[9px] bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold px-1.5 py-0.5 rounded">🗑️ Borrar</button>
+                </div>
+              </div>
+              <input type="url" id="pdf_reglas_url" placeholder="https://ejemplo.com/manual.pdf o archivo cargado" class="w-full p-2 border rounded-xl outline-none bg-white text-xs">
             </div>
-            <div>
-              <label class="text-[9px] text-slate-500 font-bold uppercase">Enlace Vídeo Explicativo YouTube</label>
-              <input type="url" id="video_tutorial_url" placeholder="https://www.youtube.com/watch?v=..." class="w-full p-2 border rounded-xl outline-none mt-0.5 bg-white text-xs">
+
+            <div class="space-y-1 border-t pt-2">
+              <div class="flex justify-between items-center">
+                <label class="text-[9px] text-slate-500 font-bold uppercase">Vídeo Explicativo YouTube</label>
+                <button type="button" onclick="borrarVideoFormulario()" class="text-[9px] bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold px-1.5 py-0.5 rounded">🗑️ Borrar Enlace</button>
+              </div>
+              <input type="url" id="video_tutorial_url" placeholder="https://www.youtube.com/watch?v=..." class="w-full p-2 border rounded-xl outline-none bg-white text-xs">
             </div>
           </div>
 
@@ -789,7 +805,6 @@
     let seccionesMarcadasIA = [];
     let audioCtx = null;
 
-    // HELPER PARA TRANSFORMAR OBJETOS O ARRAYS EN TEXTO PLANO
     function aTextoPlano(val) {
       if (val === null || val === undefined) return '';
       if (typeof val === 'string') return val;
@@ -1002,7 +1017,7 @@
       document.getElementById('panelFiltrosAvanzados').classList.toggle('hidden');
     }
 
-    // FICHA DETALLADA
+    // FICHA DETALLADA Y RECURSOS
     async function abrirFichaDetallada(juegoId) {
       juegoActualFicha = juegosCache.find(j => j.id === juegoId);
       if (!juegoActualFicha) return;
@@ -1102,21 +1117,20 @@
       } catch (err) { console.error(err); }
     }
 
+    // AJUSTE SOLICITADO: BOTÓN PDF A ANCHO COMPLETO Y SUPRESIÓN DEL BOTÓN VÍDEO DUPLICADO
     function actualizarBotonesRecursosFicha() {
       const btnPdf = document.getElementById('btnAccionPdf');
-      const btnVid = document.getElementById('btnAccionVideo');
       const visorVid = document.getElementById('visorVideoContainer');
 
-      if (juegoActualFicha.pdf_reglas_url) {
-        btnPdf.innerHTML = `📄 Abrir PDF Adjunto`;
+      if (juegoActualFicha.pdf_reglas_url && juegoActualFicha.pdf_reglas_url.trim().length > 0) {
+        btnPdf.innerHTML = `📄 Abrir PDF de Instrucciones`;
         btnPdf.onclick = () => window.open(juegoActualFicha.pdf_reglas_url, '_blank');
       } else {
-        btnPdf.innerHTML = `📄 Subir PDF`;
+        btnPdf.innerHTML = `📄 Subir PDF de Instrucciones`;
         btnPdf.onclick = () => document.getElementById('inputSubirPdfModal').click();
       }
 
-      if (juegoActualFicha.video_tutorial_url) {
-        btnVid.innerHTML = `🎬 Ver Vídeo Explicativo`;
+      if (juegoActualFicha.video_tutorial_url && juegoActualFicha.video_tutorial_url.trim().length > 0) {
         const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
         const match = juegoActualFicha.video_tutorial_url.match(regExp);
         if (match && match[2].length === 11) {
@@ -1124,12 +1138,9 @@
           visorVid.classList.remove('hidden');
         } else {
           visorVid.classList.add('hidden');
-          btnVid.onclick = () => window.open(juegoActualFicha.video_tutorial_url, '_blank');
         }
       } else {
         visorVid.classList.add('hidden');
-        btnVid.innerHTML = `🎬 Añadir Vídeo YouTube`;
-        btnVid.onclick = () => agregarEnlaceYouTubePrompt();
       }
     }
 
@@ -1143,7 +1154,7 @@
         try {
           await fetchSeguro(`/api/juegos/${juegoActualFicha.id}/recursos`, {
             method: 'PUT',
-            body: JSON.stringify({ pdf_reglas_url: base64Pdf })
+            body: JSON.stringify({ pdf_reglas_url: base64Pdf, video_tutorial_url: juegoActualFicha.video_tutorial_url })
           });
           juegoActualFicha.pdf_reglas_url = base64Pdf;
           actualizarBotonesRecursosFicha();
@@ -1151,22 +1162,6 @@
         } catch(err) { alert(err.message); }
       };
       reader.readAsDataURL(file);
-    }
-
-    async function agregarEnlaceYouTubePrompt() {
-      if (!juegoActualFicha) return;
-      const urlVideo = prompt("Introduce el enlace de YouTube del vídeo explicativo:");
-      if (urlVideo && urlVideo.trim()) {
-        try {
-          await fetchSeguro(`/api/juegos/${juegoActualFicha.id}/recursos`, {
-            method: 'PUT',
-            body: JSON.stringify({ video_tutorial_url: urlVideo.trim() })
-          });
-          juegoActualFicha.video_tutorial_url = urlVideo.trim();
-          actualizarBotonesRecursosFicha();
-          alert("✅ Enlace de vídeo guardado correctamente.");
-        } catch(err) { alert(err.message); }
-      }
     }
 
     function cambiarTabFicha(tab) {
@@ -1225,6 +1220,7 @@
       renderizarTarjetas();
     }
 
+    // TARJETA PRINCIPAL REESTRUCTURADA CON FOTO CUADRADA COMPLETA Y BLOQUES AJUSTADOS
     function renderizarTarjetas() {
       const container = document.getElementById('mainContainer');
       const search = document.getElementById('searchInput').value.toLowerCase();
@@ -1282,29 +1278,30 @@
                 </div>
 
                 <div class="flex gap-3 items-stretch">
-                  <div onclick="abrirFichaDetallada('${j.id}')" class="w-36 h-36 aspect-square bg-slate-900 rounded-2xl relative flex items-center justify-center overflow-hidden cursor-pointer shrink-0 border border-slate-100 shadow-inner">
+                  <!-- CONTENEDOR DE LA FOTO CUADRADA CON MISMO ALTO/ANCHO QUE LOS 2 BLOQUES DE INFORMACIÓN -->
+                  <div onclick="abrirFichaDetallada('${j.id}')" class="w-36 h-36 bg-slate-900 rounded-2xl relative flex items-center justify-center overflow-hidden cursor-pointer shrink-0 border border-slate-100 shadow-inner">
                     <button onclick="event.stopPropagation(); toggleFavorito('${j.id}')" class="absolute top-1.5 left-1.5 w-6 h-6 bg-black/60 hover:bg-black/80 rounded-full flex items-center justify-center text-xs z-20 backdrop-blur-md card-zoom shadow-md text-white">
                       ${esFav ? '❤️' : '🤍'}
                     </button>
 
                     ${tieneImagen ? `
-                      <div class="absolute inset-0 bg-cover bg-center filter blur-md opacity-35" style="background-image: url('${imagenSrc}')"></div>
-                      <img src="${imagenSrc}" class="w-full h-full object-cover relative z-10 p-1 rounded-xl">
+                      <img src="${imagenSrc}" class="w-full h-full object-contain p-1 relative z-10 rounded-xl">
                     ` : '<div class="text-slate-400 text-xs text-center p-2">Sin Foto</div>'}
                   </div>
 
+                  <!-- BLOQUES CONTIGUOS DE INFORMACIÓN CON ESPACIO Y MECÁNICAS EN DOS LÍNEAS -->
                   <div class="flex-grow min-w-0 flex flex-col justify-between gap-1.5 h-36">
-                    <div class="bg-slate-50 p-2 rounded-xl border border-slate-200 text-[11px] space-y-1 flex-1 flex flex-col justify-center">
-                      <div class="flex items-center justify-between text-slate-700 font-semibold gap-1">
-                        <span class="truncate">🏷️ ${j.tipologia || 'General'}</span>
-                        <span class="truncate text-slate-500">🧩 ${j.mecanicas || 'Sin mecánicas'}</span>
+                    <div class="bg-slate-50 p-2 rounded-xl border border-slate-200 text-[11px] space-y-1 flex-1 flex flex-col justify-center min-h-0">
+                      <div class="text-slate-700 font-semibold text-[10px] leading-tight">
+                        <span class="block text-indigo-900 font-bold truncate">🏷️ ${j.tipologia || 'General'}</span>
+                        <p class="text-slate-600 line-clamp-2 mt-0.5">🧩 ${j.mecanicas || 'Sin mecánicas'}</p>
                       </div>
-                      <p class="text-slate-800 font-medium truncate pt-0.5 border-t border-slate-200/60">
+                      <p class="text-slate-800 font-medium truncate pt-1 border-t border-slate-200/60 mt-1">
                         👶 ${formatearTextoEdad(j)} • 👥 ${formatearTextoJugadores(j)}
                       </p>
                     </div>
 
-                    <div class="bg-indigo-50/70 border border-indigo-100 p-2 rounded-xl text-[10px] space-y-0.5 text-indigo-950 flex-1 flex flex-col justify-center">
+                    <div class="bg-indigo-50/70 border border-indigo-100 p-2 rounded-xl text-[10px] space-y-0.5 text-indigo-950 flex-1 flex flex-col justify-center min-h-0">
                       <p class="font-bold text-indigo-700 truncate">🎮 ${j.veces_jugado || 0} partidas</p>
                       <p class="truncate text-slate-600">⏱️ ${tiempoMedioStr}</p>
                       <p class="truncate text-slate-600">🕒 ${ultimaPartidaFechaStr}</p>
@@ -1344,7 +1341,7 @@
                 <button onclick="event.stopPropagation(); toggleFavorito('${j.id}')" class="absolute top-1 left-1 w-5 h-5 bg-black/60 rounded-full flex items-center justify-center text-[10px] z-10 text-white">
                   ${esFav ? '❤️' : '🤍'}
                 </button>
-                ${tieneImagen ? `<img src="${imagenSrc}" class="w-full h-full object-cover">` : '<span class="text-[9px] text-slate-400">Sin Foto</span>'}
+                ${tieneImagen ? `<img src="${imagenSrc}" class="w-full h-full object-contain">` : '<span class="text-[9px] text-slate-400">Sin Foto</span>'}
               </div>
 
               <div class="flex-grow min-w-0 flex flex-col justify-between py-0.5 gap-1">
@@ -1422,6 +1419,30 @@
     }
 
     function cerrarModalFormulario() { document.getElementById('modalForm').classList.add('hidden'); }
+
+    // FUNCIONES AÑADIDAS PARA GESTIÓN DE PDF Y VÍDEO EN FORMULARIO
+    function cargarPdfEnFormulario(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        document.getElementById('pdf_reglas_url').value = e.target.result;
+        alert("✅ Archivo PDF cargado en el formulario.");
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function borrarPdfFormulario() {
+      document.getElementById('pdf_reglas_url').value = '';
+      document.getElementById('inputPdfForm').value = '';
+      alert("📄 Enlace de PDF eliminado del formulario.");
+    }
+
+    function borrarVideoFormulario() {
+      document.getElementById('video_tutorial_url').value = '';
+      alert("🎬 Enlace de vídeo eliminado del formulario.");
+    }
 
     async function preprocesarGuardadoJuego(e) {
       e.preventDefault();
@@ -1520,7 +1541,6 @@
       finally { btnIA.innerText = "🤖 Consultar a Gemini IA"; btnIA.disabled = false; }
     }
 
-    // COMPARADOR IA COMPATIBLE Y SOLUCIONADO
     function abrirComparadorIA() {
       if (!datosAnalizadosIA) return;
 
@@ -1557,7 +1577,6 @@
         const elemForm = document.getElementById(campo.idElem);
         const valActual = elemForm ? elemForm.value : '';
 
-        // Renderizado del bloque comparativo
         if (valIA && valIA.trim().length > 0) {
           bloquesGenerados++;
           seleccionesComparadorIA[campo.idElem] = 'ia';
@@ -1705,29 +1724,24 @@
       reader.onload = (e) => {
         const img = new Image();
         img.onload = () => {
-          const esVertical = img.height >= img.width;
-          const targetRatio = esVertical ? (3 / 4) : (4 / 3);
-
           const canvas = document.createElement('canvas');
-          const canvasSize = 800;
-          canvas.width = canvasSize;
-          canvas.height = canvasSize;
+          canvas.width = 800; canvas.height = 800;
           const ctx = canvas.getContext('2d');
 
           ctx.fillStyle = '#0f172a';
-          ctx.fillRect(0, 0, canvasSize, canvasSize);
+          ctx.fillRect(0, 0, 800, 800);
 
           let drawW, drawH;
-          if (esVertical) {
-            drawH = canvasSize * 0.92;
-            drawW = drawH * targetRatio;
+          if (img.height >= img.width) {
+            drawH = 800 * 0.95;
+            drawW = drawH * (img.width / img.height);
           } else {
-            drawW = canvasSize * 0.92;
-            drawH = drawW / targetRatio;
+            drawW = 800 * 0.95;
+            drawH = drawW * (img.height / img.width);
           }
 
-          const offsetX = (canvasSize - drawW) / 2;
-          const offsetY = (canvasSize - drawH) / 2;
+          const offsetX = (800 - drawW) / 2;
+          const offsetY = (800 - drawH) / 2;
 
           ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
 
