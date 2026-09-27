@@ -429,7 +429,7 @@
     </div>
   </div>
 
-  <!-- MODAL FORMULARIO DE EDICIÓN / ALTA Y RECURSOS -->
+  <!-- MODAL FORMULARIO DE EDICIÓN / ALTA -->
   <div id="modalForm" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
     <div class="bg-white rounded-2xl max-w-md w-full h-[90vh] max-h-[660px] flex flex-col shadow-2xl overflow-hidden relative border border-slate-100">
       <div class="p-3 border-b flex justify-between items-center bg-slate-50 shrink-0">
@@ -1202,7 +1202,7 @@
       renderizarTarjetas();
     }
 
-    // RENDERIZADO REVISADO Y OPTIMIZADO PARA MÓVIL Y DESKTOP
+    // RENDERIZADO AJUSTADO CON PROPORCIONES Y SINTAXIS SIMPLIFICADA
     function renderizarTarjetas() {
       const container = document.getElementById('mainContainer');
       const search = document.getElementById('searchInput').value.toLowerCase();
@@ -1218,7 +1218,6 @@
         
         const edadJuego = obtenerEdadNumerica(j);
         let okEdad = edadSeleccionada === 0 || (edadJuego <= edadSeleccionada);
-
         let okMec = mecsChecked.length === 0 || mecsChecked.every(m => (j.mecanicas || '').includes(m));
 
         return okCat && okNom && okJug && okEdad && okMec;
@@ -1261,12 +1260,11 @@
                   <span class="bg-slate-900 text-white text-[10px] font-bold px-2.5 py-1 rounded-xl shrink-0 shadow-sm">${j.categoria}</span>
                 </div>
 
-                <!-- SECCIÓN CENTRAL: FOTO AMPLIADA + DATOS Y STATS ALTURA EXACTA IGUALADA -->
+                <!-- SECCIÓN CENTRAL: FOTO CUADRADA ESTRICTA (1:1) + DATOS Y STATS ALTURA IGUALADA -->
                 <div class="flex gap-3 items-stretch">
-                  <!-- FOTO EN FORMATO CUADRADO CON MAYOR PRESENCIA -->
+                  
+                  <!-- FOTO ESTRICTAMENTE CUADRADA (ASPECT-SQUARE) -->
                   <div onclick="abrirFichaDetallada('${j.id}')" class="w-5/12 aspect-square bg-slate-900 rounded-2xl relative flex items-center justify-center overflow-hidden cursor-pointer shrink-0 border border-slate-100 shadow-inner">
-                    
-                    <!-- BOTÓN CORAZÓN (Z-20) -->
                     <button onclick="event.stopPropagation(); toggleFavorito('${j.id}')" class="absolute top-2 left-2 w-7 h-7 bg-black/60 hover:bg-black/80 rounded-full flex items-center justify-center text-xs z-20 backdrop-blur-md card-zoom shadow-md text-white">
                       ${esFav ? '❤️' : '🤍'}
                     </button>
@@ -1277,19 +1275,19 @@
                     ` : '<div class="text-slate-400 text-xs text-center p-2">Sin Foto</div>'}
                   </div>
 
-                  <!-- COLUMNA DERECHA CON DOS BLOQUES FLEXIBLES QUE SUMAN LA ALTURA DE LA FOTO -->
-                  <div class="w-7/12 min-w-0 flex flex-col justify-between space-y-1.5">
+                  <!-- DATOS SIMPLIFICADOS (SIN PALABRAS REPETITIVAS) -->
+                  <div class="w-7/12 min-w-0 flex flex-col justify-between gap-1.5">
                     
-                    <!-- BLOQUE 1: FICHA TÉCNICA SIMPLIFICADA -->
+                    <!-- BLOQUE FICHA TÉCNICA -->
                     <div class="bg-slate-50 p-2 rounded-xl border border-slate-200/80 text-[11px] space-y-1 flex-1 flex flex-col justify-center">
-                      <p class="text-slate-700 truncate">👶 <b>Edad:</b> ${formatearTextoEdad(j)}</p>
-                      <p class="text-slate-700 truncate">👥 <b>Jugadores:</b> ${formatearTextoJugadores(j)}</p>
-                      <p class="text-slate-600 text-[10px] truncate" title="${j.mecanicas || 'Sin especificar'}">🧩 <b>Mecánicas:</b> ${j.mecanicas || 'Sin especificar'}</p>
+                      <p class="text-slate-700 truncate">👶 ${formatearTextoEdad(j)}</p>
+                      <p class="text-slate-700 truncate">👥 ${formatearTextoJugadores(j)}</p>
+                      <p class="text-slate-600 text-[10px] truncate" title="${j.mecanicas || 'Sin especificar'}">🧩 ${j.mecanicas || 'Sin especificar'}</p>
                     </div>
 
-                    <!-- BLOQUE 2: ESTADÍSTICAS SIMPLIFICADAS (MISMAS ALTURAS Y SIMPLIFICADO) -->
+                    <!-- BLOQUE ESTADÍSTICAS -->
                     <div class="bg-indigo-50/70 border border-indigo-100 p-2 rounded-xl text-[10px] space-y-0.5 text-indigo-950 flex-1 flex flex-col justify-center">
-                      <p class="font-bold text-indigo-700 flex items-center gap-1">🎮 ${j.veces_jugado || 0} partidas</p>
+                      <p class="font-bold text-indigo-700 truncate">🎮 ${j.veces_jugado || 0} partidas</p>
                       <p class="truncate text-slate-600">⏱️ ${tiempoMedioStr}</p>
                       <p class="truncate text-slate-600">🕒 ${ultimaPartidaFechaStr}</p>
                       <p class="truncate text-emerald-800 font-bold">🏆 ${ganadoresLimpios}</p>
@@ -1298,17 +1296,14 @@
                   </div>
                 </div>
 
-                <!-- UBICACIÓN Y AUTORÍA (ABAJO) -->
+                <!-- UBICACIÓN Y CREADOR -->
                 <div class="text-[10px] text-slate-500 pt-0.5 flex justify-between items-center border-t border-slate-100">
-                  <span class="truncate">📍 <b>Ubicación:</b> ${j.ubicacion || 'Sin sitio'}</span>
-                  <div class="truncate text-right shrink-0">
-                    <p class="truncate">👤 Añadido: @${j.creador_nick || 'admin'}</p>
-                    ${j.modificador_nick ? `<p class="truncate text-[9px] text-slate-400">✏️ Editado: @${j.modificador_nick}</p>` : ''}
-                  </div>
+                  <span class="truncate">📍 ${j.ubicacion || 'Sin sitio'}</span>
+                  <span class="truncate text-right shrink-0">👤 @${j.creador_nick || 'admin'}</span>
                 </div>
               </div>
 
-              <!-- BOTÓN PRINCIPAL VAMOS A JUGAR -->
+              <!-- BOTÓN JUGAR -->
               <div class="p-3.5 pt-0">
                 <button onclick="abrirModalPartida('${j.id}', '${j.nombre.replace(/'/g, "\\'")}')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs card-zoom shadow-md flex items-center justify-center gap-1.5">
                   ¡Vamos a jugar!
@@ -1322,7 +1317,7 @@
         container.innerHTML = gridHTML;
 
       } else {
-        // MODO LISTA REVISADO: MÁS AMPLIO, IMAGEN MÁS GRANDE Y BOTÓN / CATEGORÍA EN SEGUNDA LÍNEA
+        // MODO LISTA: FOTO PRESIDE A LA IZQUIERDA Y DOS LÍNEAS ORGANIZADAS A LA DERECHA
         let listHTML = '<div class="space-y-2.5 max-w-4xl mx-auto">';
         filtrados.forEach(j => {
           const imagenSrc = j.foto_url || j.foto_base64 || '';
@@ -1330,36 +1325,38 @@
           const esFav = favoritosCache.includes(j.id);
 
           listHTML += `
-            <div class="bg-white p-3 rounded-2xl shadow-sm border border-slate-200 space-y-2 hover:border-indigo-200 transition">
+            <div class="bg-white p-2.5 rounded-2xl shadow-sm border border-slate-200 flex gap-3 items-stretch hover:border-indigo-200 transition">
               
-              <!-- PRIMERA LÍNEA: FAV + FOTO GRANDE + TÍTULO Y META -->
-              <div class="flex items-center gap-3 min-w-0">
-                <button onclick="toggleFavorito('${j.id}')" class="text-base shrink-0 p-1">
+              <!-- FOTO QUE PRESIDE A LA IZQUIERDA (OCUPA LA ALTURA COMPLETA) -->
+              <div onclick="abrirFichaDetallada('${j.id}')" class="w-20 bg-slate-900 rounded-xl overflow-hidden shrink-0 flex items-center justify-center relative cursor-pointer border border-slate-100 shadow-inner min-h-[70px]">
+                <button onclick="event.stopPropagation(); toggleFavorito('${j.id}')" class="absolute top-1 left-1 w-5 h-5 bg-black/60 rounded-full flex items-center justify-center text-[10px] z-10 text-white">
                   ${esFav ? '❤️' : '🤍'}
                 </button>
+                ${tieneImagen ? `<img src="${imagenSrc}" class="w-full h-full object-cover">` : '<span class="text-[9px] text-slate-400">Sin Foto</span>'}
+              </div>
 
-                <!-- IMAGEN MÁS GRANDE (14x14 = 56px) -->
-                <div onclick="abrirFichaDetallada('${j.id}')" class="w-14 h-14 bg-slate-900 rounded-xl overflow-hidden shrink-0 flex items-center justify-center relative cursor-pointer border border-slate-100 shadow-inner">
-                  ${tieneImagen ? `<img src="${imagenSrc}" class="w-full h-full object-cover">` : '<span class="text-[9px] text-slate-400">Sin Foto</span>'}
-                </div>
-
-                <div class="min-w-0 flex-grow cursor-pointer" onclick="abrirFichaDetallada('${j.id}')">
+              <!-- CONTENIDO A LA DERECHA (2 LÍNEAS) -->
+              <div class="flex-grow min-w-0 flex flex-col justify-between py-0.5">
+                
+                <!-- LÍNEA 1: TÍTULO Y DATOS RÁPIDOS -->
+                <div class="min-w-0 cursor-pointer" onclick="abrirFichaDetallada('${j.id}')">
                   <h4 class="font-black text-slate-800 text-sm leading-tight hover:text-indigo-600 transition truncate">${j.nombre}</h4>
                   <p class="text-[11px] text-slate-500 truncate mt-0.5">
                     📍 ${j.ubicacion || 'Sin sitio'} • 👶 ${formatearTextoEdad(j)} • 👥 ${formatearTextoJugadores(j)}
                   </p>
                 </div>
-              </div>
 
-              <!-- SEGUNDA LÍNEA: BADGE DE CATEGORÍA Y BOTÓN JUGAR AL LADO -->
-              <div class="flex justify-between items-center pt-1 border-t border-slate-100">
-                <span class="bg-slate-100 text-slate-700 text-[10px] font-bold px-2.5 py-1 rounded-lg border border-slate-200">
-                  ${j.categoria}
-                </span>
+                <!-- LÍNEA 2: CATEGORÍA A LA IZQUIERDA Y BOTÓN JUGAR A LA DERECHA -->
+                <div class="flex justify-between items-center pt-1 mt-1 border-t border-slate-100">
+                  <span class="bg-slate-100 text-slate-700 text-[10px] font-bold px-2 py-0.5 rounded-md border border-slate-200 truncate max-w-[120px]">
+                    ${j.categoria}
+                  </span>
 
-                <button onclick="abrirModalPartida('${j.id}', '${j.nombre.replace(/'/g, "\\'")}')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs card-zoom shadow-sm flex items-center gap-1">
-                  ¡Vamos a jugar!
-                </button>
+                  <button onclick="abrirModalPartida('${j.id}', '${j.nombre.replace(/'/g, "\\'")}')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs card-zoom shadow-sm flex items-center gap-1 shrink-0">
+                    ¡Vamos a jugar!
+                  </button>
+                </div>
+
               </div>
 
             </div>
@@ -1676,7 +1673,7 @@
       } catch (err) { alert(err.message); }
     }
 
-    // PROCESAMIENTO Y RECUPERACIÓN DE FOTO ADAPTADA
+    // PROCESAMIENTO DE FOTO
     function procesarFoto(event) {
       const file = event.target.files[0];
       if (!file) return;
