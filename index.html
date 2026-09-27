@@ -1202,7 +1202,7 @@
       renderizarTarjetas();
     }
 
-    // RENDERIZADO AJUSTADO CON PROPORCIONES Y SINTAXIS SIMPLIFICADA
+    // RENDERIZADO AJUSTADO
     function renderizarTarjetas() {
       const container = document.getElementById('mainContainer');
       const search = document.getElementById('searchInput').value.toLowerCase();
@@ -1275,7 +1275,7 @@
                     ` : '<div class="text-slate-400 text-xs text-center p-2">Sin Foto</div>'}
                   </div>
 
-                  <!-- DATOS SIMPLIFICADOS (SIN PALABRAS REPETITIVAS) -->
+                  <!-- DATOS SIMPLIFICADOS -->
                   <div class="w-7/12 min-w-0 flex flex-col justify-between gap-1.5">
                     
                     <!-- BLOQUE FICHA TÉCNICA -->
@@ -1317,7 +1317,7 @@
         container.innerHTML = gridHTML;
 
       } else {
-        // MODO LISTA: FOTO PRESIDE A LA IZQUIERDA Y DOS LÍNEAS ORGANIZADAS A LA DERECHA
+        // MODO LISTA: FOTO CUADRADA COMPACTA Y ALINEADA A LAS DOS FILAS
         let listHTML = '<div class="space-y-2.5 max-w-4xl mx-auto">';
         filtrados.forEach(j => {
           const imagenSrc = j.foto_url || j.foto_base64 || '';
@@ -1325,18 +1325,18 @@
           const esFav = favoritosCache.includes(j.id);
 
           listHTML += `
-            <div class="bg-white p-2.5 rounded-2xl shadow-sm border border-slate-200 flex gap-3 items-stretch hover:border-indigo-200 transition">
+            <div class="bg-white p-2.5 rounded-2xl shadow-sm border border-slate-200 flex gap-3 items-center hover:border-indigo-200 transition">
               
-              <!-- FOTO QUE PRESIDE A LA IZQUIERDA (OCUPA LA ALTURA COMPLETA) -->
-              <div onclick="abrirFichaDetallada('${j.id}')" class="w-20 bg-slate-900 rounded-xl overflow-hidden shrink-0 flex items-center justify-center relative cursor-pointer border border-slate-100 shadow-inner min-h-[70px]">
+              <!-- FOTO CUADRADA PERFECTA (1:1) Y TAMAÑO ADECUADO A LAS 2 FILAS -->
+              <div onclick="abrirFichaDetallada('${j.id}')" class="w-16 h-16 aspect-square bg-slate-900 rounded-xl overflow-hidden shrink-0 flex items-center justify-center relative cursor-pointer border border-slate-100 shadow-inner">
                 <button onclick="event.stopPropagation(); toggleFavorito('${j.id}')" class="absolute top-1 left-1 w-5 h-5 bg-black/60 rounded-full flex items-center justify-center text-[10px] z-10 text-white">
                   ${esFav ? '❤️' : '🤍'}
                 </button>
                 ${tieneImagen ? `<img src="${imagenSrc}" class="w-full h-full object-cover">` : '<span class="text-[9px] text-slate-400">Sin Foto</span>'}
               </div>
 
-              <!-- CONTENIDO A LA DERECHA (2 LÍNEAS) -->
-              <div class="flex-grow min-w-0 flex flex-col justify-between py-0.5">
+              <!-- CONTENIDO A LA DERECHA (2 LÍNEAS EXACTAS) -->
+              <div class="flex-grow min-w-0 flex flex-col justify-between py-0.5 gap-1.5">
                 
                 <!-- LÍNEA 1: TÍTULO Y DATOS RÁPIDOS -->
                 <div class="min-w-0 cursor-pointer" onclick="abrirFichaDetallada('${j.id}')">
@@ -1347,12 +1347,12 @@
                 </div>
 
                 <!-- LÍNEA 2: CATEGORÍA A LA IZQUIERDA Y BOTÓN JUGAR A LA DERECHA -->
-                <div class="flex justify-between items-center pt-1 mt-1 border-t border-slate-100">
+                <div class="flex justify-between items-center pt-1 border-t border-slate-100">
                   <span class="bg-slate-100 text-slate-700 text-[10px] font-bold px-2 py-0.5 rounded-md border border-slate-200 truncate max-w-[120px]">
                     ${j.categoria}
                   </span>
 
-                  <button onclick="abrirModalPartida('${j.id}', '${j.nombre.replace(/'/g, "\\'")}')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs card-zoom shadow-sm flex items-center gap-1 shrink-0">
+                  <button onclick="abrirModalPartida('${j.id}', '${j.nombre.replace(/'/g, "\\'")}')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-3 py-1 rounded-xl text-xs card-zoom shadow-sm flex items-center gap-1 shrink-0">
                     ¡Vamos a jugar!
                   </button>
                 </div>
