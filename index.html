@@ -431,7 +431,7 @@
     </div>
   </div>
 
-  <!-- MODAL FORMULARIO DE EDICIÓN / ALTA -->
+  <!-- MODAL FORMULARIO DE EDICIÓN / ALTA (CAMPOS Y ORDEN REVISADOS) -->
   <div id="modalForm" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
     <div class="bg-white rounded-2xl max-w-md w-full h-[90vh] max-h-[660px] flex flex-col shadow-2xl overflow-hidden relative border border-slate-100">
       <div class="p-3 border-b flex justify-between items-center bg-slate-50 shrink-0">
@@ -440,6 +440,7 @@
       </div>
 
       <div class="flex-grow overflow-y-auto p-3 space-y-3 text-xs">
+        <!-- 1. FOTOGRAFÍA -->
         <div class="space-y-2 bg-slate-50 p-2.5 rounded-2xl border border-slate-200">
           <div id="imagePreview" class="w-48 h-48 mx-auto bg-slate-900 rounded-xl flex items-center justify-center border-2 border-dashed border-slate-300 overflow-hidden relative shadow-inner">
             <span class="text-slate-400 text-xs text-center px-2">Sin fotografía<br><span class="text-[10px] text-slate-500">(Se adaptará a 3:4 / 4:3)</span></span>
@@ -457,16 +458,17 @@
             </button>
           </div>
 
+          <!-- 2. SECCIÓN CONSULTA AUTOMÁTICA CON DESMARCADO POR DEFECTO -->
           <div class="bg-purple-50 p-2.5 rounded-xl border border-purple-200 space-y-2 mt-2">
-            <span class="font-bold text-purple-900 text-[11px] block">✨ Consultar / Completar con IA:</span>
+            <span class="font-bold text-purple-900 text-[11px] block">✨ Consulta / Autocompletado con IA:</span>
             <div class="grid grid-cols-2 gap-1.5 text-[10px]" id="checkboxesSeccionesIA">
-              <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="datos_basicos" checked class="rounded text-purple-600"> Datos Básicos</label>
-              <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="mecanicas" checked class="rounded text-purple-600"> Mecánicas</label>
-              <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="reglas_basicas" checked class="rounded text-purple-600"> Reglas Básicas</label>
-              <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="reglas_completas" checked class="rounded text-purple-600"> Reglas Completas</label>
+              <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="datos_basicos" class="rounded text-purple-600"> Datos Básicos</label>
+              <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="mecanicas" class="rounded text-purple-600"> Mecánicas</label>
+              <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="reglas_basicas" class="rounded text-purple-600"> Reglas Básicas</label>
+              <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="reglas_completas" class="rounded text-purple-600"> Reglas Completas</label>
             </div>
-            <button type="button" onclick="analizarConIA()" id="btnIA" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 rounded-xl text-xs card-zoom shadow-sm">
-              🤖 Consultar a Gemini IA
+            <button type="button" onclick="confirmarYAnalizarConIA()" id="btnIA" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 rounded-xl text-xs card-zoom shadow-sm">
+              🤖 Consulta Automática
             </button>
           </div>
         </div>
@@ -475,28 +477,36 @@
           <input type="hidden" id="juegoId">
           <input type="hidden" id="juegoFotoBase64">
 
+          <!-- 3. NOMBRE DEL JUEGO -->
           <div>
             <label class="font-bold text-slate-600 uppercase text-[10px]">Nombre del Juego <span class="text-rose-500">*</span></label>
             <input type="text" id="nombre" required class="w-full p-2 border rounded-xl outline-none mt-0.5">
           </div>
 
+          <!-- 4 & 5. CATEGORÍA (NIVEL 1) Y TIPOLOGÍA/SOPORTE (NIVEL 2) -->
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="font-bold text-slate-600 uppercase text-[10px]">Categoría <span class="text-rose-500">*</span></label>
-              <select id="categoria" required class="w-full p-2 border rounded-xl outline-none mt-0.5 bg-white">
+              <label class="font-bold text-slate-600 uppercase text-[10px]">Categoría (Nivel 1) <span class="text-rose-500">*</span></label>
+              <select id="categoria" required class="w-full p-2 border rounded-xl outline-none mt-0.5 bg-white font-medium">
                 <option value="Juego de Mesa">Juego de Mesa</option>
+                <option value="Habilidad">Habilidad</option>
+                <option value="Puzles">Puzles</option>
                 <option value="Construcción">Construcción</option>
                 <option value="Exterior">Exterior</option>
                 <option value="Consola">Consola</option>
-                <option value="Otro">Otro</option>
+                <option value="Juguetes">Juguetes</option>
+                <option value="Lectura">Lectura</option>
+                <option value="Manualidades">Manualidades</option>
+                <option value="Música">Música</option>
               </select>
             </div>
             <div>
-              <label class="font-bold text-slate-600 uppercase text-[10px]">Tipología / Formato <span class="text-rose-500">*</span></label>
-              <input type="text" id="tipologia" required placeholder="Ej. Cartas, Tablero" class="w-full p-2 border rounded-xl outline-none mt-0.5">
+              <label class="font-bold text-slate-600 uppercase text-[10px]">Tipología / Soporte <span class="text-rose-500">*</span></label>
+              <input type="text" id="tipologia" required placeholder="Ej. Tablero, Cartas" class="w-full p-2 border rounded-xl outline-none mt-0.5">
             </div>
           </div>
 
+          <!-- 6 & 7. EDAD RECOMENDADA Y UBICACIÓN (MANUAL Y OBLIGATORIA) -->
           <div class="grid grid-cols-2 gap-2">
             <div>
               <label class="font-bold text-slate-600 uppercase text-[10px]">Edad Recomendada <span class="text-rose-500">*</span></label>
@@ -515,7 +525,7 @@
 
             <div>
               <div class="flex justify-between items-center">
-                <label class="font-bold text-slate-600 uppercase text-[10px]">Ubicación <span class="text-rose-500">*</span></label>
+                <label class="font-bold text-slate-600 uppercase text-[10px]">Ubicación (Manual) <span class="text-rose-500">*</span></label>
                 <button type="button" onclick="crearNuevaUbicacionPrompt()" class="text-[9px] text-indigo-600 font-bold">＋ Crear</button>
               </div>
               <select id="ubicacionSelect" required class="w-full p-2 border rounded-xl outline-none mt-0.5 bg-white">
@@ -524,6 +534,7 @@
             </div>
           </div>
 
+          <!-- 8. Nº DE JUGADORES PERMITIDOS -->
           <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-1.5">
             <span class="font-bold text-slate-600 uppercase text-[10px] block">Nº de Jugadores Permitidos <span class="text-rose-500">*</span></span>
             <div class="grid grid-cols-2 gap-2">
@@ -556,34 +567,38 @@
             </div>
           </div>
 
+          <!-- 9. MECÁNICAS (NIVEL 3) -->
           <div>
-            <label class="font-bold text-slate-600 uppercase text-[10px]">Mecánicas (MÁXIMO 3) <span class="text-rose-500">*</span></label>
-            <input type="text" id="mecanicas" required placeholder="Ej. Gestión de mano, Fastidiar, Colección" class="w-full p-2 border rounded-xl outline-none mt-0.5">
+            <label class="font-bold text-slate-600 uppercase text-[10px]">Mecánicas (Nivel 3 - Máx 3) <span class="text-rose-500">*</span></label>
+            <input type="text" id="mecanicas" required placeholder="Ej. Estrategia, Enfrentamiento" class="w-full p-2 border rounded-xl outline-none mt-0.5">
           </div>
 
+          <!-- 10. REGLAS BÁSICAS (RESUMEN) -->
           <div>
             <label class="font-bold text-slate-600 uppercase text-[10px]">Reglas Básicas (Resumen)</label>
             <textarea id="instrucciones" rows="2" placeholder="Resumen de 2 o 3 frases..." class="w-full p-2 border rounded-xl outline-none mt-0.5 text-xs"></textarea>
           </div>
 
+          <!-- 11. REGLAS COMPLETAS PASO A PASO -->
           <div>
             <label class="font-bold text-slate-600 uppercase text-[10px]">Reglas Completas Paso a Paso</label>
             <textarea id="instruccionesCompletas" rows="4" placeholder="Desarrollo oficial paso a paso..." class="w-full p-2 border rounded-xl outline-none mt-0.5 text-xs"></textarea>
           </div>
 
+          <!-- 12. ARCHIVOS / VÍDEOS ENLACES -->
           <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-2.5">
-            <span class="font-bold text-slate-600 uppercase text-[10px] block">📎 Enlaces de Recursos (PDF y Vídeo)</span>
+            <span class="font-bold text-slate-600 uppercase text-[10px] block">📎 Enlaces de Recursos (PDF R2 y Vídeo)</span>
             
             <div class="space-y-1">
               <div class="flex justify-between items-center">
                 <label class="text-[9px] text-slate-500 font-bold uppercase">Documento PDF Instrucciones</label>
                 <div class="flex gap-1">
                   <input type="file" id="inputPdfForm" accept="application/pdf" onchange="cargarPdfEnFormulario(event)" class="hidden">
-                  <button type="button" onclick="document.getElementById('inputPdfForm').click()" class="text-[9px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-1.5 py-0.5 rounded">📄 Subir / Cambiar</button>
+                  <button type="button" onclick="document.getElementById('inputPdfForm').click()" class="text-[9px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-1.5 py-0.5 rounded">📄 Cargar PDF</button>
                   <button type="button" onclick="borrarPdfFormulario()" class="text-[9px] bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold px-1.5 py-0.5 rounded">🗑️ Borrar</button>
                 </div>
               </div>
-              <input type="url" id="pdf_reglas_url" placeholder="https://ejemplo.com/manual.pdf o archivo cargado" class="w-full p-2 border rounded-xl outline-none bg-white text-xs">
+              <input type="url" id="pdf_reglas_url" placeholder="URL o archivo cargado..." class="w-full p-2 border rounded-xl outline-none bg-white text-xs" readonly>
             </div>
 
             <div class="space-y-1 border-t pt-2">
@@ -798,13 +813,12 @@
     let seccionesMarcadasIA = [];
     let audioCtx = null;
 
-    // UNIFICACIÓN DE CAMPOS COMPARABLES
     const MAPA_CAMPOS_IA = [
       { key: 'nombre', label: 'Nombre del Juego', idElem: 'nombre', grupo: 'datos_basicos' },
-      { key: 'categoria', label: 'Categoría', idElem: 'categoria', grupo: 'datos_basicos' },
-      { key: 'tipologia', label: 'Tipología / Formato', idElem: 'tipologia', grupo: 'datos_basicos' },
+      { key: 'categoria', label: 'Categoría (Nivel 1)', idElem: 'categoria', grupo: 'datos_basicos' },
+      { key: 'tipologia', label: 'Tipología / Soporte (Nivel 2)', idElem: 'tipologia', grupo: 'datos_basicos' },
       { key: 'edad', label: 'Edad Recomendada', idElem: 'edad', grupo: 'datos_basicos' },
-      { key: 'mecanicas', label: 'Mecánicas (Máx 3)', idElem: 'mecanicas', grupo: 'mecanicas' },
+      { key: 'mecanicas', label: 'Mecánicas (Nivel 3 - Máx 3)', idElem: 'mecanicas', grupo: 'mecanicas' },
       { key: 'instrucciones', label: 'Reglas Básicas (Resumen)', idElem: 'instrucciones', grupo: 'reglas_basicas' },
       { key: 'instruccionesCompletas', label: 'Reglas Completas Paso a Paso', idElem: 'instruccionesCompletas', grupo: 'reglas_completas' }
     ];
@@ -1140,13 +1154,14 @@
       reader.onload = async (event) => {
         const base64Pdf = event.target.result;
         try {
-          await fetchSeguro(`/api/juegos/${juegoActualFicha.id}/recursos`, {
+          const res = await fetchSeguro(`/api/juegos/${juegoActualFicha.id}/recursos`, {
             method: 'PUT',
             body: JSON.stringify({ pdf_reglas_url: base64Pdf, video_tutorial_url: juegoActualFicha.video_tutorial_url })
           });
-          juegoActualFicha.pdf_reglas_url = base64Pdf;
+          const json = await res.json();
+          juegoActualFicha.pdf_reglas_url = json.pdf_url || base64Pdf;
           actualizarBotonesRecursosFicha();
-          alert("✅ Documento PDF guardado correctamente.");
+          alert("✅ Documento PDF guardado correctamente en R2.");
         } catch(err) { alert(err.message); }
       };
       reader.readAsDataURL(file);
@@ -1354,10 +1369,14 @@
       }
     }
 
+    // ABRIR FORMULARIO: DESMARCADO DE CHECKBOXES IA POR DEFECTO
     function abrirModalFormulario(juegoAEditar = null) {
       const form = document.getElementById('juegoForm');
       form.reset();
       poblarSelectUbicaciones();
+
+      // Desmarcar todas las opciones de consulta IA por defecto
+      document.querySelectorAll('#checkboxesSeccionesIA input[type="checkbox"]').forEach(cb => cb.checked = false);
 
       if (juegoAEditar) {
         document.getElementById('modalTitulo').innerText = "Editar Ficha de Juego";
@@ -1406,7 +1425,7 @@
       const reader = new FileReader();
       reader.onload = (e) => {
         document.getElementById('pdf_reglas_url').value = e.target.result;
-        alert("✅ Archivo PDF cargado en el formulario.");
+        alert("📄 Documento PDF listo para ser subido a Cloudflare R2.");
       };
       reader.readAsDataURL(file);
     }
@@ -1414,12 +1433,12 @@
     function borrarPdfFormulario() {
       document.getElementById('pdf_reglas_url').value = '';
       document.getElementById('inputPdfForm').value = '';
-      alert("📄 Enlace de PDF eliminado del formulario.");
+      alert("📄 Archivo PDF desvinculado.");
     }
 
     function borrarVideoFormulario() {
       document.getElementById('video_tutorial_url').value = '';
-      alert("🎬 Enlace de vídeo eliminado del formulario.");
+      alert("🎬 Enlace de vídeo eliminado.");
     }
 
     async function preprocesarGuardadoJuego(e) {
@@ -1437,7 +1456,7 @@
         if (check.existe) {
           const confirmarVariante = confirm(
             `⚠️ ATENCIÓN: Ya existe un juego registrado con el nombre "${check.juego_existente}".\n\n` +
-            `Si se trata de una versión, expansión o variante diferente, presiona OK para guardarlo como una nueva ficha independiente.\n` +
+            `Si se trata de una versión o variante diferente, presiona OK para guardarlo como nueva ficha.\n` +
             `De lo contrario, pulsa Cancelar para modificar el nombre.`
           );
           if (!confirmarVariante) return;
@@ -1449,7 +1468,7 @@
 
     async function guardarJuego() {
       const btn = document.getElementById('btnGuardar');
-      btn.innerText = "Subiendo...";
+      btn.innerText = "Subiendo a R2 / Nube...";
       btn.disabled = true;
 
       const idActual = document.getElementById('juegoId').value;
@@ -1489,12 +1508,31 @@
       finally { btn.innerText = "Guardar en la Nube"; btn.disabled = false; }
     }
 
+    // CONFIRMACIÓN PREVIA Y EJECUCIÓN DE CONSULTA AUTOMÁTICA
+    function confirmarYAnalizarConIA() {
+      const seleccionados = Array.from(document.querySelectorAll('#checkboxesSeccionesIA input:checked')).map(el => {
+        if (el.value === 'datos_basicos') return "Datos Básicos";
+        if (el.value === 'mecanicas') return "Mecánicas";
+        if (el.value === 'reglas_basicas') return "Reglas Básicas";
+        if (el.value === 'reglas_completas') return "Reglas Completas";
+        return el.value;
+      });
+
+      if (seleccionados.length === 0) {
+        return alert("Por favor, marca al menos una opción para realizar la Consulta Automática.");
+      }
+
+      const confirmar = confirm(`🤖 ¿Deseas iniciar la Consulta Automática con IA para las siguientes secciones?\n\n- ${seleccionados.join('\n- ')}\n\nEsta acción consultará a Gemini para autocompletar la ficha.`);
+      if (confirmar) {
+        analizarConIA();
+      }
+    }
+
     async function analizarConIA() {
       const base64 = document.getElementById('juegoFotoBase64').value;
       const nombreActual = document.getElementById('nombre').value;
       
       seccionesMarcadasIA = Array.from(document.querySelectorAll('#checkboxesSeccionesIA input:checked')).map(el => el.value);
-      if (seccionesMarcadasIA.length === 0) return alert("Selecciona al menos una sección para consultar a la IA.");
 
       if (!base64 && !nombreActual) return alert("Sube una foto o escribe el nombre del juego para que Gemini pueda identificarlo.");
 
@@ -1516,10 +1554,9 @@
 
         abrirComparadorIA();
       } catch (err) { alert(err.message); }
-      finally { btnIA.innerText = "🤖 Consultar a Gemini IA"; btnIA.disabled = false; }
+      finally { btnIA.innerText = "🤖 Consulta Automática"; btnIA.disabled = false; }
     }
 
-    // COMPARADOR DE IA ADAPTADO PARA SOPORTAR DATOS BÁSICOS
     function abrirComparadorIA() {
       if (!datosAnalizadosIA) return;
 
@@ -1583,7 +1620,6 @@
         }
       });
 
-      // ASIGNACIÓN AUTOMÁTICA DE NÚMERO DE JUGADORES
       if (seccionesMarcadasIA.includes('datos_basicos')) {
         if (datosAnalizadosIA.min_jugadores) {
           const elMin = document.getElementById('minJugadoresSelect');
@@ -1666,13 +1702,13 @@
       const id = document.getElementById('juegoId').value;
       if (!id) return;
 
-      if (!confirm("⚠️ ¿Estás COMPLETAMENTE seguro de que deseas eliminar permanentemente este juego y todo su historial?")) return;
+      if (!confirm("⚠️ ¿Estás COMPLETAMENTE seguro de que deseas eliminar permanentemente este juego, su imagen y su manual PDF de Cloudflare R2?")) return;
 
       try {
         await fetchSeguro(`/api/juegos/${id}`, { method: 'DELETE' });
         cerrarModalFormulario();
         cargarJuegos();
-        alert("El juego ha sido eliminado.");
+        alert("El juego y todos sus archivos asociados han sido eliminados.");
       } catch (err) { alert(err.message); }
     }
 
