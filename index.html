@@ -261,7 +261,7 @@
       <div class="p-3 border-b flex justify-between items-center bg-slate-50 shrink-0">
         <h3 class="font-bold text-base text-slate-800 truncate pr-2" id="fichaTitulo">Detalles del Juego</h3>
         <div class="flex items-center gap-1.5">
-          <button id="btnEditarDesdeFicha" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-2.5 py-1 rounded-lg transition">✏️️ Editar</button>
+          <button id="btnEditarDesdeFicha" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-2.5 py-1 rounded-lg transition">✏ Editar</button>
           <button onclick="cerrarFichaModal()" class="text-slate-400 font-bold text-xl px-1">✕</button>
         </div>
       </div>
@@ -459,10 +459,10 @@
           <div class="bg-purple-50 p-2.5 rounded-xl border border-purple-200 space-y-2 mt-2">
             <span class="font-bold text-purple-900 text-[11px] block">✨ Consulta / Autocompletado con IA:</span>
             <div class="grid grid-cols-2 gap-1.5 text-[10px]" id="checkboxesSeccionesIA">
-              <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="datos_basicos" class="rounded text-purple-600"> Datos Básicos</label>
-              <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="mecanicas" class="rounded text-purple-600"> Mecánicas</label>
-              <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="reglas_basicas" class="rounded text-purple-600"> Reglas Básicas</label>
-              <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="reglas_completas" class="rounded text-purple-600"> Reglas Completas</label>
+              <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="datos_basicos" class="rounded text-purple-600" checked> Datos Básicos</label>
+              <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="mecanicas" class="rounded text-purple-600" checked> Mecánicas</label>
+              <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="reglas_basicas" class="rounded text-purple-600" checked> Reglas Básicas</label>
+              <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="reglas_completas" class="rounded text-purple-600" checked> Reglas Completas</label>
             </div>
             <button type="button" onclick="confirmarYAnalizarConIA()" id="btnIA" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 rounded-xl text-xs card-zoom shadow-sm">
               🤖 Consulta Automática
@@ -1272,7 +1272,7 @@
                 <div class="flex gap-3 items-stretch">
                   <div onclick="abrirFichaDetallada('${j.id}')" class="w-36 h-36 bg-slate-900 rounded-2xl relative flex items-center justify-center overflow-hidden cursor-pointer shrink-0 border border-slate-100 shadow-inner">
                     <button onclick="event.stopPropagation(); toggleFavorito('${j.id}')" class="absolute top-1.5 left-1.5 w-6 h-6 bg-black/60 hover:bg-black/80 rounded-full flex items-center justify-center text-xs z-20 backdrop-blur-md card-zoom shadow-md text-white">
-                      ${esFav ? '❤️️' : '🤍'}
+                      ${esFav ? '❤' : '🤍'}
                     </button>
                     ${tieneImagen ? `<img src="${imagenSrc}" class="w-full h-full object-contain p-1 relative z-10 rounded-xl">` : '<div class="text-slate-400 text-xs text-center p-2">Sin Foto</div>'}
                   </div>
@@ -1365,7 +1365,7 @@
       form.reset();
       poblarSelectUbicaciones();
 
-      // AL EDITAR O CREAR, SE SELECCIONAN TODOS LOS CHECKBOXES POR DEFECTO PARA QUE LA CONSULTA SEA COMPLETA
+      // AL EDITAR O CREAR, SE SELECCIONAN TODOS LOS CHECKBOXES DE IA POR DEFECTO
       document.querySelectorAll('#checkboxesSeccionesIA input[type="checkbox"]').forEach(cb => cb.checked = true);
 
       if (juegoAEditar) {
@@ -1671,7 +1671,6 @@
 
     function cerrarComparadorIA() { document.getElementById('modalComparadorIA').classList.add('hidden'); }
 
-    // TRANSFERENCIA CORREGIDA Y RIGUROSA AL FORMULARIO
     function aplicarSeleccionComparador() {
       MAPA_CAMPOS_IA.forEach(campo => {
         const modo = seleccionesComparadorIA[campo.idElem];
@@ -1700,7 +1699,6 @@
                 if (existeOpcion) {
                   targetElem.value = valorAAplicar;
                 } else {
-                  // Si es un desplegable y la opción no existe, la añade dinámicamente
                   const nuevaOpt = document.createElement('option');
                   nuevaOpt.value = valorAAplicar;
                   nuevaOpt.text = valorAAplicar;
@@ -1723,7 +1721,7 @@
       const id = document.getElementById('juegoId').value;
       if (!id) return;
 
-      if (!confirm("⚠️ ¿Estás COMPLETAMENTE seguro de que deseas eliminar permanentemente este juego, su imagen y su manual PDF de Cloudflare R2?")) return;
+      if (!confirm("⚠️️ ¿Estás COMPLETAMENTE seguro de que deseas eliminar permanentemente este juego, su imagen y su manual PDF de Cloudflare R2?")) return;
 
       try {
         await fetchSeguro(`/api/juegos/${id}`, { method: 'DELETE' });
