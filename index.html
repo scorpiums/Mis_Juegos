@@ -163,7 +163,7 @@
       </div>
     </header>
 
-    <!-- MENÚ SUPERIOR ANCLADO -->
+    <!-- MENÚ SUPERIOR -->
     <div class="sticky top-[48px] z-30 bg-slate-100 p-3 border-b border-slate-200 shadow-md">
       <div class="max-w-4xl mx-auto space-y-2.5">
         <div class="flex gap-1.5">
@@ -178,7 +178,6 @@
           </button>
         </div>
 
-        <!-- PANEL FILTROS AVANZADOS -->
         <div id="panelFiltrosAvanzados" class="hidden bg-white p-3.5 rounded-2xl border border-slate-200 shadow-md space-y-3 text-xs">
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
@@ -256,7 +255,7 @@
     </button>
   </div>
 
-  <!-- MODAL FICHA DETALLADA DEL JUEGO -->
+  <!-- MODAL FICHA DETALLADA -->
   <div id="modalFichaJuego" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
     <div class="bg-white rounded-2xl max-w-md w-full h-[85vh] max-h-[620px] flex flex-col shadow-2xl overflow-hidden relative border border-slate-100">
       <div class="p-3 border-b flex justify-between items-center bg-slate-50 shrink-0">
@@ -431,7 +430,7 @@
     </div>
   </div>
 
-  <!-- MODAL FORMULARIO DE EDICIÓN / ALTA (CAMPOS Y ORDEN REVISADOS) -->
+  <!-- MODAL FORMULARIO DE EDICIÓN / ALTA -->
   <div id="modalForm" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
     <div class="bg-white rounded-2xl max-w-md w-full h-[90vh] max-h-[660px] flex flex-col shadow-2xl overflow-hidden relative border border-slate-100">
       <div class="p-3 border-b flex justify-between items-center bg-slate-50 shrink-0">
@@ -440,7 +439,6 @@
       </div>
 
       <div class="flex-grow overflow-y-auto p-3 space-y-3 text-xs">
-        <!-- 1. FOTOGRAFÍA -->
         <div class="space-y-2 bg-slate-50 p-2.5 rounded-2xl border border-slate-200">
           <div id="imagePreview" class="w-48 h-48 mx-auto bg-slate-900 rounded-xl flex items-center justify-center border-2 border-dashed border-slate-300 overflow-hidden relative shadow-inner">
             <span class="text-slate-400 text-xs text-center px-2">Sin fotografía<br><span class="text-[10px] text-slate-500">(Se adaptará a 3:4 / 4:3)</span></span>
@@ -458,7 +456,6 @@
             </button>
           </div>
 
-          <!-- 2. SECCIÓN CONSULTA AUTOMÁTICA CON DESMARCADO POR DEFECTO -->
           <div class="bg-purple-50 p-2.5 rounded-xl border border-purple-200 space-y-2 mt-2">
             <span class="font-bold text-purple-900 text-[11px] block">✨ Consulta / Autocompletado con IA:</span>
             <div class="grid grid-cols-2 gap-1.5 text-[10px]" id="checkboxesSeccionesIA">
@@ -477,13 +474,11 @@
           <input type="hidden" id="juegoId">
           <input type="hidden" id="juegoFotoBase64">
 
-          <!-- 3. NOMBRE DEL JUEGO -->
           <div>
             <label class="font-bold text-slate-600 uppercase text-[10px]">Nombre del Juego <span class="text-rose-500">*</span></label>
             <input type="text" id="nombre" required class="w-full p-2 border rounded-xl outline-none mt-0.5">
           </div>
 
-          <!-- 4 & 5. CATEGORÍA (NIVEL 1) Y TIPOLOGÍA/SOPORTE (NIVEL 2) -->
           <div class="grid grid-cols-2 gap-2">
             <div>
               <label class="font-bold text-slate-600 uppercase text-[10px]">Categoría (Nivel 1) <span class="text-rose-500">*</span></label>
@@ -506,7 +501,6 @@
             </div>
           </div>
 
-          <!-- 6 & 7. EDAD RECOMENDADA Y UBICACIÓN (MANUAL Y OBLIGATORIA) -->
           <div class="grid grid-cols-2 gap-2">
             <div>
               <label class="font-bold text-slate-600 uppercase text-[10px]">Edad Recomendada <span class="text-rose-500">*</span></label>
@@ -534,7 +528,6 @@
             </div>
           </div>
 
-          <!-- 8. Nº DE JUGADORES PERMITIDOS -->
           <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-1.5">
             <span class="font-bold text-slate-600 uppercase text-[10px] block">Nº de Jugadores Permitidos <span class="text-rose-500">*</span></span>
             <div class="grid grid-cols-2 gap-2">
@@ -567,25 +560,21 @@
             </div>
           </div>
 
-          <!-- 9. MECÁNICAS (NIVEL 3) -->
           <div>
             <label class="font-bold text-slate-600 uppercase text-[10px]">Mecánicas (Nivel 3 - Máx 3) <span class="text-rose-500">*</span></label>
             <input type="text" id="mecanicas" required placeholder="Ej. Estrategia, Enfrentamiento" class="w-full p-2 border rounded-xl outline-none mt-0.5">
           </div>
 
-          <!-- 10. REGLAS BÁSICAS (RESUMEN) -->
           <div>
             <label class="font-bold text-slate-600 uppercase text-[10px]">Reglas Básicas (Resumen)</label>
             <textarea id="instrucciones" rows="2" placeholder="Resumen de 2 o 3 frases..." class="w-full p-2 border rounded-xl outline-none mt-0.5 text-xs"></textarea>
           </div>
 
-          <!-- 11. REGLAS COMPLETAS PASO A PASO -->
           <div>
             <label class="font-bold text-slate-600 uppercase text-[10px]">Reglas Completas Paso a Paso</label>
             <textarea id="instruccionesCompletas" rows="4" placeholder="Desarrollo oficial paso a paso..." class="w-full p-2 border rounded-xl outline-none mt-0.5 text-xs"></textarea>
           </div>
 
-          <!-- 12. ARCHIVOS / VÍDEOS ENLACES -->
           <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-2.5">
             <span class="font-bold text-slate-600 uppercase text-[10px] block">📎 Enlaces de Recursos (PDF R2 y Vídeo)</span>
             
@@ -624,7 +613,7 @@
     </div>
   </div>
 
-  <!-- MODAL COMPARADOR IA -->
+  <!-- MODAL COMPARADOR IA (MAPEO COMPLETO Y CORREGIDO DE DATOS BÁSICOS) -->
   <div id="modalComparadorIA" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 hidden flex items-center justify-center p-3">
     <div class="bg-white rounded-2xl max-w-lg w-full h-[85vh] max-h-[620px] flex flex-col shadow-2xl overflow-hidden relative border border-purple-200">
       <div class="p-3 border-b bg-purple-900 text-white flex justify-between items-center shrink-0">
@@ -813,11 +802,13 @@
     let seccionesMarcadasIA = [];
     let audioCtx = null;
 
+    // MAPA DE CAMPOS COMPLETO PARA EL COMPARADOR INTERACTIVO
     const MAPA_CAMPOS_IA = [
       { key: 'nombre', label: 'Nombre del Juego', idElem: 'nombre', grupo: 'datos_basicos' },
       { key: 'categoria', label: 'Categoría (Nivel 1)', idElem: 'categoria', grupo: 'datos_basicos' },
       { key: 'tipologia', label: 'Tipología / Soporte (Nivel 2)', idElem: 'tipologia', grupo: 'datos_basicos' },
       { key: 'edad', label: 'Edad Recomendada', idElem: 'edad', grupo: 'datos_basicos' },
+      { key: 'jugadores_texto', label: 'Nº de Jugadores (Mín - Máx)', idElem: 'jugadores_rango', grupo: 'datos_basicos' },
       { key: 'mecanicas', label: 'Mecánicas (Nivel 3 - Máx 3)', idElem: 'mecanicas', grupo: 'mecanicas' },
       { key: 'instrucciones', label: 'Reglas Básicas (Resumen)', idElem: 'instrucciones', grupo: 'reglas_basicas' },
       { key: 'instruccionesCompletas', label: 'Reglas Completas Paso a Paso', idElem: 'instruccionesCompletas', grupo: 'reglas_completas' }
@@ -1161,7 +1152,7 @@
           const json = await res.json();
           juegoActualFicha.pdf_reglas_url = json.pdf_url || base64Pdf;
           actualizarBotonesRecursosFicha();
-          alert("✅ Documento PDF guardado correctamente en R2.");
+          alert("✅ Documento PDF guardado correctamente en Cloudflare R2.");
         } catch(err) { alert(err.message); }
       };
       reader.readAsDataURL(file);
@@ -1369,13 +1360,11 @@
       }
     }
 
-    // ABRIR FORMULARIO: DESMARCADO DE CHECKBOXES IA POR DEFECTO
     function abrirModalFormulario(juegoAEditar = null) {
       const form = document.getElementById('juegoForm');
       form.reset();
       poblarSelectUbicaciones();
 
-      // Desmarcar todas las opciones de consulta IA por defecto
       document.querySelectorAll('#checkboxesSeccionesIA input[type="checkbox"]').forEach(cb => cb.checked = false);
 
       if (juegoAEditar) {
@@ -1508,7 +1497,6 @@
       finally { btn.innerText = "Guardar en la Nube"; btn.disabled = false; }
     }
 
-    // CONFIRMACIÓN PREVIA Y EJECUCIÓN DE CONSULTA AUTOMÁTICA
     function confirmarYAnalizarConIA() {
       const seleccionados = Array.from(document.querySelectorAll('#checkboxesSeccionesIA input:checked')).map(el => {
         if (el.value === 'datos_basicos') return "Datos Básicos";
@@ -1557,6 +1545,7 @@
       finally { btnIA.innerText = "🤖 Consulta Automática"; btnIA.disabled = false; }
     }
 
+    // COMPARADOR INTERACTIVO RENDERIZADO COMPLETO Y CORREGIDO
     function abrirComparadorIA() {
       if (!datosAnalizadosIA) return;
 
@@ -1564,11 +1553,20 @@
       contenedor.innerHTML = '';
       seleccionesComparadorIA = {};
 
+      const minJ = parseInt(datosAnalizadosIA.min_jugadores) || 1;
+      const maxJ = parseInt(datosAnalizadosIA.max_jugadores) || 4;
+      const textoJugadoresIA = minJ === maxJ ? `${minJ} jugador${minJ > 1 ? 'es' : ''}` : maxJ >= 99 ? `${minJ}+ jugadores` : `${minJ} - ${maxJ} jugadores`;
+
+      const minOrig = document.getElementById('minJugadoresSelect').value;
+      const maxOrig = document.getElementById('maxJugadoresSelect').value;
+      const textoJugadoresOrig = minOrig === maxOrig ? `${minOrig} jugador${minOrig > 1 ? 'es' : ''}` : maxOrig >= 99 ? `${minOrig}+ jugadores` : `${minOrig} - ${maxOrig} jugadores`;
+
       const iaNormalizada = {
         nombre: aTextoPlano(datosAnalizadosIA.nombre),
         categoria: aTextoPlano(datosAnalizadosIA.categoria),
         tipologia: aTextoPlano(datosAnalizadosIA.tipologia),
         edad: aTextoPlano(datosAnalizadosIA.edad),
+        jugadores_texto: textoJugadoresIA,
         mecanicas: aTextoPlano(datosAnalizadosIA.mecanicas).split(',').map(s => s.trim()).filter(Boolean).slice(0, 3).join(', '),
         instrucciones: aTextoPlano(datosAnalizadosIA.instrucciones || datosAnalizadosIA.reglas_basicas),
         instruccionesCompletas: aTextoPlano(datosAnalizadosIA.instrucciones_completas || datosAnalizadosIA.reglas_completas || datosAnalizadosIA.instruccionesCompletas)
@@ -1580,8 +1578,14 @@
         if (!seccionesMarcadasIA.includes(campo.grupo)) return;
 
         const valIA = iaNormalizada[campo.key];
-        const elemForm = document.getElementById(campo.idElem);
-        const valActual = elemForm ? elemForm.value : '';
+        
+        let valActual = '';
+        if (campo.idElem === 'jugadores_rango') {
+          valActual = textoJugadoresOrig;
+        } else {
+          const elemForm = document.getElementById(campo.idElem);
+          valActual = elemForm ? elemForm.value : '';
+        }
 
         if (valIA && valIA.trim().length > 0) {
           bloquesGenerados++;
@@ -1611,7 +1615,7 @@
 
               <div class="pt-1">
                 <button type="button" onclick="toggleEdicionManualComparador('${campo.idElem}')" class="text-[10px] text-indigo-600 font-bold underline">
-                  ✏️ O combinar / editar manualmente
+                  ✏️️ O combinar / editar manualmente
                 </button>
                 <textarea id="manual_${campo.idElem}" rows="2" class="w-full p-2 border rounded-lg outline-none text-xs hidden mt-1 bg-white" placeholder="Escribe tu texto combinado aquí...">${valIA}</textarea>
               </div>
@@ -1619,17 +1623,6 @@
           `;
         }
       });
-
-      if (seccionesMarcadasIA.includes('datos_basicos')) {
-        if (datosAnalizadosIA.min_jugadores) {
-          const elMin = document.getElementById('minJugadoresSelect');
-          if (elMin) elMin.value = datosAnalizadosIA.min_jugadores;
-        }
-        if (datosAnalizadosIA.max_jugadores) {
-          const elMax = document.getElementById('maxJugadoresSelect');
-          if (elMax) elMax.value = datosAnalizadosIA.max_jugadores;
-        }
-      }
 
       if (bloquesGenerados === 0) {
         contenedor.innerHTML = `
@@ -1681,15 +1674,22 @@
     function aplicarSeleccionComparador() {
       MAPA_CAMPOS_IA.forEach(campo => {
         const modo = seleccionesComparadorIA[campo.idElem];
-        const targetElem = document.getElementById(campo.idElem);
 
-        if (targetElem && modo) {
+        if (campo.idElem === 'jugadores_rango') {
           if (modo === 'ia') {
-            const valIA = aTextoPlano(datosAnalizadosIA[campo.key] || datosAnalizadosIA.instrucciones_completas || datosAnalizadosIA.instrucciones);
-            if (valIA) targetElem.value = valIA;
-          } else if (modo === 'manual') {
-            const areaManual = document.getElementById(`manual_${campo.idElem}`);
-            if (areaManual && areaManual.value.trim()) targetElem.value = areaManual.value;
+            if (datosAnalizadosIA.min_jugadores) document.getElementById('minJugadoresSelect').value = datosAnalizadosIA.min_jugadores;
+            if (datosAnalizadosIA.max_jugadores) document.getElementById('maxJugadoresSelect').value = datosAnalizadosIA.max_jugadores;
+          }
+        } else {
+          const targetElem = document.getElementById(campo.idElem);
+          if (targetElem && modo) {
+            if (modo === 'ia') {
+              const valIA = aTextoPlano(datosAnalizadosIA[campo.key] || datosAnalizadosIA.instrucciones_completas || datosAnalizadosIA.instrucciones);
+              if (valIA) targetElem.value = valIA;
+            } else if (modo === 'manual') {
+              const areaManual = document.getElementById(`manual_${campo.idElem}`);
+              if (areaManual && areaManual.value.trim()) targetElem.value = areaManual.value;
+            }
           }
         }
       });
@@ -1776,7 +1776,7 @@
 
       let seleccionado = null;
       if (modo === 'compensado') {
-        elegibles.sort((a,b) => (a.veces_jugado || 0) - (b.veces_jugado || 0));
+        elegibles.sort((a,b) => (a.veces_jugado || 0) - (a.veces_jugado || 0));
         seleccionado = elegibles[0];
       } else {
         seleccionado = elegibles[Math.floor(Math.random() * elegibles.length)];
