@@ -261,7 +261,7 @@
       <div class="p-3 border-b flex justify-between items-center bg-slate-50 shrink-0">
         <h3 class="font-bold text-base text-slate-800 truncate pr-2" id="fichaTitulo">Detalles del Juego</h3>
         <div class="flex items-center gap-1.5">
-          <button id="btnEditarDesdeFicha" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-2.5 py-1 rounded-lg transition">✏️ Editar</button>
+          <button id="btnEditarDesdeFicha" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-2.5 py-1 rounded-lg transition">✏️️ Editar</button>
           <button onclick="cerrarFichaModal()" class="text-slate-400 font-bold text-xl px-1">✕</button>
         </div>
       </div>
@@ -613,7 +613,7 @@
     </div>
   </div>
 
-  <!-- MODAL COMPARADOR IA (EDITAR MANUALMENTE CORREGIDO) -->
+  <!-- MODAL COMPARADOR IA -->
   <div id="modalComparadorIA" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 hidden flex items-center justify-center p-3">
     <div class="bg-white rounded-2xl max-w-lg w-full h-[85vh] max-h-[620px] flex flex-col shadow-2xl overflow-hidden relative border border-purple-200">
       <div class="p-3 border-b bg-purple-900 text-white flex justify-between items-center shrink-0">
@@ -802,7 +802,7 @@
     let seccionesMarcadasIA = [];
     let audioCtx = null;
 
-    // MAPA DE CAMPOS REVISADO Y ALINEADO CON EL FORMULARIO
+    // MAPA DE CAMPOS COMPLETO Y ALINEADO CON EL FORMULARIO
     const MAPA_CAMPOS_IA = [
       { key: 'nombre', label: 'Nombre del Juego', idElem: 'nombre', grupo: 'datos_basicos' },
       { key: 'categoria', label: 'Categoría (Nivel 1)', idElem: 'categoria', grupo: 'datos_basicos' },
@@ -811,7 +811,7 @@
       { key: 'jugadores_texto', label: 'Nº de Jugadores (Mín - Máx)', idElem: 'jugadores_rango', grupo: 'datos_basicos' },
       { key: 'mecanicas', label: 'Mecánicas (Nivel 3 - Máx 3)', idElem: 'mecanicas', grupo: 'mecanicas' },
       { key: 'instrucciones', label: 'Reglas Básicas (Resumen)', idElem: 'instrucciones', grupo: 'reglas_basicas' },
-      { key: 'instruccionesCompletas', label: 'Reglas Completas Paso a Paso', idElem: 'instruccionesCompletas', grupo: 'reglas_completas' }
+      { key: 'instrucciones_completas', label: 'Reglas Completas Paso a Paso', idElem: 'instruccionesCompletas', grupo: 'reglas_completas' }
     ];
 
     function aTextoPlano(val) {
@@ -1272,7 +1272,7 @@
                 <div class="flex gap-3 items-stretch">
                   <div onclick="abrirFichaDetallada('${j.id}')" class="w-36 h-36 bg-slate-900 rounded-2xl relative flex items-center justify-center overflow-hidden cursor-pointer shrink-0 border border-slate-100 shadow-inner">
                     <button onclick="event.stopPropagation(); toggleFavorito('${j.id}')" class="absolute top-1.5 left-1.5 w-6 h-6 bg-black/60 hover:bg-black/80 rounded-full flex items-center justify-center text-xs z-20 backdrop-blur-md card-zoom shadow-md text-white">
-                      ${esFav ? '❤️' : '🤍'}
+                      ${esFav ? '❤️️' : '🤍'}
                     </button>
                     ${tieneImagen ? `<img src="${imagenSrc}" class="w-full h-full object-contain p-1 relative z-10 rounded-xl">` : '<div class="text-slate-400 text-xs text-center p-2">Sin Foto</div>'}
                   </div>
@@ -1343,7 +1343,7 @@
                       ${j.categoria}
                     </span>
                     <span class="text-[10px] text-slate-500 truncate">
-                      🏷️️ ${j.tipologia || 'General'}
+                      🏷️ ${j.tipologia || 'General'}
                     </span>
                   </div>
 
@@ -1365,7 +1365,8 @@
       form.reset();
       poblarSelectUbicaciones();
 
-      document.querySelectorAll('#checkboxesSeccionesIA input[type="checkbox"]').forEach(cb => cb.checked = false);
+      // AL EDITAR O CREAR, SE SELECCIONAN TODOS LOS CHECKBOXES POR DEFECTO PARA QUE LA CONSULTA SEA COMPLETA
+      document.querySelectorAll('#checkboxesSeccionesIA input[type="checkbox"]').forEach(cb => cb.checked = true);
 
       if (juegoAEditar) {
         document.getElementById('modalTitulo').innerText = "Editar Ficha de Juego";
@@ -1545,7 +1546,6 @@
       finally { btnIA.innerText = "🤖 Consulta Automática"; btnIA.disabled = false; }
     }
 
-    // COMPARADOR INTERACTIVO CON INTEGRACIÓN TOTAL Y TEXTO ACTUALIZADO
     function abrirComparadorIA() {
       if (!datosAnalizadosIA) return;
 
@@ -1568,8 +1568,8 @@
         edad: aTextoPlano(datosAnalizadosIA.edad),
         jugadores_texto: textoJugadoresIA,
         mecanicas: aTextoPlano(datosAnalizadosIA.mecanicas).split(',').map(s => s.trim()).filter(Boolean).slice(0, 3).join(', '),
-        instrucciones: aTextoPlano(datosAnalizadosIA.instrucciones || datosAnalizadosIA.reglas_basicas),
-        instruccionesCompletas: aTextoPlano(datosAnalizadosIA.instrucciones_completas || datosAnalizadosIA.reglas_completas || datosAnalizadosIA.instruccionesCompletas)
+        instrucciones: aTextoPlano(datosAnalizadosIA.instrucciones),
+        instrucciones_completas: aTextoPlano(datosAnalizadosIA.instrucciones_completas)
       };
 
       let bloquesGenerados = 0;
@@ -1671,6 +1671,7 @@
 
     function cerrarComparadorIA() { document.getElementById('modalComparadorIA').classList.add('hidden'); }
 
+    // TRANSFERENCIA CORREGIDA Y RIGUROSA AL FORMULARIO
     function aplicarSeleccionComparador() {
       MAPA_CAMPOS_IA.forEach(campo => {
         const modo = seleccionesComparadorIA[campo.idElem];
@@ -1684,19 +1685,31 @@
         } else {
           const targetElem = document.getElementById(campo.idElem);
           if (targetElem) {
+            let valorAAplicar = '';
+
             if (modo === 'ia') {
-              const valIA = aTextoPlano(datosAnalizadosIA[campo.key]);
-              if (valIA) {
-                if (targetElem.tagName === 'SELECT') {
-                  const existeOpcion = Array.from(targetElem.options).some(opt => opt.value === valIA);
-                  if (existeOpcion) targetElem.value = valIA;
-                } else {
-                  targetElem.value = valIA;
-                }
-              }
+              valorAAplicar = aTextoPlano(datosAnalizadosIA[campo.key]);
             } else if (modo === 'manual') {
               const areaManual = document.getElementById(`manual_${campo.idElem}`);
-              if (areaManual && areaManual.value.trim()) targetElem.value = areaManual.value;
+              if (areaManual) valorAAplicar = areaManual.value.trim();
+            }
+
+            if (valorAAplicar && modo !== 'original') {
+              if (targetElem.tagName === 'SELECT') {
+                const existeOpcion = Array.from(targetElem.options).some(opt => opt.value === valorAAplicar);
+                if (existeOpcion) {
+                  targetElem.value = valorAAplicar;
+                } else {
+                  // Si es un desplegable y la opción no existe, la añade dinámicamente
+                  const nuevaOpt = document.createElement('option');
+                  nuevaOpt.value = valorAAplicar;
+                  nuevaOpt.text = valorAAplicar;
+                  targetElem.add(nuevaOpt);
+                  targetElem.value = valorAAplicar;
+                }
+              } else {
+                targetElem.value = valorAAplicar;
+              }
             }
           }
         }
