@@ -926,7 +926,7 @@
 
       userContainer.innerHTML = `
         <button onclick="abrirPerfilModal()" class="bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-[11px] sm:text-xs px-2.5 py-1.5 rounded-lg shadow-sm flex items-center gap-1.5 transition card-zoom truncate max-w-[130px] sm:max-w-none" title="Ver mi perfil">
-          ${avatarHtml} <span class="truncate">${currentUser.nick}</span>
+          ${avatarHtml} <span class="truncate">${escaparHTML(currentUser.nick)}</span>
         </button>
       `;
 
@@ -1012,6 +1012,17 @@
       document.getElementById('panelFiltrosAvanzados').classList.toggle('hidden');
     }
 
+    // La lista no trae las reglas completas (pesan mucho): se cargan bajo demanda y se guardan en la caché
+    async function asegurarReglasCompletas(juego) {
+      if (!juego || juego.instrucciones_completas !== undefined) return juego;
+      try {
+        const res = await fetchSeguro(`/api/juegos/${juego.id}`);
+        const full = await res.json();
+        if (!full.error) juego.instrucciones_completas = full.instrucciones_completas || '';
+      } catch (e) { console.error(e); }
+      return juego;
+    }
+
     async function abrirFichaDetallada(juegoId) {
       juegoActualFicha = juegosCache.find(j => j.id === juegoId);
       if (!juegoActualFicha) return;
@@ -1034,7 +1045,15 @@
       document.getElementById('fichaMecanicas').innerText = juegoActualFicha.mecanicas || 'Sin mecánicas asociadas';
       
       document.getElementById('fichaReglasBasicasText').innerText = juegoActualFicha.instrucciones || 'Sin reglas básicas registradas.';
-      document.getElementById('fichaReglasCompletasText').innerText = juegoActualFicha.instrucciones_completas || juegoActualFicha.instrucciones || 'Sin instrucciones oficiales completas registradas.';
+      const elReglasCompletas = document.getElementById('fichaReglasCompletasText');
+      const pintarReglasCompletas = (j) => { elReglasCompletas.innerText = j.instrucciones_completas || j.instrucciones || 'Sin instrucciones oficiales completas registradas.'; };
+      if (juegoActualFicha.instrucciones_completas === undefined) {
+        elReglasCompletas.innerText = 'Cargando reglas...';
+        const juegoCargando = juegoActualFicha;
+        asegurarReglasCompletas(juegoCargando).then(() => { if (juegoActualFicha === juegoCargando) pintarReglasCompletas(juegoCargando); });
+      } else {
+        pintarReglasCompletas(juegoActualFicha);
+      }
 
       const imagenSrc = juegoActualFicha.foto_url || juegoActualFicha.foto_base64 || '';
       const imgContainer = document.getElementById('fichaImagenContainer');
@@ -1045,7 +1064,7 @@
       const btnEditar = document.getElementById('btnEditarDesdeFicha');
       if (currentUser.rol === 'ADMIN' || currentUser.id === juegoActualFicha.creador_id) {
         btnEditar.classList.remove('hidden');
-        btnEditar.onclick = () => { cerrarFichaModal(); abrirModalFormulario(juegoActualFicha); };
+        btnEditar.onclick = async () => { await asegurarReglasCompletas(juegoActualFicha); cerrarFichaModal(); abrirModalFormulario(juegoActualFicha); };
       } else { btnEditar.classList.add('hidden'); }
 
       document.getElementById('btnJugarDesdeFicha').onclick = () => {
@@ -1182,6 +1201,7 @@
       btn.disabled = true;
 
       try {
+        await asegurarReglasCompletas(juegoActualFicha);
         const res = await fetchSeguro(`/api/dudas-ia`, {
           method: 'POST',
           body: JSON.stringify({
@@ -1191,6 +1211,7 @@
           })
         });
         const json = await res.json();
+        if (json.error) throw new Error(json.error);
         respBox.innerText = json.respuesta || "Sin respuesta";
         respBox.classList.remove('hidden');
       } catch (err) { alert(err.message); }
@@ -1546,91 +1567,102 @@
       finally { btnIA.innerText = "🤖 Consulta Automática"; btnIA.disabled = false; }
     }
 
+    function escaparHTML(v) {
+      return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
+    function textoJugadores(min, max) {
+      min = parseInt(min); max = parseInt(max);
+      if (isNaN(min) || isNaN(max)) return '';
+      if (min === max) return `${min} jugador${min > 1 ? 'es' : ''}`;
+      return max >= 99 ? `${min}+ jugadores` : `${min} - ${max} jugadores`;
+    }
+
+    // Garantiza que un <select> tenga la opción antes de asignarla (si no, el select queda vacío)
+    function asegurarOpcionSelect(select, valor, etiqueta) {
+      valor = String(valor);
+      if (!Array.from(select.options).some(o => o.value === valor)) {
+        const opt = new Option(etiqueta || valor, valor);
+        const num = parseFloat(valor);
+        const antes = isNaN(num) ? null : Array.from(select.options).find(o => parseFloat(o.value) > num);
+        select.add(opt, antes || null);
+      }
+      select.value = valor;
+    }
+
     function abrirComparadorIA() {
       if (!datosAnalizadosIA) return;
 
       const contenedor = document.getElementById('contenedorCamposComparador');
-      contenedor.innerHTML = '';
       seleccionesComparadorIA = {};
 
-      const minJ = parseInt(datosAnalizadosIA.min_jugadores) || 1;
-      const maxJ = parseInt(datosAnalizadosIA.max_jugadores) || 4;
-      const textoJugadoresIA = minJ === maxJ ? `${minJ} jugador${minJ > 1 ? 'es' : ''}` : maxJ >= 99 ? `${minJ}+ jugadores` : `${minJ} - ${maxJ} jugadores`;
-
-      const minOrig = document.getElementById('minJugadoresSelect').value;
-      const maxOrig = document.getElementById('maxJugadoresSelect').value;
-      const textoJugadoresOrig = minOrig === maxOrig ? `${minOrig} jugador${minOrig > 1 ? 'es' : ''}` : maxOrig >= 99 ? `${minOrig}+ jugadores` : `${minOrig} - ${maxOrig} jugadores`;
-
+      const d = datosAnalizadosIA;
       const iaNormalizada = {
-        nombre: aTextoPlano(datosAnalizadosIA.nombre),
-        categoria: aTextoPlano(datosAnalizadosIA.categoria),
-        tipologia: aTextoPlano(datosAnalizadosIA.tipologia),
-        edad: aTextoPlano(datosAnalizadosIA.edad),
-        jugadores_texto: textoJugadoresIA,
-        mecanicas: aTextoPlano(datosAnalizadosIA.mecanicas).split(',').map(s => s.trim()).filter(Boolean).slice(0, 3).join(', '),
-        instrucciones: aTextoPlano(datosAnalizadosIA.instrucciones),
-        instrucciones_completas: aTextoPlano(datosAnalizadosIA.instrucciones_completas)
+        nombre: aTextoPlano(d.nombre),
+        categoria: aTextoPlano(d.categoria),
+        tipologia: aTextoPlano(d.tipologia),
+        edad: aTextoPlano(d.edad),
+        jugadores_texto: textoJugadores(d.min_jugadores, d.max_jugadores),
+        mecanicas: aTextoPlano(d.mecanicas).split(',').map(s => s.trim()).filter(Boolean).slice(0, 3).join(', '),
+        instrucciones: aTextoPlano(d.instrucciones),
+        instrucciones_completas: aTextoPlano(d.instrucciones_completas)
       };
 
-      let bloquesGenerados = 0;
+      const bloques = [];
+      const sinDatos = [];
 
       MAPA_CAMPOS_IA.forEach(campo => {
         if (!seccionesMarcadasIA.includes(campo.grupo)) return;
 
-        const valIA = iaNormalizada[campo.key];
-        
-        let valActual = '';
-        if (campo.idElem === 'jugadores_rango') {
-          valActual = textoJugadoresOrig;
-        } else {
-          const elemForm = document.getElementById(campo.idElem);
-          valActual = elemForm ? elemForm.value : '';
-        }
+        const valIA = (iaNormalizada[campo.key] || '').trim();
+        if (!valIA) { sinDatos.push(campo.label); return; }
 
-        if (valIA && valIA.trim().length > 0) {
-          bloquesGenerados++;
-          seleccionesComparadorIA[campo.idElem] = 'ia';
+        const esJugadores = campo.idElem === 'jugadores_rango';
+        const valActual = esJugadores
+          ? textoJugadores(document.getElementById('minJugadoresSelect').value, document.getElementById('maxJugadoresSelect').value)
+          : (document.getElementById(campo.idElem)?.value || '');
 
-          contenedor.innerHTML += `
-            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-2">
-              <span class="font-bold text-slate-700 uppercase text-[10px] block border-b pb-1">${campo.label}</span>
-              
-              <div class="grid grid-cols-2 gap-2 text-[11px]">
-                <div id="card_orig_${campo.idElem}" onclick="seleccionarOpcionComparador('${campo.idElem}', 'original')" class="p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-white border-slate-200 opacity-60 overflow-hidden">
-                  <div class="break-words">
-                    <span class="text-[9px] font-bold text-slate-400 block uppercase mb-1">📄 ORIGINAL:</span>
-                    <p class="text-slate-700 whitespace-pre-line leading-relaxed">${valActual || '(Vacío)'}</p>
-                  </div>
-                  <span id="check_orig_${campo.idElem}" class="text-[10px] font-bold text-slate-400 mt-2 block">✕ No seleccionado</span>
+        seleccionesComparadorIA[campo.idElem] = 'ia';
+        const id = campo.idElem;
+
+        bloques.push(`
+          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-2">
+            <span class="font-bold text-slate-700 uppercase text-[10px] block border-b pb-1">${escaparHTML(campo.label)}</span>
+            <div class="grid grid-cols-2 gap-2 text-[11px]">
+              <div id="card_orig_${id}" onclick="seleccionarOpcionComparador('${id}', 'original')" class="p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-white border-slate-200 opacity-60 overflow-hidden">
+                <div class="break-words">
+                  <span class="text-[9px] font-bold text-slate-400 block uppercase mb-1">📄 ORIGINAL:</span>
+                  <p class="text-slate-700 whitespace-pre-line leading-relaxed">${escaparHTML(valActual) || '(Vacío)'}</p>
                 </div>
-
-                <div id="card_ia_${campo.idElem}" onclick="seleccionarOpcionComparador('${campo.idElem}', 'ia')" class="p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-purple-100 border-purple-500 shadow-sm overflow-hidden">
-                  <div class="break-words">
-                    <span class="text-[9px] font-bold text-purple-700 block uppercase mb-1">✨ SUGERIDO POR IA:</span>
-                    <p class="text-purple-950 font-semibold whitespace-pre-line leading-relaxed">${valIA}</p>
-                  </div>
-                  <span id="check_ia_${campo.idElem}" class="text-[10px] font-bold text-purple-700 mt-2 block">✓ Seleccionado</span>
-                </div>
+                <span id="check_orig_${id}" class="text-[10px] font-bold text-slate-400 mt-2 block">✕ No seleccionado</span>
               </div>
-
-              <div class="pt-1">
-                <button type="button" onclick="toggleEdicionManualComparador('${campo.idElem}')" class="text-[10px] text-indigo-600 font-bold underline">
-                  ✏ Editar manualmente
-                </button>
-                <textarea id="manual_${campo.idElem}" rows="2" class="w-full p-2 border rounded-lg outline-none text-xs hidden mt-1 bg-white" placeholder="Escribe tu texto personalizado aquí...">${valIA}</textarea>
+              <div id="card_ia_${id}" onclick="seleccionarOpcionComparador('${id}', 'ia')" class="p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-purple-100 border-purple-500 shadow-sm overflow-hidden">
+                <div class="break-words">
+                  <span class="text-[9px] font-bold text-purple-700 block uppercase mb-1">✨ SUGERIDO POR IA:</span>
+                  <p class="text-purple-950 font-semibold whitespace-pre-line leading-relaxed">${escaparHTML(valIA)}</p>
+                </div>
+                <span id="check_ia_${id}" class="text-[10px] font-bold text-purple-700 mt-2 block">✓ Seleccionado</span>
               </div>
             </div>
-          `;
-        }
+            ${esJugadores ? '' : `
+            <div class="pt-1">
+              <button type="button" onclick="toggleEdicionManualComparador('${id}')" class="text-[10px] text-indigo-600 font-bold underline">✏ Editar manualmente</button>
+              <textarea id="manual_${id}" rows="2" class="w-full p-2 border rounded-lg outline-none text-xs hidden mt-1 bg-white" placeholder="Escribe tu texto personalizado aquí...">${escaparHTML(valIA)}</textarea>
+            </div>`}
+          </div>`);
       });
 
-      if (bloquesGenerados === 0) {
+      if (sinDatos.length) {
+        bloques.push(`<div class="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-2">⚠️ La IA no devolvió valor válido para: ${sinDatos.map(escaparHTML).join(', ')}.</div>`);
+      }
+      if (bloques.length === 0 || bloques.length === 1 && sinDatos.length) {
         contenedor.innerHTML = `
           <div class="text-center py-8 text-slate-500 space-y-2">
             <p class="font-bold">⚠️ No se extrajeron textos comparables.</p>
             <p class="text-xs">Gemini no devolvió información útil para las secciones marcadas.</p>
-          </div>
-        `;
+          </div>`;
+      } else {
+        contenedor.innerHTML = bloques.join('');
       }
 
       document.getElementById('modalComparadorIA').classList.remove('hidden');
@@ -1672,49 +1704,35 @@
     function cerrarComparadorIA() { document.getElementById('modalComparadorIA').classList.add('hidden'); }
 
     function aplicarSeleccionComparador() {
+      let aplicados = 0;
       MAPA_CAMPOS_IA.forEach(campo => {
         const modo = seleccionesComparadorIA[campo.idElem];
-        if (!modo) return;
+        if (!modo || modo === 'original') return;
 
         if (campo.idElem === 'jugadores_rango') {
-          if (modo === 'ia') {
-            if (datosAnalizadosIA.min_jugadores) document.getElementById('minJugadoresSelect').value = datosAnalizadosIA.min_jugadores;
-            if (datosAnalizadosIA.max_jugadores) document.getElementById('maxJugadoresSelect').value = datosAnalizadosIA.max_jugadores;
-          }
-        } else {
-          const targetElem = document.getElementById(campo.idElem);
-          if (targetElem) {
-            let valorAAplicar = '';
-
-            if (modo === 'ia') {
-              valorAAplicar = aTextoPlano(datosAnalizadosIA[campo.key]);
-            } else if (modo === 'manual') {
-              const areaManual = document.getElementById(`manual_${campo.idElem}`);
-              if (areaManual) valorAAplicar = areaManual.value.trim();
-            }
-
-            if (valorAAplicar && modo !== 'original') {
-              if (targetElem.tagName === 'SELECT') {
-                const existeOpcion = Array.from(targetElem.options).some(opt => opt.value === valorAAplicar);
-                if (existeOpcion) {
-                  targetElem.value = valorAAplicar;
-                } else {
-                  const nuevaOpt = document.createElement('option');
-                  nuevaOpt.value = valorAAplicar;
-                  nuevaOpt.text = valorAAplicar;
-                  targetElem.add(nuevaOpt);
-                  targetElem.value = valorAAplicar;
-                }
-              } else {
-                targetElem.value = valorAAplicar;
-              }
-            }
-          }
+          const min = parseInt(datosAnalizadosIA.min_jugadores);
+          const max = parseInt(datosAnalizadosIA.max_jugadores);
+          if (!isNaN(min)) asegurarOpcionSelect(document.getElementById('minJugadoresSelect'), min, `${min} jugador${min > 1 ? 'es' : ''}`);
+          if (!isNaN(max)) asegurarOpcionSelect(document.getElementById('maxJugadoresSelect'), max, max >= 99 ? 'Sin límite (+)' : `${max} jugadores`);
+          aplicados++;
+          return;
         }
+
+        const target = document.getElementById(campo.idElem);
+        if (!target) return;
+
+        let valor = '';
+        if (modo === 'ia') valor = aTextoPlano(datosAnalizadosIA[campo.key]).trim();
+        else if (modo === 'manual') valor = (document.getElementById(`manual_${campo.idElem}`)?.value || '').trim();
+        if (!valor) return;
+
+        if (target.tagName === 'SELECT') asegurarOpcionSelect(target, valor);
+        else target.value = valor;
+        aplicados++;
       });
 
       cerrarComparadorIA();
-      alert("✅ Todos los campos seleccionados han sido actualizados en el formulario.");
+      alert(aplicados ? `✅ ${aplicados} campo(s) actualizados en el formulario.` : "No se aplicó ningún cambio.");
     }
 
     async function confirmarBorradoSeguro() {
@@ -2028,6 +2046,7 @@
         if (json.error) throw new Error(json.error);
 
         currentUser = json.usuario;
+        if (json.token) localStorage.setItem('auth_token', json.token);
         localStorage.setItem('session_user', JSON.stringify(currentUser));
         alert("Perfil actualizado correctamente");
         iniciarApp();
