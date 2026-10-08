@@ -779,6 +779,7 @@
         <h3 class="font-bold text-lg text-slate-800">⚙️ Gestión Avanzada de Usuarios</h3>
         <button onclick="cerrarAdminPanel()" class="text-slate-400 font-bold text-xl px-2">✕</button>
       </div>
+      <div id="resumenUsuarios" class="flex flex-wrap gap-2 text-[11px] font-bold"></div>
       <div id="listaUsuarios" class="space-y-3 text-sm"></div>
     </div>
   </div>
@@ -2075,46 +2076,77 @@
         const orden = { BLOQUEADO: 0, PENDIENTE: 1, ACTIVO: 2 };
         usuarios.sort((a, b) => (orden[a.estado] ?? 3) - (orden[b.estado] ?? 3) || String(a.nick).localeCompare(String(b.nick)));
 
-        const estilosEstado = {
-          ACTIVO: 'bg-emerald-100 text-emerald-800',
-          PENDIENTE: 'bg-amber-100 text-amber-800',
-          BLOQUEADO: 'bg-rose-100 text-rose-800'
+        const tema = {
+          ACTIVO:    { badge: 'bg-emerald-100 text-emerald-800', avatar: 'bg-emerald-100 text-emerald-700', borde: 'border-slate-200' },
+          PENDIENTE: { badge: 'bg-amber-100 text-amber-800',     avatar: 'bg-amber-100 text-amber-700',     borde: 'border-amber-200' },
+          BLOQUEADO: { badge: 'bg-rose-100 text-rose-800',       avatar: 'bg-rose-100 text-rose-700',       borde: 'border-rose-300' }
         };
         const boton = (id, estado, texto, color) =>
-          `<button onclick="cambiarEstadoUsuarioAdmin('${escaparHTML(id)}', '${estado}')" class="text-xs ${color} text-white font-bold px-2.5 py-1 rounded-lg flex-1 sm:flex-none">${texto}</button>`;
+          `<button onclick="cambiarEstadoUsuarioAdmin('${escaparHTML(id)}', '${estado}')" class="text-xs ${color} text-white font-bold px-3 py-1.5 rounded-lg transition">${texto}</button>`;
 
-        const bloqueados = usuarios.filter(u => u.estado === 'BLOQUEADO').length;
-        const aviso = bloqueados
-          ? `<div class="bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold rounded-xl p-2.5">🔒 ${bloqueados} cuenta(s) bloqueada(s) por exceso de intentos fallidos</div>`
-          : '';
+        // Resumen superior
+        const cuenta = e => usuarios.filter(u => u.estado === e).length;
+        const chip = (n, txt, color) => `<span class="px-2.5 py-1 rounded-full ${color}">${n} ${txt}</span>`;
+        document.getElementById('resumenUsuarios').innerHTML =
+          chip(cuenta('ACTIVO'), cuenta('ACTIVO') === 1 ? 'activo' : 'activos', 'bg-emerald-50 text-emerald-700') +
+          chip(cuenta('PENDIENTE'), cuenta('PENDIENTE') === 1 ? 'pendiente' : 'pendientes', 'bg-amber-50 text-amber-700') +
+          chip(cuenta('BLOQUEADO'), cuenta('BLOQUEADO') === 1 ? 'bloqueado' : 'bloqueados', cuenta('BLOQUEADO') ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-500');
 
-        document.getElementById('listaUsuarios').innerHTML = aviso + usuarios.map(u => {
-          const intentos = parseInt(u.intentos_fallidos) || 0;
+        document.getElementById('listaUsuarios').innerHTML = usuarios.map(u => {
+          const t = tema[u.estado] || { badge: 'bg-slate-200 text-slate-700', avatar: 'bg-slate-200 text-slate-600', borde: 'border-slate-200' };
+          const intentos = Math.min(parseInt(u.intentos_fallidos) || 0, LIMITE);
           const bloqueado = u.estado === 'BLOQUEADO';
           const esProtegido = u.id === 'admin-root' || u.id === currentUser.id;
           const ultimo = u.ultimo_intento_fallido ? new Date(u.ultimo_intento_fallido) : null;
-          const ultimoTxt = ultimo && !isNaN(ultimo) ? ` · último: ${ultimo.toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' })}` : '';
+          const ultimoTxt = ultimo && !isNaN(ultimo) ? ultimo.toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' }) : '';
+          const inicial = escaparHTML((u.nombre || u.nick || '?').trim().charAt(0).toUpperCase());
 
+          // Línea 2: intentos fallidos con barra de progreso + reinicio
+          let filaIntentos = '';
+          if (intentos > 0) {
+            const color = bloqueado ? 'text-rose-700 bg-rose-50 border-rose-200' : 'text-amber-700 bg-amber-50 border-amber-200';
+            const segmentos = Array.from({ length: LIMITE }, (_, k) =>
+              `<span class="h-1.5 w-5 rounded-full ${k < intentos ? (bloqueado ? 'bg-rose-500' : 'bg-amber-500') : 'bg-slate-200'}"></span>`).join('');
+            const reiniciar = (!bloqueado && u.estado === 'ACTIVO')
+              ? boton(u.id, 'ACTIVO', '↺ Reiniciar', 'bg-slate-500 hover:bg-slate-600') : '';
+            filaIntentos = `
+              <div class="flex items-center justify-between gap-3 mt-3 px-3 py-2 rounded-xl border ${color}">
+                <div class="min-w-0">
+                  <p class="text-[11px] font-bold">⚠️ Intentos fallidos: ${intentos}/${LIMITE}</p>
+                  <div class="flex gap-1 mt-1">${segmentos}</div>
+                  ${ultimoTxt ? `<p class="text-[10px] opacity-80 mt-1">Último: ${ultimoTxt}</p>` : ''}
+                </div>
+                ${reiniciar}
+              </div>`;
+          }
+
+          // Código de activación (solo pendientes)
+          const filaCodigo = (u.estado === 'PENDIENTE' && u.codigo_verificacion)
+            ? `<div class="mt-3 px-3 py-2 rounded-xl bg-indigo-50 border border-indigo-100 text-[11px] text-indigo-700 flex items-center gap-2">🔑 Código de activación: <span class="font-mono font-bold text-sm tracking-widest">${escaparHTML(u.codigo_verificacion)}</span></div>`
+            : '';
+
+          // Línea 3: acciones
           const acciones = [];
           if (bloqueado) acciones.push(boton(u.id, 'ACTIVO', '🔓 Desbloquear', 'bg-indigo-600 hover:bg-indigo-700'));
-          else if (u.estado === 'PENDIENTE') acciones.push(boton(u.id, 'ACTIVO', 'Activar', 'bg-emerald-600 hover:bg-emerald-700'));
-          else {
-            if (intentos > 0) acciones.push(boton(u.id, 'ACTIVO', '↺ Reiniciar intentos', 'bg-slate-500 hover:bg-slate-600'));
-            if (!esProtegido) acciones.push(boton(u.id, 'PENDIENTE', 'Desactivar', 'bg-amber-500 hover:bg-amber-600'));
-          }
+          else if (u.estado === 'PENDIENTE') acciones.push(boton(u.id, 'ACTIVO', '✓ Activar', 'bg-emerald-600 hover:bg-emerald-700'));
+          else if (!esProtegido) acciones.push(boton(u.id, 'PENDIENTE', 'Desactivar', 'bg-amber-500 hover:bg-amber-600'));
           if (u.id !== 'admin-root') {
-            acciones.push(`<button onclick="borrarUsuarioAdmin('${escaparHTML(u.id)}')" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold px-2.5 py-1 rounded-lg">🗑️</button>`);
+            acciones.push(`<button onclick="borrarUsuarioAdmin('${escaparHTML(u.id)}')" title="Borrar usuario" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold px-3 py-1.5 rounded-lg transition">🗑️</button>`);
           }
+          const filaAcciones = acciones.length
+            ? `<div class="flex justify-end gap-2 mt-3 pt-3 border-t border-slate-200">${acciones.join('')}</div>` : '';
 
           return `
-            <div class="bg-slate-50 p-3 rounded-xl border ${bloqueado ? 'border-rose-300' : ''} flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-              <div>
-                <span class="font-bold text-slate-800">${escaparHTML(u.nombre)} (@${escaparHTML(u.nick)})</span>
-                <span class="ml-2 text-[10px] px-2 py-0.5 rounded-full font-bold ${estilosEstado[u.estado] || 'bg-slate-200 text-slate-700'}">${escaparHTML(u.estado)}</span>
-                ${u.estado === 'PENDIENTE' && u.codigo_verificacion ? `<p class="text-[11px] text-indigo-600 font-mono mt-0.5">Código: ${escaparHTML(u.codigo_verificacion)}</p>` : ''}
-                ${intentos > 0 ? `<p class="text-[11px] font-semibold mt-0.5 ${bloqueado ? 'text-rose-600' : 'text-amber-600'}">⚠️ Intentos fallidos: ${intentos}/${LIMITE}${ultimoTxt}</p>` : ''}
+            <div class="bg-white p-3.5 rounded-2xl border ${t.borde} shadow-sm">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 shrink-0 rounded-full flex items-center justify-center font-bold ${t.avatar}">${inicial}</div>
+                <div class="min-w-0 flex-1">
+                  <p class="font-bold text-slate-800 truncate">${escaparHTML(u.nombre)}</p>
+                  <p class="text-xs text-slate-500 truncate">@${escaparHTML(u.nick)}${u.rol === 'ADMIN' ? ' · <span class="font-bold text-indigo-600">Administrador</span>' : ''}</p>
+                </div>
+                <span class="text-[10px] px-2.5 py-1 rounded-full font-bold ${t.badge}">${escaparHTML(u.estado)}</span>
               </div>
-              <div class="flex gap-1.5 w-full sm:w-auto">${acciones.join('')}</div>
+              ${filaCodigo}${filaIntentos}${filaAcciones}
             </div>`;
         }).join('');
       } catch (err) { alert(err.message); }
