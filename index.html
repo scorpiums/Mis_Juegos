@@ -899,9 +899,13 @@
         ...(token ? { 'Authorization': `Bearer ${token}` } : {})
       };
       const res = await fetch(`${WORKER_URL}${ruta}`, { ...opciones, headers });
-      if (res.status === 401 || res.status === 403) {
+      if (res.status === 401) {
         cerrarSesion();
-        throw new Error("Sesión caducada o acceso denegado.");
+        throw new Error("Sesión caducada o cuenta desactivada. Vuelve a iniciar sesión.");
+      }
+      if (res.status === 403) {
+        const motivo = await res.clone().json().catch(() => ({}));
+        throw new Error(motivo.error || "No tienes permisos para esta acción.");
       }
       return res;
     }
@@ -2065,42 +2069,65 @@
       try {
         const res = await fetchSeguro(`/api/admin/usuarios`);
         const usuarios = await res.json();
+        if (usuarios.error) throw new Error(usuarios.error);
 
-        const lista = document.getElementById('listaUsuarios');
-        lista.innerHTML = '';
+        const LIMITE = 5;
+        const orden = { BLOQUEADO: 0, PENDIENTE: 1, ACTIVO: 2 };
+        usuarios.sort((a, b) => (orden[a.estado] ?? 3) - (orden[b.estado] ?? 3) || String(a.nick).localeCompare(String(b.nick)));
 
-        usuarios.forEach(u => {
-          const esActivo = u.estado === 'ACTIVO';
-          lista.innerHTML += `
-            <div class="bg-slate-50 p-3 rounded-xl border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+        const estilosEstado = {
+          ACTIVO: 'bg-emerald-100 text-emerald-800',
+          PENDIENTE: 'bg-amber-100 text-amber-800',
+          BLOQUEADO: 'bg-rose-100 text-rose-800'
+        };
+        const boton = (id, estado, texto, color) =>
+          `<button onclick="cambiarEstadoUsuarioAdmin('${escaparHTML(id)}', '${estado}')" class="text-xs ${color} text-white font-bold px-2.5 py-1 rounded-lg flex-1 sm:flex-none">${texto}</button>`;
+
+        const bloqueados = usuarios.filter(u => u.estado === 'BLOQUEADO').length;
+        const aviso = bloqueados
+          ? `<div class="bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold rounded-xl p-2.5">🔒 ${bloqueados} cuenta(s) bloqueada(s) por exceso de intentos fallidos</div>`
+          : '';
+
+        document.getElementById('listaUsuarios').innerHTML = aviso + usuarios.map(u => {
+          const intentos = parseInt(u.intentos_fallidos) || 0;
+          const bloqueado = u.estado === 'BLOQUEADO';
+          const esProtegido = u.id === 'admin-root' || u.id === currentUser.id;
+          const ultimo = u.ultimo_intento_fallido ? new Date(u.ultimo_intento_fallido) : null;
+          const ultimoTxt = ultimo && !isNaN(ultimo) ? ` · último: ${ultimo.toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' })}` : '';
+
+          const acciones = [];
+          if (bloqueado) acciones.push(boton(u.id, 'ACTIVO', '🔓 Desbloquear', 'bg-indigo-600 hover:bg-indigo-700'));
+          else if (u.estado === 'PENDIENTE') acciones.push(boton(u.id, 'ACTIVO', 'Activar', 'bg-emerald-600 hover:bg-emerald-700'));
+          else {
+            if (intentos > 0) acciones.push(boton(u.id, 'ACTIVO', '↺ Reiniciar intentos', 'bg-slate-500 hover:bg-slate-600'));
+            if (!esProtegido) acciones.push(boton(u.id, 'PENDIENTE', 'Desactivar', 'bg-amber-500 hover:bg-amber-600'));
+          }
+          if (u.id !== 'admin-root') {
+            acciones.push(`<button onclick="borrarUsuarioAdmin('${escaparHTML(u.id)}')" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold px-2.5 py-1 rounded-lg">🗑️</button>`);
+          }
+
+          return `
+            <div class="bg-slate-50 p-3 rounded-xl border ${bloqueado ? 'border-rose-300' : ''} flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
               <div>
-                <span class="font-bold text-slate-800">${u.nombre} (@${u.nick})</span>
-                <span class="ml-2 text-[10px] px-2 py-0.5 rounded-full ${esActivo ? 'bg-emerald-100 text-emerald-800 font-bold' : 'bg-amber-100 text-amber-800 font-bold'}">${u.estado}</span>
-                ${u.codigo_verificacion ? `<p class="text-[11px] text-indigo-600 font-mono mt-0.5">Código: ${u.codigo_verificacion}</p>` : ''}
+                <span class="font-bold text-slate-800">${escaparHTML(u.nombre)} (@${escaparHTML(u.nick)})</span>
+                <span class="ml-2 text-[10px] px-2 py-0.5 rounded-full font-bold ${estilosEstado[u.estado] || 'bg-slate-200 text-slate-700'}">${escaparHTML(u.estado)}</span>
+                ${u.estado === 'PENDIENTE' && u.codigo_verificacion ? `<p class="text-[11px] text-indigo-600 font-mono mt-0.5">Código: ${escaparHTML(u.codigo_verificacion)}</p>` : ''}
+                ${intentos > 0 ? `<p class="text-[11px] font-semibold mt-0.5 ${bloqueado ? 'text-rose-600' : 'text-amber-600'}">⚠️ Intentos fallidos: ${intentos}/${LIMITE}${ultimoTxt}</p>` : ''}
               </div>
-
-              <div class="flex gap-1.5 w-full sm:w-auto">
-                <button onclick="cambiarEstadoUsuarioAdmin('${u.id}', '${esActivo ? 'PENDIENTE' : 'ACTIVO'}')" class="text-xs ${esActivo ? 'bg-amber-500 hover:bg-amber-600' : 'bg-emerald-600 hover:bg-emerald-700'} text-white font-bold px-2.5 py-1 rounded-lg flex-1 sm:flex-none">
-                  ${esActivo ? 'Desactivar' : 'Activar'}
-                </button>
-                ${u.id !== 'admin-root' ? `
-                  <button onclick="borrarUsuarioAdmin('${u.id}')" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold px-2.5 py-1 rounded-lg">
-                    🗑️
-                  </button>
-                ` : ''}
-              </div>
-            </div>
-          `;
-        });
+              <div class="flex gap-1.5 w-full sm:w-auto">${acciones.join('')}</div>
+            </div>`;
+        }).join('');
       } catch (err) { alert(err.message); }
     }
 
     async function cambiarEstadoUsuarioAdmin(userId, nuevoEstado) {
       try {
-        await fetchSeguro(`/api/admin/usuarios/${userId}/estado`, {
+        const res = await fetchSeguro(`/api/admin/usuarios/${userId}/estado`, {
           method: 'PUT',
           body: JSON.stringify({ estado: nuevoEstado })
         });
+        const json = await res.json();
+        if (json.error) throw new Error(json.error);
         cargarUsuariosAdmin();
       } catch (err) { alert(err.message); }
     }
