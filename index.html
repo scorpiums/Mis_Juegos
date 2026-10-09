@@ -16,16 +16,16 @@
     }
     .roulette-container {
       position: relative;
-      width: 200px;
-      height: 200px;
+      width: 190px;
+      height: 190px;
       margin: 0 auto;
     }
     .roulette-wheel {
       width: 100%;
       height: 100%;
       border-radius: 50%;
-      border: 6px solid #1e1b4b;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      border: 5px solid #1e1b4b;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
       position: relative;
       overflow: hidden;
       transition: transform 3.5s cubic-bezier(0.15, 0.85, 0.35, 1.02);
@@ -38,14 +38,14 @@
     }
     .roulette-pointer {
       position: absolute;
-      top: -12px;
+      top: -10px;
       left: 50%;
       transform: translateX(-50%);
       width: 0;
       height: 0;
-      border-left: 12px solid transparent;
-      border-right: 12px solid transparent;
-      border-top: 22px solid #dc2626;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-top: 18px solid #dc2626;
       z-index: 20;
       filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
     }
@@ -54,17 +54,17 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 44px;
-      height: 44px;
+      width: 40px;
+      height: 40px;
       background: #ffffff;
-      border: 4px solid #1e1b4b;
+      border: 3px solid #1e1b4b;
       border-radius: 50%;
       z-index: 10;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 900;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
     .line-clamp-2 {
       display: -webkit-box;
@@ -74,68 +74,65 @@
     }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-800 font-sans min-h-screen pb-20">
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen pb-16">
 
   <!-- PANTALLA DE AUTENTICACIÓN -->
-  <div id="authScreen" class="fixed inset-0 bg-indigo-900 z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4">
+  <div id="authScreen" class="fixed inset-0 bg-indigo-900 z-50 flex items-center justify-center p-3">
+    <div class="bg-white rounded-3xl p-5 max-w-sm w-full shadow-2xl space-y-3.5">
       <div class="text-center space-y-1">
-        <div class="flex justify-center items-center gap-2 mb-2">
-          <div class="w-10 h-10 bg-amber-400 rounded-xl border-2 border-black flex items-center justify-center shadow-md font-bold text-black">🎮</div>
+        <div class="flex justify-center items-center gap-2 mb-1">
+          <div class="w-9 h-9 bg-amber-400 rounded-xl border-2 border-black flex items-center justify-center shadow-md font-bold text-black text-sm">🎮</div>
           <h2 class="text-2xl font-black text-indigo-900 tracking-tight">MIS JUEGOS</h2>
         </div>
-        <p class="text-xs text-slate-500">Inicia sesión para entrar a la colección</p>
+        <p class="text-[11px] text-slate-500">Inicia sesión para acceder a la colección</p>
       </div>
 
-      <form id="loginForm" onsubmit="procesarLogin(event)" class="space-y-3">
+      <form id="loginForm" onsubmit="procesarLogin(event)" class="space-y-2.5">
         <div>
-          <label class="text-xs font-bold text-slate-500 uppercase">Usuario / Nick</label>
-          <input type="text" id="loginNick" required class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-xs">
+          <label class="text-[10px] font-bold text-slate-500 uppercase">Usuario / Nick</label>
+          <input type="text" id="loginNick" required class="w-full p-2.5 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-xs">
         </div>
         <div>
-          <label class="text-xs font-bold text-slate-500 uppercase">Contraseña</label>
-          <input type="password" id="loginPassword" required class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-xs">
+          <label class="text-[10px] font-bold text-slate-500 uppercase">Contraseña</label>
+          <input type="password" id="loginPassword" required class="w-full p-2.5 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-xs">
         </div>
-        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl card-zoom text-xs">
+        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl card-zoom text-xs shadow-md">
           Entrar
         </button>
-        <p class="text-center text-xs text-slate-500 pt-2">
+        <p class="text-center text-[11px] text-slate-500 pt-1">
           ¿No tienes cuenta? <a href="#" onclick="toggleAuthMode('registro')" class="text-indigo-600 font-bold">Regístrate</a>
         </p>
       </form>
 
-      <form id="registroForm" onsubmit="procesarRegistro(event)" class="space-y-3 hidden" autocomplete="off">
-        <input type="text" style="display:none" name="fakeusernameremembered">
-        <input type="password" style="display:none" name="fakepasswordremembered">
-
+      <form id="registroForm" onsubmit="procesarRegistro(event)" class="space-y-2.5 hidden" autocomplete="off">
         <div>
-          <label class="text-xs font-bold text-slate-500 uppercase">Nombre Completo</label>
-          <input type="text" id="regNombre" required autocomplete="off" class="w-full p-2.5 border rounded-xl outline-none text-xs">
+          <label class="text-[10px] font-bold text-slate-500 uppercase">Nombre Completo</label>
+          <input type="text" id="regNombre" required class="w-full p-2 border rounded-xl outline-none text-xs">
         </div>
         <div>
-          <label class="text-xs font-bold text-slate-500 uppercase">Nick de Usuario</label>
-          <input type="text" id="regNick" required autocomplete="new-username" class="w-full p-2.5 border rounded-xl outline-none text-xs">
+          <label class="text-[10px] font-bold text-slate-500 uppercase">Nick de Usuario</label>
+          <input type="text" id="regNick" required class="w-full p-2 border rounded-xl outline-none text-xs">
         </div>
         <div>
-          <label class="text-xs font-bold text-slate-500 uppercase">Contraseña</label>
-          <input type="password" id="regPass1" required autocomplete="new-password" class="w-full p-2.5 border rounded-xl outline-none text-xs">
+          <label class="text-[10px] font-bold text-slate-500 uppercase">Contraseña</label>
+          <input type="password" id="regPass1" required class="w-full p-2 border rounded-xl outline-none text-xs">
         </div>
         <div>
-          <label class="text-xs font-bold text-slate-500 uppercase">Repetir Contraseña</label>
-          <input type="password" id="regPass2" required autocomplete="new-password" class="w-full p-2.5 border rounded-xl outline-none text-xs">
+          <label class="text-[10px] font-bold text-slate-500 uppercase">Repetir Contraseña</label>
+          <input type="password" id="regPass2" required class="w-full p-2 border rounded-xl outline-none text-xs">
         </div>
-        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl card-zoom text-xs">
+        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl card-zoom text-xs shadow-md">
           Solicitar Cuenta
         </button>
-        <p class="text-center text-xs text-slate-500 pt-1">
+        <p class="text-center text-[11px] text-slate-500 pt-1">
           ¿Ya tienes cuenta? <a href="#" onclick="toggleAuthMode('login')" class="text-indigo-600 font-bold">Inicia Sesión</a>
         </p>
       </form>
 
-      <div id="codigoForm" class="space-y-3 hidden">
-        <p class="text-xs text-slate-600 text-center">Introduce el código de 6 dígitos proporcionado por el Administrador:</p>
-        <input type="text" id="valCodigo" placeholder="000000" maxlength="6" class="w-full p-3 border text-center font-bold text-xl tracking-widest rounded-xl outline-none">
-        <button type="button" onclick="validarCodigoAcceso()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl text-xs">
+      <div id="codigoForm" class="space-y-2.5 hidden">
+        <p class="text-[11px] text-slate-600 text-center">Introduce el código de 6 dígitos proporcionado por el Administrador:</p>
+        <input type="text" id="valCodigo" placeholder="000000" maxlength="6" class="w-full p-2.5 border text-center font-bold text-lg tracking-widest rounded-xl outline-none">
+        <button type="button" onclick="validarCodigoAcceso()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 rounded-xl text-xs shadow-md">
           Validar y Activar
         </button>
       </div>
@@ -144,9 +141,9 @@
 
   <!-- APLICACIÓN PRINCIPAL -->
   <div id="mainApp" class="hidden">
-    <header class="bg-indigo-600 text-white px-3 py-2.5 shadow-md sticky top-0 z-40 flex justify-between items-center gap-1">
+    <header class="bg-indigo-600 text-white px-3 py-2 shadow-md sticky top-0 z-40 flex justify-between items-center gap-1">
       <div class="flex items-center gap-2 shrink-0">
-        <div class="w-8 h-8 bg-amber-400 rounded-xl border-2 border-black flex items-center justify-center shadow-md text-black font-black text-sm">🎮</div>
+        <div class="w-7 h-7 bg-amber-400 rounded-lg border-2 border-black flex items-center justify-center shadow-md text-black font-black text-xs">🎮</div>
         <div class="leading-tight">
           <span class="text-amber-300 font-black text-xs sm:text-sm logo-gaming tracking-wider">MIS JUEGOS</span>
           <span class="block text-[8px] text-indigo-200 uppercase font-semibold">Colección Familiar</span>
@@ -155,34 +152,34 @@
 
       <div class="flex items-center gap-2 shrink-0">
         <div id="userBadgeContainer"></div>
-        <button onclick="cerrarSesion()" class="text-indigo-200 hover:text-white p-1.5 transition flex items-center justify-center card-zoom" title="Cerrar Sesión">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <button onclick="cerrarSesion()" class="text-indigo-200 hover:text-white p-1 transition flex items-center justify-center card-zoom" title="Cerrar Sesión">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 3H7a2 2 0 00-2 2v14a2 2 0 002 2h8m4-10l-4-4m4 4l-4 4m4-4H9"></path>
           </svg>
         </button>
       </div>
     </header>
 
-    <!-- BARRA SUPERIOR -->
-    <div class="sticky top-[48px] z-30 bg-slate-100 p-3 border-b border-slate-200 shadow-md">
-      <div class="max-w-4xl mx-auto space-y-2.5">
+    <!-- BARRA SUPERIOR Y FILTROS -->
+    <div class="sticky top-[44px] z-30 bg-slate-100 p-2.5 border-b border-slate-200 shadow-sm">
+      <div class="max-w-4xl mx-auto space-y-2">
         <div class="flex gap-1.5">
-          <input type="text" id="searchInput" oninput="filtrarJuegos()" placeholder="🔍 Buscar juego..." class="w-full p-2.5 rounded-xl border border-slate-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-xs sm:text-sm">
+          <input type="text" id="searchInput" oninput="filtrarJuegos()" placeholder="🔍 Buscar juego..." class="w-full p-2 rounded-xl border border-slate-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-xs">
           
-          <button onclick="togglePanelFiltros()" id="btnToggleFiltros" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-3 py-2 rounded-xl shadow-sm flex items-center gap-1 whitespace-nowrap card-zoom text-xs">
+          <button onclick="togglePanelFiltros()" id="btnToggleFiltros" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-2.5 py-1.5 rounded-xl shadow-sm flex items-center gap-1 whitespace-nowrap card-zoom text-xs">
             🎛️ Filtros
           </button>
 
-          <button onclick="abrirModalRuleta()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-3 py-2 rounded-xl shadow-md flex items-center gap-1 whitespace-nowrap card-zoom text-xs">
+          <button onclick="abrirModalRuleta()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-2.5 py-1.5 rounded-xl shadow-md flex items-center gap-1 whitespace-nowrap card-zoom text-xs">
             🎡 Ruleta
           </button>
         </div>
 
-        <div id="panelFiltrosAvanzados" class="hidden bg-white p-3.5 rounded-2xl border border-slate-200 shadow-md space-y-3 text-xs">
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div id="panelFiltrosAvanzados" class="hidden bg-white p-3 rounded-2xl border border-slate-200 shadow-md space-y-2.5 text-xs">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
             <div>
-              <label class="font-bold text-slate-500 uppercase text-[10px]">👥 Nº de Jugadores</label>
-              <select id="filtroNumJugadores" onchange="filtrarJuegos()" class="w-full p-2 border rounded-xl outline-none mt-1 bg-slate-50 font-medium">
+              <label class="font-bold text-slate-500 uppercase text-[9px]">👥 Nº de Jugadores</label>
+              <select id="filtroNumJugadores" onchange="filtrarJuegos()" class="w-full p-1.5 border rounded-xl outline-none mt-0.5 bg-slate-50 font-medium">
                 <option value="">Cualquier número</option>
                 <option value="1">1 Jugador</option>
                 <option value="2">2 Jugadores</option>
@@ -193,8 +190,8 @@
             </div>
 
             <div>
-              <label class="font-bold text-slate-500 uppercase text-[10px]">👶 Apto para Edad</label>
-              <select id="filtroEdadMinima" onchange="filtrarJuegos()" class="w-full p-2 border rounded-xl outline-none mt-1 bg-slate-50 font-medium">
+              <label class="font-bold text-slate-500 uppercase text-[9px]">👶 Apto para Edad</label>
+              <select id="filtroEdadMinima" onchange="filtrarJuegos()" class="w-full p-1.5 border rounded-xl outline-none mt-0.5 bg-slate-50 font-medium">
                 <option value="">Todas las edades</option>
                 <option value="3">Para +3 años</option>
                 <option value="4">Para +4 años</option>
@@ -209,8 +206,8 @@
             </div>
 
             <div>
-              <label class="font-bold text-slate-500 uppercase text-[10px]">📊 Ordenar Por</label>
-              <select id="filtroOrdenacion" onchange="filtrarJuegos()" class="w-full p-2 border rounded-xl outline-none mt-1 bg-indigo-50 text-indigo-900 font-bold">
+              <label class="font-bold text-slate-500 uppercase text-[9px]">📊 Ordenar Por</label>
+              <select id="filtroOrdenacion" onchange="filtrarJuegos()" class="w-full p-1.5 border rounded-xl outline-none mt-0.5 bg-indigo-50 text-indigo-900 font-bold">
                 <option value="nombre_asc">Nombre (A - Z)</option>
                 <option value="mas_jugados">Más jugados primero</option>
                 <option value="menos_jugados">Menos jugados primero</option>
@@ -220,94 +217,90 @@
           </div>
 
           <div>
-            <label class="font-bold text-slate-500 uppercase text-[10px] block mb-1">🧩 Mecánicas y Componentes:</label>
-            <div class="flex flex-wrap gap-1.5" id="checkboxesMecanicasDinamicas">
+            <label class="font-bold text-slate-500 uppercase text-[9px] block mb-1">🧩 Mecánicas y Componentes:</label>
+            <div class="flex flex-wrap gap-1" id="checkboxesMecanicasDinamicas">
               <span class="text-slate-400 text-[10px]">Cargando mecánicas...</span>
             </div>
           </div>
         </div>
         
         <div class="flex justify-between items-center gap-2">
-          <div class="flex gap-1.5 overflow-x-auto pb-1 text-xs scrollbar-none flex-grow" id="categoriasFiltro">
-            <button onclick="filtrarCategoria('Todas', event)" class="cat-btn bg-indigo-600 text-white px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition">Todas</button>
-            <button onclick="filtrarCategoria('Favoritos', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition">❤️ Favoritos</button>
-            <button onclick="filtrarCategoria('Juego de Mesa', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition">Mesa</button>
-            <button onclick="filtrarCategoria('Construcción', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition">Construcción</button>
-            <button onclick="filtrarCategoria('Exterior', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition">Exterior</button>
-            <button onclick="filtrarCategoria('Consola', event)" class="cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition">Consola</button>
+          <!-- Pestañas de categorías generadas dinámicamente -->
+          <div class="flex gap-1 overflow-x-auto pb-0.5 text-xs scrollbar-none flex-grow" id="categoriasFiltro">
+            <button onclick="filtrarCategoria('Todos', event)" class="cat-btn bg-indigo-600 text-white px-2.5 py-1 rounded-full font-medium shadow-sm whitespace-nowrap transition">Todos</button>
+            <button onclick="filtrarCategoria('Favoritos', event)" class="cat-btn bg-white text-slate-600 border px-2.5 py-1 rounded-full font-medium shadow-sm whitespace-nowrap transition">❤️ Favoritos</button>
           </div>
 
-          <div class="flex bg-slate-200 p-1 rounded-xl shrink-0">
-            <button onclick="cambiarVista('grid')" id="btnGrid" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-indigo-600 shadow-sm transition">⊞</button>
-            <button onclick="cambiarVista('compact')" id="btnCompact" class="px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 transition">☰</button>
+          <div class="flex bg-slate-200 p-0.5 rounded-xl shrink-0">
+            <button onclick="cambiarVista('grid')" id="btnGrid" class="px-2 py-0.5 rounded-lg text-xs font-bold bg-white text-indigo-600 shadow-sm transition">⊞</button>
+            <button onclick="cambiarVista('compact')" id="btnCompact" class="px-2 py-0.5 rounded-lg text-xs font-bold text-slate-600 transition">☰</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- MAIN -->
-    <main class="p-3 max-w-4xl mx-auto" id="mainContainer">
-      <div class="text-center py-10 text-slate-400">Cargando colección desde la nube...</div>
+    <!-- CONTENEDOR PRINCIPAL -->
+    <main class="p-2.5 max-w-4xl mx-auto" id="mainContainer">
+      <div class="text-center py-10 text-slate-400 text-xs">Cargando colección desde la nube...</div>
     </main>
 
-    <button onclick="abrirModalFormulario()" class="fixed bottom-6 right-6 bg-indigo-600 hover:bg-indigo-700 text-white p-4 rounded-full shadow-2xl z-40 text-2xl font-bold flex items-center justify-center w-14 h-14 card-zoom">
+    <button onclick="abrirModalFormulario()" class="fixed bottom-5 right-5 bg-indigo-600 hover:bg-indigo-700 text-white p-3.5 rounded-full shadow-2xl z-40 text-xl font-bold flex items-center justify-center w-12 h-12 card-zoom">
       ＋
     </button>
   </div>
 
   <!-- MODAL FICHA DETALLADA -->
-  <div id="modalFichaJuego" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
-    <div class="bg-white rounded-2xl max-w-md w-full h-[85vh] max-h-[620px] flex flex-col shadow-2xl overflow-hidden relative border border-slate-100">
-      <div class="p-3 border-b flex justify-between items-center bg-slate-50 shrink-0">
-        <h3 class="font-bold text-base text-slate-800 truncate pr-2" id="fichaTitulo">Detalles del Juego</h3>
-        <div class="flex items-center gap-1.5">
-          <button id="btnEditarDesdeFicha" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-2.5 py-1 rounded-lg transition">✏ Editar</button>
-          <button onclick="cerrarFichaModal()" class="text-slate-400 font-bold text-xl px-1">✕</button>
+  <div id="modalFichaJuego" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-2.5">
+    <div class="bg-white rounded-2xl max-w-md w-full h-[85vh] max-h-[600px] flex flex-col shadow-2xl overflow-hidden relative border border-slate-100">
+      <div class="p-2.5 border-b flex justify-between items-center bg-slate-50 shrink-0">
+        <h3 class="font-bold text-sm text-slate-800 truncate pr-2" id="fichaTitulo">Detalles del Juego</h3>
+        <div class="flex items-center gap-1">
+          <button id="btnEditarDesdeFicha" class="text-[11px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-2 py-0.5 rounded-lg transition">✏ Editar</button>
+          <button onclick="cerrarFichaModal()" class="text-slate-400 font-bold text-lg px-1">✕</button>
         </div>
       </div>
 
-      <div class="h-44 bg-slate-900 overflow-hidden relative flex items-center justify-center shrink-0 shadow-inner" id="fichaImagenContainer"></div>
+      <div class="h-40 bg-slate-900 overflow-hidden relative flex items-center justify-center shrink-0 shadow-inner" id="fichaImagenContainer"></div>
 
-      <div class="flex bg-slate-100 p-1 text-[11px] font-bold text-slate-600 justify-between shrink-0 border-y border-slate-200">
-        <button onclick="cambiarTabFicha('info')" id="tabInfoBtn" class="flex-1 py-1.5 rounded-lg text-center transition">Info</button>
-        <button onclick="cambiarTabFicha('reglas')" id="tabReglasBtn" class="flex-1 py-1.5 rounded-lg text-center transition">Reglas & IA</button>
-        <button onclick="cambiarTabFicha('stats')" id="tabStatsBtn" class="flex-1 py-1.5 rounded-lg text-center transition">Estadísticas</button>
-        <button onclick="cambiarTabFicha('historial')" id="tabHistorialBtn" class="flex-1 py-1.5 rounded-lg text-center transition">Historial</button>
+      <div class="flex bg-slate-100 p-0.5 text-[10px] font-bold text-slate-600 justify-between shrink-0 border-y border-slate-200">
+        <button onclick="cambiarTabFicha('info')" id="tabInfoBtn" class="flex-1 py-1 rounded-md text-center transition">Info</button>
+        <button onclick="cambiarTabFicha('reglas')" id="tabReglasBtn" class="flex-1 py-1 rounded-md text-center transition">Reglas & IA</button>
+        <button onclick="cambiarTabFicha('stats')" id="tabStatsBtn" class="flex-1 py-1 rounded-md text-center transition">Estadísticas</button>
+        <button onclick="cambiarTabFicha('historial')" id="tabHistorialBtn" class="flex-1 py-1 rounded-md text-center transition">Historial</button>
       </div>
 
-      <div class="flex-grow overflow-y-auto p-3 space-y-3 text-xs">
-        <div id="tabInfoContent" class="space-y-2.5">
-          <div class="border-b pb-1.5 space-y-0.5">
+      <div class="flex-grow overflow-y-auto p-2.5 space-y-2.5 text-xs">
+        <div id="tabInfoContent" class="space-y-2">
+          <div class="border-b pb-1 space-y-0.5">
             <p class="text-slate-700">📍 <b>Ubicación:</b> <span id="fichaUbicacion"></span></p>
             <p class="text-slate-600 text-[10px]" id="fichaAutoriaTexto"></p>
           </div>
 
-          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-1">
+          <div class="bg-slate-50 p-2 rounded-xl border border-slate-200 space-y-1">
             <span class="font-bold text-slate-500 uppercase text-[9px] block tracking-wider">📦 Ficha Técnica</span>
             <p class="text-slate-700">🏷️ <b>Tipología:</b> <span id="fichaTipologia"></span></p>
-            <p class="text-slate-700">👶 <b>Edad:</b> <span id="fichaEdad"></span></p>
-            <p class="text-slate-700">👥 <b>Jugadores:</b> <span id="fichaJugadores"></span></p>
             <p class="text-slate-700">🧩 <b>Mecánicas:</b> <span id="fichaMecanicas"></span></p>
+            <p class="text-slate-700">👶 <b>Edad:</b> <span id="fichaEdad"></span> • 👥 <b>Jugadores:</b> <span id="fichaJugadores"></span></p>
           </div>
 
-          <div class="bg-indigo-50/50 p-2.5 rounded-xl border border-indigo-100 space-y-1">
+          <div class="bg-indigo-50/50 p-2 rounded-xl border border-indigo-100 space-y-0.5">
             <p class="font-bold text-indigo-900 uppercase text-[9px] tracking-wider">⚡ Reglas Básicas (Resumen Rápido):</p>
-            <p id="fichaReglasBasicasText" class="text-slate-700 leading-relaxed text-xs"></p>
+            <p id="fichaReglasBasicasText" class="text-slate-700 leading-relaxed text-[11px]"></p>
           </div>
         </div>
 
-        <div id="tabReglasContent" class="space-y-3 hidden">
+        <div id="tabReglasContent" class="space-y-2.5 hidden">
           <div class="space-y-1">
-            <p class="font-bold text-slate-700 uppercase text-[10px] tracking-wider">📖 Instrucciones Oficiales Completas:</p>
-            <div id="fichaReglasCompletasText" class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-slate-700 leading-relaxed whitespace-pre-line text-xs max-h-40 overflow-y-auto"></div>
+            <p class="font-bold text-slate-700 uppercase text-[9px] tracking-wider">📖 Instrucciones Oficiales Completas:</p>
+            <div id="fichaReglasCompletasText" class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-slate-700 leading-relaxed whitespace-pre-line text-[11px] max-h-36 overflow-y-auto"></div>
           </div>
 
-          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-2">
+          <div class="bg-slate-50 p-2 rounded-xl border border-slate-200 space-y-1.5">
             <span class="font-bold text-slate-600 uppercase text-[9px] block">📎 Recursos Adjuntos</span>
             
             <div id="contenedorBotonPdf" class="w-full">
               <input type="file" id="inputSubirPdfModal" accept="application/pdf" onchange="subirPdfJuegoDirecto(event)" class="hidden">
-              <button onclick="document.getElementById('inputSubirPdfModal').click()" id="btnAccionPdf" class="w-full bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 font-bold p-2.5 rounded-xl text-center text-xs flex items-center justify-center gap-1.5 shadow-sm">
+              <button onclick="document.getElementById('inputSubirPdfModal').click()" id="btnAccionPdf" class="w-full bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 font-bold p-2 rounded-xl text-center text-xs flex items-center justify-center gap-1 shadow-sm">
                 📄 Subir PDF de Instrucciones
               </button>
             </div>
@@ -315,43 +308,43 @@
             <div id="visorVideoContainer" class="hidden aspect-video w-full rounded-xl overflow-hidden border mt-1"></div>
           </div>
 
-          <div class="bg-purple-50/80 p-3 rounded-2xl border border-purple-200 space-y-2">
+          <div class="bg-purple-50/80 p-2.5 rounded-2xl border border-purple-200 space-y-1.5">
             <p class="font-bold text-purple-900 text-xs flex items-center gap-1">🤖 Pregunta al Árbitro IA sobre las Reglas</p>
-            <div class="flex gap-1.5">
-              <input type="text" id="inputDudaIA" placeholder="Ej. ¿Qué ocurre en empate?" class="w-full p-2 border border-purple-200 rounded-xl outline-none text-xs">
-              <button onclick="consultarArbitroIA()" id="btnConsultarIA" class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-3 py-2 rounded-xl text-xs card-zoom">
+            <div class="flex gap-1">
+              <input type="text" id="inputDudaIA" placeholder="Ej. ¿Qué ocurre en empate?" class="w-full p-1.5 border border-purple-200 rounded-xl outline-none text-xs">
+              <button onclick="consultarArbitroIA()" id="btnConsultarIA" class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-2.5 py-1.5 rounded-xl text-xs card-zoom">
                 Preguntar
               </button>
             </div>
-            <div id="respuestaArbitroIA" class="hidden bg-white p-2.5 rounded-xl border border-purple-200 text-[11px] text-purple-900 leading-relaxed"></div>
+            <div id="respuestaArbitroIA" class="hidden bg-white p-2 rounded-xl border border-purple-200 text-[10px] text-purple-900 leading-relaxed"></div>
           </div>
         </div>
 
-        <div id="tabStatsContent" class="space-y-3 hidden">
+        <div id="tabStatsContent" class="space-y-2.5 hidden">
           <div class="grid grid-cols-2 gap-2 text-center">
-            <div class="bg-amber-50 border border-amber-200 p-2.5 rounded-xl">
-              <span class="block text-lg font-black text-amber-600" id="statPartidas">0</span>
-              <span class="text-[9px] text-amber-800 font-bold uppercase">Partidas Jugadas</span>
+            <div class="bg-amber-50 border border-amber-200 p-2 rounded-xl">
+              <span class="block text-base font-black text-amber-600" id="statPartidas">0</span>
+              <span class="text-[8px] text-amber-800 font-bold uppercase">Partidas Jugadas</span>
             </div>
-            <div class="bg-indigo-50 border border-indigo-200 p-2.5 rounded-xl">
-              <span class="block text-lg font-black text-indigo-600" id="statTiempoMedio">0 min</span>
-              <span class="text-[9px] text-indigo-800 font-bold uppercase">Tiempo Medio</span>
+            <div class="bg-indigo-50 border border-indigo-200 p-2 rounded-xl">
+              <span class="block text-base font-black text-indigo-600" id="statTiempoMedio">0 min</span>
+              <span class="text-[8px] text-indigo-800 font-bold uppercase">Tiempo Medio</span>
             </div>
           </div>
 
-          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-1.5">
-            <p class="font-bold text-slate-700 uppercase text-[10px] tracking-wider">🏆 Ránking de Victorias:</p>
+          <div class="bg-slate-50 p-2 rounded-xl border border-slate-200 space-y-1">
+            <p class="font-bold text-slate-700 uppercase text-[9px] tracking-wider">🏆 Ránking de Victorias:</p>
             <div id="listaRankingGanadores" class="space-y-1"></div>
           </div>
         </div>
 
-        <div id="tabHistorialJuegoContent" class="space-y-2 hidden">
-          <div id="listaPartidasJuego" class="space-y-2"></div>
+        <div id="tabHistorialJuegoContent" class="space-y-1.5 hidden">
+          <div id="listaPartidasJuego" class="space-y-1.5"></div>
         </div>
       </div>
 
-      <div class="p-3 border-t bg-slate-50 shrink-0">
-        <button id="btnJugarDesdeFicha" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs card-zoom shadow-md">
+      <div class="p-2 border-t bg-slate-50 shrink-0">
+        <button id="btnJugarDesdeFicha" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs card-zoom shadow-md">
           ¡Jugar!
         </button>
       </div>
@@ -359,69 +352,62 @@
   </div>
 
   <!-- MODAL PERFIL UNIFICADO -->
-  <div id="modalPerfil" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
-    <div class="bg-white rounded-2xl max-w-md w-full h-[85vh] max-h-[620px] flex flex-col shadow-2xl overflow-hidden relative border border-slate-100">
-      <div class="p-3 border-b flex justify-between items-center bg-slate-50 shrink-0">
+  <div id="modalPerfil" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-2.5">
+    <div class="bg-white rounded-2xl max-w-md w-full h-[85vh] max-h-[600px] flex flex-col shadow-2xl overflow-hidden relative border border-slate-100">
+      <div class="p-2.5 border-b flex justify-between items-center bg-slate-50 shrink-0">
         <div class="flex items-center gap-2">
-          <h3 class="font-bold text-base text-slate-800">👤 Perfil de Usuario</h3>
+          <h3 class="font-bold text-sm text-slate-800">👤 Perfil de Usuario</h3>
           <div id="adminIconContainer"></div>
         </div>
-        <button onclick="cerrarPerfilModal()" class="text-slate-400 font-bold text-xl px-1">✕</button>
+        <button onclick="cerrarPerfilModal()" class="text-slate-400 font-bold text-lg px-1">✕</button>
       </div>
 
-      <div class="p-3 bg-slate-900 text-white flex items-center gap-3 shrink-0 shadow-inner">
-        <div id="avatarPreview" class="w-14 h-14 bg-slate-700 rounded-full flex items-center justify-center border-2 border-amber-400 overflow-hidden relative shrink-0">
-          <span class="text-slate-400 text-xs">Foto</span>
+      <div class="p-2.5 bg-slate-900 text-white flex items-center gap-2.5 shrink-0 shadow-inner">
+        <div id="avatarPreview" class="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center border-2 border-amber-400 overflow-hidden relative shrink-0">
+          <span class="text-slate-400 text-[10px]">Foto</span>
         </div>
         <div class="min-w-0 flex-grow">
-          <h4 id="perfilHeaderNombre" class="font-bold text-sm truncate">Usuario</h4>
-          <p id="perfilHeaderNick" class="text-xs text-amber-300 font-medium truncate">@nick</p>
+          <h4 id="perfilHeaderNombre" class="font-bold text-xs truncate">Usuario</h4>
+          <p id="perfilHeaderNick" class="text-[10px] text-amber-300 font-medium truncate">@nick</p>
           <input type="file" id="inputAvatar" accept="image/*" onchange="procesarAvatar(event)" class="hidden">
-          <button type="button" onclick="document.getElementById('inputAvatar').click()" class="text-[10px] bg-white/20 hover:bg-white/30 text-white font-semibold px-2 py-0.5 rounded-md mt-1 transition">
+          <button type="button" onclick="document.getElementById('inputAvatar').click()" class="text-[9px] bg-white/20 hover:bg-white/30 text-white font-semibold px-1.5 py-0.5 rounded-md mt-0.5 transition">
             📷 Cambiar Avatar
           </button>
         </div>
       </div>
 
-      <div class="flex bg-slate-100 p-1 text-[11px] font-bold text-slate-600 justify-between shrink-0 border-y border-slate-200">
-        <button onclick="cambiarTabPerfil('historial')" id="tabHistorialPerfilBtn" class="flex-1 py-1.5 rounded-lg text-center transition">Historial</button>
-        <button onclick="cambiarTabPerfil('juegos')" id="tabJuegosPerfilBtn" class="flex-1 py-1.5 rounded-lg text-center transition">Mis Juegos</button>
-        <button onclick="cambiarTabPerfil('datos')" id="tabDatosPerfilBtn" class="flex-1 py-1.5 rounded-lg text-center transition">Mis Datos</button>
+      <div class="flex bg-slate-100 p-0.5 text-[10px] font-bold text-slate-600 justify-between shrink-0 border-y border-slate-200">
+        <button onclick="cambiarTabPerfil('historial')" id="tabHistorialPerfilBtn" class="flex-1 py-1 rounded-md text-center transition">Historial</button>
+        <button onclick="cambiarTabPerfil('juegos')" id="tabJuegosPerfilBtn" class="flex-1 py-1 rounded-md text-center transition">Mis Juegos</button>
+        <button onclick="cambiarTabPerfil('datos')" id="tabDatosPerfilBtn" class="flex-1 py-1 rounded-md text-center transition">Mis Datos</button>
       </div>
 
-      <div class="flex-grow overflow-y-auto p-3 space-y-3 text-xs">
-        <div id="tabHistorialPerfilContent" class="space-y-2">
-          <div id="miHistorialLista" class="space-y-2"></div>
+      <div class="flex-grow overflow-y-auto p-2.5 space-y-2.5 text-xs">
+        <div id="tabHistorialPerfilContent" class="space-y-1.5">
+          <div id="miHistorialLista" class="space-y-1.5"></div>
         </div>
 
-        <div id="tabJuegosPerfilContent" class="space-y-2 hidden">
-          <div id="misJuegosLista" class="space-y-2"></div>
+        <div id="tabJuegosPerfilContent" class="space-y-1.5 hidden">
+          <div id="misJuegosLista" class="space-y-1.5"></div>
         </div>
 
-        <div id="tabDatosPerfilContent" class="space-y-3 hidden">
-          <form id="perfilForm" onsubmit="guardarPerfil(event)" class="space-y-3">
+        <div id="tabDatosPerfilContent" class="space-y-2 hidden">
+          <form id="perfilForm" onsubmit="guardarPerfil(event)" class="space-y-2">
             <input type="hidden" id="perfilAvatarBase64">
             <div>
-              <label class="text-[10px] font-bold text-slate-500 uppercase">Nombre Completo</label>
-              <input type="text" id="perfilNombre" required class="w-full p-2 border rounded-xl outline-none">
+              <label class="text-[9px] font-bold text-slate-500 uppercase">Nombre Completo</label>
+              <input type="text" id="perfilNombre" required class="w-full p-1.5 border rounded-xl outline-none text-xs">
             </div>
             <div>
-              <label class="text-[10px] font-bold text-slate-500 uppercase">Nick de Usuario</label>
-              <input type="text" id="perfilNick" required class="w-full p-2 border rounded-xl outline-none">
+              <label class="text-[9px] font-bold text-slate-500 uppercase">Nick de Usuario</label>
+              <input type="text" id="perfilNick" required class="w-full p-1.5 border rounded-xl outline-none text-xs">
             </div>
             <div>
-              <label class="text-[10px] font-bold text-slate-500 uppercase">Bio / Datos Personales</label>
-              <textarea id="perfilBio" rows="2" placeholder="Escribe algo sobre ti..." class="w-full p-2 border rounded-xl outline-none"></textarea>
+              <label class="text-[9px] font-bold text-slate-500 uppercase">Bio / Datos Personales</label>
+              <textarea id="perfilBio" rows="2" placeholder="Escribe algo sobre ti..." class="w-full p-1.5 border rounded-xl outline-none text-xs"></textarea>
             </div>
 
-            <div class="border-t pt-2 space-y-2">
-              <p class="text-[10px] font-bold text-indigo-600 uppercase">Cambiar Contraseña</p>
-              <input type="password" id="passActual" placeholder="Contraseña actual" class="w-full p-2 border rounded-xl outline-none">
-              <input type="password" id="passNueva" placeholder="Nueva contraseña" class="w-full p-2 border rounded-xl outline-none">
-              <input type="password" id="passConfirmar" placeholder="Repetir nueva contraseña" class="w-full p-2 border rounded-xl outline-none">
-            </div>
-
-            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md card-zoom">
+            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-xl text-xs shadow-md card-zoom">
               Guardar Cambios
             </button>
           </form>
@@ -431,58 +417,58 @@
   </div>
 
   <!-- MODAL FORMULARIO DE EDICIÓN / ALTA DE JUEGO -->
-  <div id="modalForm" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
-    <div class="bg-white rounded-2xl max-w-md w-full h-[90vh] max-h-[660px] flex flex-col shadow-2xl overflow-hidden relative border border-slate-100">
-      <div class="p-3 border-b flex justify-between items-center bg-slate-50 shrink-0">
-        <h3 class="text-base font-bold text-slate-800" id="modalTitulo">Nuevo Juego / Juguete</h3>
-        <button onclick="cerrarModalFormulario()" class="text-slate-400 text-xl font-bold px-1">✕</button>
+  <div id="modalForm" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-2.5">
+    <div class="bg-white rounded-2xl max-w-md w-full h-[90vh] max-h-[630px] flex flex-col shadow-2xl overflow-hidden relative border border-slate-100">
+      <div class="p-2.5 border-b flex justify-between items-center bg-slate-50 shrink-0">
+        <h3 class="text-sm font-bold text-slate-800" id="modalTitulo">Nuevo Juego / Juguete</h3>
+        <button onclick="cerrarModalFormulario()" class="text-slate-400 text-lg font-bold px-1">✕</button>
       </div>
 
-      <div class="flex-grow overflow-y-auto p-3 space-y-3 text-xs">
-        <div class="space-y-2 bg-slate-50 p-2.5 rounded-2xl border border-slate-200">
-          <div id="imagePreview" class="w-48 h-48 mx-auto bg-slate-900 rounded-xl flex items-center justify-center border-2 border-dashed border-slate-300 overflow-hidden relative shadow-inner">
-            <span class="text-slate-400 text-xs text-center px-2">Sin fotografía<br><span class="text-[10px] text-slate-500">(Se adaptará a 3:4 / 4:3)</span></span>
+      <div class="flex-grow overflow-y-auto p-2.5 space-y-2.5 text-xs">
+        <div class="space-y-1.5 bg-slate-50 p-2 rounded-2xl border border-slate-200">
+          <div id="imagePreview" class="w-40 h-40 mx-auto bg-slate-900 rounded-xl flex items-center justify-center border-2 border-dashed border-slate-300 overflow-hidden relative shadow-inner">
+            <span class="text-slate-400 text-[10px] text-center px-2">Sin fotografía<br><span class="text-[9px] text-slate-500">(Cuadrada)</span></span>
           </div>
 
           <input type="file" id="inputCamara" accept="image/*" capture="environment" onchange="procesarFoto(event)" class="hidden">
           <input type="file" id="inputGaleria" accept="image/*" onchange="procesarFoto(event)" class="hidden">
 
-          <div class="grid grid-cols-2 gap-2">
-            <button type="button" onclick="document.getElementById('inputCamara').click()" class="bg-white border text-slate-700 font-semibold py-1.5 px-2 rounded-xl text-[11px] flex items-center justify-center gap-1 shadow-sm">
+          <div class="grid grid-cols-2 gap-1.5">
+            <button type="button" onclick="document.getElementById('inputCamara').click()" class="bg-white border text-slate-700 font-semibold py-1 px-2 rounded-xl text-[10px] flex items-center justify-center gap-1 shadow-sm">
               📷 Cámara
             </button>
-            <button type="button" onclick="document.getElementById('inputGaleria').click()" class="bg-white border text-slate-700 font-semibold py-1.5 px-2 rounded-xl text-[11px] flex items-center justify-center gap-1 shadow-sm">
+            <button type="button" onclick="document.getElementById('inputGaleria').click()" class="bg-white border text-slate-700 font-semibold py-1 px-2 rounded-xl text-[10px] flex items-center justify-center gap-1 shadow-sm">
               🖼️ Galería
             </button>
           </div>
 
-          <div class="bg-purple-50 p-2.5 rounded-xl border border-purple-200 space-y-2 mt-2">
-            <span class="font-bold text-purple-900 text-[11px] block">✨ Consulta / Autocompletado con IA:</span>
-            <div class="grid grid-cols-2 gap-1.5 text-[10px]" id="checkboxesSeccionesIA">
+          <div class="bg-purple-50 p-2 rounded-xl border border-purple-200 space-y-1.5 mt-1">
+            <span class="font-bold text-purple-900 text-[10px] block">✨ Consulta / Autocompletado con IA:</span>
+            <div class="grid grid-cols-2 gap-1 text-[9px]" id="checkboxesSeccionesIA">
               <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="datos_basicos" class="rounded text-purple-600" checked> Datos Básicos</label>
               <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="mecanicas" class="rounded text-purple-600" checked> Mecánicas</label>
               <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="reglas_basicas" class="rounded text-purple-600" checked> Reglas Básicas</label>
               <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="reglas_completas" class="rounded text-purple-600" checked> Reglas Completas</label>
             </div>
-            <button type="button" onclick="confirmarYAnalizarConIA()" id="btnIA" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 rounded-xl text-xs card-zoom shadow-sm">
+            <button type="button" onclick="confirmarYAnalizarConIA()" id="btnIA" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-1.5 rounded-xl text-xs card-zoom shadow-sm">
               🤖 Consulta Automática
             </button>
           </div>
         </div>
 
-        <form id="juegoForm" onsubmit="preprocesarGuardadoJuego(event)" class="space-y-3">
+        <form id="juegoForm" onsubmit="preprocesarGuardadoJuego(event)" class="space-y-2">
           <input type="hidden" id="juegoId">
           <input type="hidden" id="juegoFotoBase64">
 
           <div>
-            <label class="font-bold text-slate-600 uppercase text-[10px]">Nombre del Juego <span class="text-rose-500">*</span></label>
-            <input type="text" id="nombre" required class="w-full p-2 border rounded-xl outline-none mt-0.5">
+            <label class="font-bold text-slate-600 uppercase text-[9px]">Nombre del Juego <span class="text-rose-500">*</span></label>
+            <input type="text" id="nombre" required class="w-full p-1.5 border rounded-xl outline-none mt-0.5 text-xs">
           </div>
 
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="font-bold text-slate-600 uppercase text-[10px]">Categoría (Nivel 1) <span class="text-rose-500">*</span></label>
-              <select id="categoria" required class="w-full p-2 border rounded-xl outline-none mt-0.5 bg-white font-medium">
+              <label class="font-bold text-slate-600 uppercase text-[9px]">Categoría (Nivel 1) <span class="text-rose-500">*</span></label>
+              <select id="categoria" required class="w-full p-1.5 border rounded-xl outline-none mt-0.5 bg-white font-medium text-xs">
                 <option value="Juego de Mesa">Juego de Mesa</option>
                 <option value="Habilidad">Habilidad</option>
                 <option value="Puzles">Puzles</option>
@@ -496,15 +482,15 @@
               </select>
             </div>
             <div>
-              <label class="font-bold text-slate-600 uppercase text-[10px]">Tipología / Soporte <span class="text-rose-500">*</span></label>
-              <input type="text" id="tipologia" required placeholder="Ej. Tablero, Cartas" class="w-full p-2 border rounded-xl outline-none mt-0.5">
+              <label class="font-bold text-slate-600 uppercase text-[9px]">Tipología / Soporte <span class="text-rose-500">*</span></label>
+              <input type="text" id="tipologia" required placeholder="Ej. Tablero, Cartas" class="w-full p-1.5 border rounded-xl outline-none mt-0.5 text-xs">
             </div>
           </div>
 
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="font-bold text-slate-600 uppercase text-[10px]">Edad Recomendada <span class="text-rose-500">*</span></label>
-              <select id="edad" required class="w-full p-2 border rounded-xl outline-none mt-0.5 bg-white font-semibold">
+              <label class="font-bold text-slate-600 uppercase text-[9px]">Edad Recomendada <span class="text-rose-500">*</span></label>
+              <select id="edad" required class="w-full p-1.5 border rounded-xl outline-none mt-0.5 bg-white font-semibold text-xs">
                 <option value="+3">+3 años</option>
                 <option value="+4">+4 años</option>
                 <option value="+6" selected>+6 años</option>
@@ -519,21 +505,21 @@
 
             <div>
               <div class="flex justify-between items-center">
-                <label class="font-bold text-slate-600 uppercase text-[10px]">Ubicación (Manual) <span class="text-rose-500">*</span></label>
-                <button type="button" onclick="crearNuevaUbicacionPrompt()" class="text-[9px] text-indigo-600 font-bold">＋ Crear</button>
+                <label class="font-bold text-slate-600 uppercase text-[9px]">Ubicación <span class="text-rose-500">*</span></label>
+                <button type="button" onclick="crearNuevaUbicacionPrompt()" class="text-[8px] text-indigo-600 font-bold">＋ Crear</button>
               </div>
-              <select id="ubicacionSelect" required class="w-full p-2 border rounded-xl outline-none mt-0.5 bg-white">
+              <select id="ubicacionSelect" required class="w-full p-1.5 border rounded-xl outline-none mt-0.5 bg-white text-xs">
                 <option value="">Selecciona ubicación...</option>
               </select>
             </div>
           </div>
 
-          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-1.5">
-            <span class="font-bold text-slate-600 uppercase text-[10px] block">Nº de Jugadores Permitidos <span class="text-rose-500">*</span></span>
+          <div class="bg-slate-50 p-2 rounded-xl border border-slate-200 space-y-1">
+            <span class="font-bold text-slate-600 uppercase text-[9px] block">Nº de Jugadores Permitidos <span class="text-rose-500">*</span></span>
             <div class="grid grid-cols-2 gap-2">
               <div>
-                <label class="text-[9px] text-slate-500 font-bold uppercase">Mínimo</label>
-                <select id="minJugadoresSelect" required class="w-full p-2 border rounded-xl outline-none mt-0.5 bg-white font-medium">
+                <label class="text-[8px] text-slate-500 font-bold uppercase">Mínimo</label>
+                <select id="minJugadoresSelect" required class="w-full p-1.5 border rounded-xl outline-none mt-0.5 bg-white font-medium text-xs">
                   <option value="1">1 jugador</option>
                   <option value="2" selected>2 jugadores</option>
                   <option value="3">3 jugadores</option>
@@ -543,8 +529,8 @@
                 </select>
               </div>
               <div>
-                <label class="text-[9px] text-slate-500 font-bold uppercase">Máximo</label>
-                <select id="maxJugadoresSelect" required class="w-full p-2 border rounded-xl outline-none mt-0.5 bg-white font-medium">
+                <label class="text-[8px] text-slate-500 font-bold uppercase">Máximo</label>
+                <select id="maxJugadoresSelect" required class="w-full p-1.5 border rounded-xl outline-none mt-0.5 bg-white font-medium text-xs">
                   <option value="1">1 jugador</option>
                   <option value="2">2 jugadores</option>
                   <option value="3">3 jugadores</option>
@@ -561,50 +547,50 @@
           </div>
 
           <div>
-            <label class="font-bold text-slate-600 uppercase text-[10px]">Mecánicas (Nivel 3 - Máx 3) <span class="text-rose-500">*</span></label>
-            <input type="text" id="mecanicas" required placeholder="Ej. Estrategia, Enfrentamiento" class="w-full p-2 border rounded-xl outline-none mt-0.5">
+            <label class="font-bold text-slate-600 uppercase text-[9px]">Mecánicas (Nivel 3 - Máx 3) <span class="text-rose-500">*</span></label>
+            <input type="text" id="mecanicas" required placeholder="Ej. Estrategia, Enfrentamiento" class="w-full p-1.5 border rounded-xl outline-none mt-0.5 text-xs">
           </div>
 
           <div>
-            <label class="font-bold text-slate-600 uppercase text-[10px]">Reglas Básicas (Resumen)</label>
-            <textarea id="instrucciones" rows="2" placeholder="Resumen de 2 o 3 frases..." class="w-full p-2 border rounded-xl outline-none mt-0.5 text-xs"></textarea>
+            <label class="font-bold text-slate-600 uppercase text-[9px]">Reglas Básicas (Resumen)</label>
+            <textarea id="instrucciones" rows="2" placeholder="Resumen de 2 o 3 frases..." class="w-full p-1.5 border rounded-xl outline-none mt-0.5 text-xs"></textarea>
           </div>
 
           <div>
-            <label class="font-bold text-slate-600 uppercase text-[10px]">Reglas Completas Paso a Paso</label>
-            <textarea id="instruccionesCompletas" rows="4" placeholder="Desarrollo oficial paso a paso..." class="w-full p-2 border rounded-xl outline-none mt-0.5 text-xs"></textarea>
+            <label class="font-bold text-slate-600 uppercase text-[9px]">Reglas Completas Paso a Paso</label>
+            <textarea id="instruccionesCompletas" rows="3" placeholder="Desarrollo oficial paso a paso..." class="w-full p-1.5 border rounded-xl outline-none mt-0.5 text-xs"></textarea>
           </div>
 
-          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-2.5">
-            <span class="font-bold text-slate-600 uppercase text-[10px] block">📎 Enlaces de Recursos (PDF R2 y Vídeo)</span>
+          <div class="bg-slate-50 p-2 rounded-xl border border-slate-200 space-y-2">
+            <span class="font-bold text-slate-600 uppercase text-[9px] block">📎 Enlaces de Recursos (PDF R2 y Vídeo)</span>
             
             <div class="space-y-1">
               <div class="flex justify-between items-center">
-                <label class="text-[9px] text-slate-500 font-bold uppercase">Documento PDF Instrucciones</label>
+                <label class="text-[8px] text-slate-500 font-bold uppercase">Documento PDF Instrucciones</label>
                 <div class="flex gap-1">
                   <input type="file" id="inputPdfForm" accept="application/pdf" onchange="cargarPdfEnFormulario(event)" class="hidden">
-                  <button type="button" onclick="document.getElementById('inputPdfForm').click()" class="text-[9px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-1.5 py-0.5 rounded">📄 Cargar PDF</button>
-                  <button type="button" onclick="borrarPdfFormulario()" class="text-[9px] bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold px-1.5 py-0.5 rounded">🗑️ Borrar</button>
+                  <button type="button" onclick="document.getElementById('inputPdfForm').click()" class="text-[8px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-1.5 py-0.5 rounded">📄 Cargar PDF</button>
+                  <button type="button" onclick="borrarPdfFormulario()" class="text-[8px] bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold px-1.5 py-0.5 rounded">🗑️ Borrar</button>
                 </div>
               </div>
-              <input type="url" id="pdf_reglas_url" placeholder="URL o archivo cargado..." class="w-full p-2 border rounded-xl outline-none bg-white text-xs" readonly>
+              <input type="url" id="pdf_reglas_url" placeholder="URL o archivo cargado..." class="w-full p-1.5 border rounded-xl outline-none bg-white text-xs" readonly>
             </div>
 
-            <div class="space-y-1 border-t pt-2">
+            <div class="space-y-1 border-t pt-1.5">
               <div class="flex justify-between items-center">
-                <label class="text-[9px] text-slate-500 font-bold uppercase">Vídeo Explicativo YouTube</label>
-                <button type="button" onclick="borrarVideoFormulario()" class="text-[9px] bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold px-1.5 py-0.5 rounded">🗑️ Borrar Enlace</button>
+                <label class="text-[8px] text-slate-500 font-bold uppercase">Vídeo Explicativo YouTube</label>
+                <button type="button" onclick="borrarVideoFormulario()" class="text-[8px] bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold px-1.5 py-0.5 rounded">🗑️ Borrar Enlace</button>
               </div>
-              <input type="url" id="video_tutorial_url" placeholder="https://www.youtube.com/watch?v=..." class="w-full p-2 border rounded-xl outline-none bg-white text-xs">
+              <input type="url" id="video_tutorial_url" placeholder="https://www.youtube.com/watch?v=..." class="w-full p-1.5 border rounded-xl outline-none bg-white text-xs">
             </div>
           </div>
 
-          <button type="submit" id="btnGuardar" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-md card-zoom text-xs">
+          <button type="submit" id="btnGuardar" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl shadow-md card-zoom text-xs">
             Guardar en la Nube
           </button>
 
-          <div id="contenedorBorradoEdicion" class="hidden border-t pt-2">
-            <button type="button" onclick="confirmarBorradoSeguro()" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold py-2 rounded-xl text-xs">
+          <div id="contenedorBorradoEdicion" class="hidden border-t pt-1.5">
+            <button type="button" onclick="confirmarBorradoSeguro()" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold py-1.5 rounded-xl text-xs">
               🗑️ Eliminar Juego Permanentemente
             </button>
           </div>
@@ -614,22 +600,22 @@
   </div>
 
   <!-- MODAL COMPARADOR IA -->
-  <div id="modalComparadorIA" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 hidden flex items-center justify-center p-3">
-    <div class="bg-white rounded-2xl max-w-lg w-full h-[85vh] max-h-[620px] flex flex-col shadow-2xl overflow-hidden relative border border-purple-200">
-      <div class="p-3 border-b bg-purple-900 text-white flex justify-between items-center shrink-0">
-        <h3 class="font-bold text-sm flex items-center gap-1.5">✨ Comparador Interactivo de IA</h3>
-        <button onclick="cerrarComparadorIA()" class="text-purple-200 font-bold text-xl px-1">✕</button>
+  <div id="modalComparadorIA" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 hidden flex items-center justify-center p-2.5">
+    <div class="bg-white rounded-2xl max-w-lg w-full h-[85vh] max-h-[600px] flex flex-col shadow-2xl overflow-hidden relative border border-purple-200">
+      <div class="p-2.5 border-b bg-purple-900 text-white flex justify-between items-center shrink-0">
+        <h3 class="font-bold text-xs flex items-center gap-1.5">✨ Comparador Interactivo de IA</h3>
+        <button onclick="cerrarComparadorIA()" class="text-purple-200 font-bold text-lg px-1">✕</button>
       </div>
 
-      <div class="p-2.5 bg-purple-50 text-purple-900 text-[11px] font-medium shrink-0 border-b border-purple-100">
-        Toca directamente sobre la caja que prefieras conservar (Original o IA):
+      <div class="p-2 bg-purple-50 text-purple-900 text-[10px] font-medium shrink-0 border-b border-purple-100">
+        Toca sobre la opción que prefieras conservar (Original o IA):
       </div>
 
-      <div class="flex-grow overflow-y-auto p-3 space-y-3 text-xs" id="contenedorCamposComparador"></div>
+      <div class="flex-grow overflow-y-auto p-2.5 space-y-2 text-xs" id="contenedorCamposComparador"></div>
 
-      <div class="p-3 border-t bg-slate-50 shrink-0 flex gap-2">
-        <button onclick="cerrarComparadorIA()" class="w-1/3 bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-xs">Cancelar</button>
-        <button onclick="aplicarSeleccionComparador()" class="w-2/3 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md card-zoom">
+      <div class="p-2.5 border-t bg-slate-50 shrink-0 flex gap-2">
+        <button onclick="cerrarComparadorIA()" class="w-1/3 bg-slate-200 text-slate-700 font-bold py-2 rounded-xl text-xs">Cancelar</button>
+        <button onclick="aplicarSeleccionComparador()" class="w-2/3 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 rounded-xl text-xs shadow-md card-zoom">
           ✅ Aplicar Cambios al Formulario
         </button>
       </div>
@@ -637,17 +623,17 @@
   </div>
 
   <!-- MODAL RULETA -->
-  <div id="modalRuleta" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
-    <div class="bg-white rounded-2xl max-w-md w-full p-4 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
-      <div class="flex justify-between items-center border-b pb-2">
-        <h3 class="font-bold text-lg text-slate-800 flex items-center gap-1">🎡 Ruleta de Selección</h3>
-        <button onclick="cerrarModalRuleta()" class="text-slate-400 font-bold text-xl px-2">✕</button>
+  <div id="modalRuleta" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-2.5">
+    <div class="bg-white rounded-2xl max-w-md w-full p-3.5 space-y-3 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b pb-1.5">
+        <h3 class="font-bold text-base text-slate-800 flex items-center gap-1">🎡 Ruleta de Selección</h3>
+        <button onclick="cerrarModalRuleta()" class="text-slate-400 font-bold text-lg px-1">✕</button>
       </div>
 
-      <div id="pasoRuletaConfig" class="space-y-3 text-xs">
+      <div id="pasoRuletaConfig" class="space-y-2.5 text-xs">
         <div>
-          <label class="font-bold text-slate-600 uppercase text-[10px]">Modo de Selección:</label>
-          <select id="ruletaModo" class="w-full p-2.5 border rounded-xl outline-none font-bold text-indigo-700 bg-indigo-50 mt-1">
+          <label class="font-bold text-slate-600 uppercase text-[9px]">Modo de Selección:</label>
+          <select id="ruletaModo" class="w-full p-2 border rounded-xl outline-none font-bold text-indigo-700 bg-indigo-50 mt-0.5 text-xs">
             <option value="azar">🎲 Aleatorio Puro (Cualquier juego)</option>
             <option value="descarte">🔄 Modo Descarte (Sin repetir hasta vaciar bolsa)</option>
             <option value="compensado">⚖️ Modo Compensado (Prioriza poco jugados)</option>
@@ -655,22 +641,22 @@
           </select>
         </div>
 
-        <div class="bg-slate-50 p-2.5 rounded-xl border space-y-2">
-          <span class="font-bold text-slate-600 uppercase text-[10px] block">Condicionar por categoría:</span>
-          <div class="grid grid-cols-2 gap-1.5" id="checkboxesRuletaCat">
-            <label class="flex items-center gap-1.5"><input type="checkbox" value="Juego de Mesa" checked> Mesa</label>
-            <label class="flex items-center gap-1.5"><input type="checkbox" value="Construcción" checked> Construcción</label>
-            <label class="flex items-center gap-1.5"><input type="checkbox" value="Exterior" checked> Exterior</label>
-            <label class="flex items-center gap-1.5"><input type="checkbox" value="Consola" checked> Consola</label>
+        <div class="bg-slate-50 p-2 rounded-xl border space-y-1.5">
+          <span class="font-bold text-slate-600 uppercase text-[9px] block">Condicionar por categoría:</span>
+          <div class="grid grid-cols-2 gap-1" id="checkboxesRuletaCat">
+            <label class="flex items-center gap-1"><input type="checkbox" value="Juego de Mesa" checked> Mesa</label>
+            <label class="flex items-center gap-1"><input type="checkbox" value="Construcción" checked> Construcción</label>
+            <label class="flex items-center gap-1"><input type="checkbox" value="Exterior" checked> Exterior</label>
+            <label class="flex items-center gap-1"><input type="checkbox" value="Consola" checked> Consola</label>
           </div>
         </div>
 
-        <button onclick="girarRuletaClasica()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-black py-3 rounded-xl shadow-lg card-zoom text-sm">
+        <button onclick="girarRuletaClasica()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-black py-2.5 rounded-xl shadow-lg card-zoom text-xs">
           🎰 ¡GIRAR RULETA!
         </button>
       </div>
 
-      <div id="pasoRuletaAnimacion" class="hidden text-center py-6 space-y-4">
+      <div id="pasoRuletaAnimacion" class="hidden text-center py-4 space-y-3">
         <div class="roulette-container">
           <div class="roulette-pointer"></div>
           <div class="roulette-wheel" id="rouletteWheelElem"></div>
@@ -679,24 +665,24 @@
         <p class="font-bold text-slate-600 animate-pulse text-xs">¡Girando la ruleta...</p>
       </div>
 
-      <div id="pasoRuletaResultado" class="hidden space-y-3">
+      <div id="pasoRuletaResultado" class="hidden space-y-2.5">
         <div class="text-center">
-          <span class="text-[10px] bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full uppercase">🎉 ¡El juego elegido es!</span>
-          <h4 class="font-black text-xl text-indigo-900 mt-1" id="ruletaResultadoNombre">Juego</h4>
+          <span class="text-[9px] bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full uppercase">🎉 ¡El juego elegido es!</span>
+          <h4 class="font-black text-lg text-indigo-900 mt-0.5" id="ruletaResultadoNombre">Juego</h4>
         </div>
 
-        <div class="h-40 bg-slate-900 rounded-xl overflow-hidden relative flex items-center justify-center" id="ruletaResultadoImagen"></div>
+        <div class="h-36 bg-slate-900 rounded-xl overflow-hidden relative flex items-center justify-center" id="ruletaResultadoImagen"></div>
 
         <div class="flex gap-2 pt-1">
-          <button id="btnJugarRuleta" class="flex-grow bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs card-zoom shadow-md">
+          <button id="btnJugarRuleta" class="flex-grow bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs card-zoom shadow-md">
             🟢 ¡Jugar!
           </button>
-          <button id="btnVerFichaRuleta" class="bg-indigo-50 text-indigo-700 font-bold px-3 py-2.5 rounded-xl text-xs card-zoom">
+          <button id="btnVerFichaRuleta" class="bg-indigo-50 text-indigo-700 font-bold px-3 py-2 rounded-xl text-xs card-zoom">
             📖 Ver Ficha
           </button>
         </div>
 
-        <button onclick="reiniciarRuleta()" class="w-full bg-slate-100 text-slate-600 font-bold py-2 rounded-xl text-xs">
+        <button onclick="reiniciarRuleta()" class="w-full bg-slate-100 text-slate-600 font-bold py-1.5 rounded-xl text-xs">
           🔄 Girar de nuevo
         </button>
       </div>
@@ -704,83 +690,83 @@
   </div>
 
   <!-- MODAL PARTIDAS -->
-  <div id="modalPartida" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
-    <div class="bg-white rounded-2xl max-w-md w-full p-5 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
-      <div class="flex justify-between items-center border-b pb-2">
-        <h3 class="font-bold text-base text-slate-800">🎲 ¡Vamos a Jugar!</h3>
-        <button onclick="cerrarModalPartida()" class="text-slate-400 font-bold text-xl px-2">✕</button>
+  <div id="modalPartida" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-2.5">
+    <div class="bg-white rounded-2xl max-w-md w-full p-4 space-y-3 shadow-xl max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b pb-1.5">
+        <h3 class="font-bold text-sm text-slate-800">🎲 ¡Vamos a Jugar!</h3>
+        <button onclick="cerrarModalPartida()" class="text-slate-400 font-bold text-lg px-1">✕</button>
       </div>
 
       <input type="hidden" id="partidaJuegoId">
-      <p class="font-bold text-indigo-700 text-sm text-center" id="partidaJuegoNombre">Juego</p>
+      <p class="font-bold text-indigo-700 text-xs text-center" id="partidaJuegoNombre">Juego</p>
 
-      <div id="pasoModoSelector" class="space-y-3">
-        <div class="grid grid-cols-2 gap-3">
-          <button type="button" onclick="elegirModoPartida('ahora')" class="bg-indigo-50 hover:bg-indigo-100 border-2 border-indigo-500 text-indigo-900 p-4 rounded-2xl font-bold text-center card-zoom">
+      <div id="pasoModoSelector" class="space-y-2.5">
+        <div class="grid grid-cols-2 gap-2">
+          <button type="button" onclick="elegirModoPartida('ahora')" class="bg-indigo-50 hover:bg-indigo-100 border-2 border-indigo-500 text-indigo-900 p-3 rounded-2xl font-bold text-center card-zoom text-xs">
             ⏱️ <br>¡Jugar Ahora!
-            <span class="block text-[10px] font-normal text-slate-500 mt-1">Con cronómetro en directo</span>
+            <span class="block text-[9px] font-normal text-slate-500 mt-0.5">Con cronómetro en directo</span>
           </button>
-          <button type="button" onclick="elegirModoPartida('pasado')" class="bg-slate-50 hover:bg-slate-100 border-2 border-slate-300 text-slate-800 p-4 rounded-2xl font-bold text-center card-zoom">
+          <button type="button" onclick="elegirModoPartida('pasado')" class="bg-slate-50 hover:bg-slate-100 border-2 border-slate-300 text-slate-800 p-3 rounded-2xl font-bold text-center card-zoom text-xs">
             📝 <br>Ya hemos jugado
-            <span class="block text-[10px] font-normal text-slate-500 mt-1">Introducir datos a mano</span>
+            <span class="block text-[9px] font-normal text-slate-500 mt-0.5">Introducir datos a mano</span>
           </button>
         </div>
       </div>
 
-      <div id="pasoJugadoresSelector" class="space-y-3 hidden">
+      <div id="pasoJugadoresSelector" class="space-y-2.5 hidden">
         <div class="flex justify-between items-center">
-          <label class="text-xs font-bold text-slate-500 uppercase">Selecciona los participantes:</label>
-          <button type="button" onclick="abrirPromptInvitado()" class="text-xs bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold px-2 py-1 rounded-lg">
+          <label class="text-[10px] font-bold text-slate-500 uppercase">Selecciona los participantes:</label>
+          <button type="button" onclick="abrirPromptInvitado()" class="text-[10px] bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold px-2 py-0.5 rounded-lg">
             ＋ Añadir invitado
           </button>
         </div>
-        <div id="checkboxesJugadores" class="grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded-xl border max-h-40 overflow-y-auto text-xs"></div>
+        <div id="checkboxesJugadores" class="grid grid-cols-2 gap-1.5 bg-slate-50 p-2 rounded-xl border max-h-36 overflow-y-auto text-xs"></div>
 
-        <div class="flex gap-2 pt-2">
-          <button type="button" onclick="volverSeleccionModo()" class="w-1/3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2.5 rounded-xl text-xs">Volver</button>
-          <button type="button" onclick="avanzarAFormularioFinal()" class="w-2/3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md">Siguiente ➔</button>
+        <div class="flex gap-1.5 pt-1">
+          <button type="button" onclick="volverSeleccionModo()" class="w-1/3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 rounded-xl text-xs">Volver</button>
+          <button type="button" onclick="avanzarAFormularioFinal()" class="w-2/3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-xl text-xs shadow-md">Siguiente ➔</button>
         </div>
       </div>
 
-      <div id="pasoCronometroActivo" class="space-y-4 text-center hidden py-4">
-        <div class="bg-slate-900 text-amber-400 font-mono text-4xl font-black py-6 rounded-2xl tracking-widest shadow-inner" id="cronometroDisplay">
+      <div id="pasoCronometroActivo" class="space-y-3 text-center hidden py-3">
+        <div class="bg-slate-900 text-amber-400 font-mono text-3xl font-black py-4 rounded-2xl tracking-widest shadow-inner" id="cronometroDisplay">
           00:00
         </div>
-        <p class="text-xs text-slate-500 animate-pulse">Partida en curso... ¡Diviértete!</p>
-        <button type="button" onclick="detenerCronometroYFinalizar()" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 rounded-xl text-sm shadow-lg card-zoom">
+        <p class="text-[10px] text-slate-500 animate-pulse">Partida en curso... ¡Diviértete!</p>
+        <button type="button" onclick="detenerCronometroYFinalizar()" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-lg card-zoom">
           ⏹️ Terminar Partida
         </button>
       </div>
 
-      <div id="pasoResultadosFinales" class="space-y-3 hidden text-xs">
+      <div id="pasoResultadosFinales" class="space-y-2.5 hidden text-xs">
         <div>
-          <label class="font-bold text-slate-600 uppercase">¿Cuántas partidas se han jugado?</label>
-          <input type="number" id="inputNumPartidas" value="1" min="1" onchange="generarSelectoresGanadores()" class="w-full p-2 border rounded-xl outline-none font-bold text-sm mt-1">
+          <label class="font-bold text-slate-600 uppercase text-[10px]">¿Cuántas partidas se han jugado?</label>
+          <input type="number" id="inputNumPartidas" value="1" min="1" onchange="generarSelectoresGanadores()" class="w-full p-1.5 border rounded-xl outline-none font-bold text-xs mt-0.5">
         </div>
 
-        <div id="contenedorGanadoresPartidas" class="space-y-2 max-h-40 overflow-y-auto"></div>
+        <div id="contenedorGanadoresPartidas" class="space-y-1.5 max-h-36 overflow-y-auto"></div>
 
         <div id="campoDuracionManualContainer">
-          <label class="font-bold text-slate-600 uppercase">Duración total (opcional, en minutos)</label>
-          <input type="number" id="inputDuracionMinutos" placeholder="Ej. 30" class="w-full p-2 border rounded-xl outline-none mt-1">
+          <label class="font-bold text-slate-600 uppercase text-[10px]">Duración total (opcional, minutos)</label>
+          <input type="number" id="inputDuracionMinutos" placeholder="Ej. 30" class="w-full p-1.5 border rounded-xl outline-none mt-0.5 text-xs">
         </div>
 
-        <button type="button" onclick="guardarPartidaFinal()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-xs shadow-md card-zoom">
+        <button type="button" onclick="guardarPartidaFinal()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md card-zoom">
           💾 Guardar Partida y Estadísticas
         </button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL ADMIN -->
-  <div id="modalAdmin" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
-    <div class="bg-white rounded-2xl max-w-lg w-full p-5 space-y-4 shadow-xl max-h-[85vh] overflow-y-auto">
-      <div class="flex justify-between items-center border-b pb-3">
-        <h3 class="font-bold text-lg text-slate-800">⚙️ Gestión Avanzada de Usuarios</h3>
-        <button onclick="cerrarAdminPanel()" class="text-slate-400 font-bold text-xl px-2">✕</button>
+  <!-- MODAL ADMIN (COMPRIMIDO Y COMPACTO) -->
+  <div id="modalAdmin" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-2.5">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-3.5 space-y-3 shadow-xl max-h-[85vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b pb-2">
+        <h3 class="font-bold text-sm text-slate-800">⚙️ Gestión Avanzada de Usuarios</h3>
+        <button onclick="cerrarAdminPanel()" class="text-slate-400 font-bold text-lg px-1">✕</button>
       </div>
-      <div id="resumenUsuarios" class="flex flex-wrap gap-2 text-[11px] font-bold"></div>
-      <div id="listaUsuarios" class="space-y-3 text-sm"></div>
+      <div id="resumenUsuarios" class="flex flex-wrap gap-1.5 text-[10px] font-bold"></div>
+      <div id="listaUsuarios" class="space-y-2 text-xs"></div>
     </div>
   </div>
 
@@ -791,7 +777,7 @@
     let ubicacionesCache = [];
     let mecanicasDinamicasCache = [];
     let bolsaDescarteRuleta = [];
-    let categoriaActual = 'Todas';
+    let categoriaActual = 'Todos';
     let vistaActual = 'grid'; 
     let currentUser = null;
     let juegoActualFicha = null;
@@ -803,7 +789,6 @@
     let seccionesMarcadasIA = [];
     let audioCtx = null;
 
-    // MAPA DE CAMPOS COMPLETO Y ALINEADO CON EL FORMULARIO
     const MAPA_CAMPOS_IA = [
       { key: 'nombre', label: 'Nombre del Juego', idElem: 'nombre', grupo: 'datos_basicos' },
       { key: 'categoria', label: 'Categoría (Nivel 1)', idElem: 'categoria', grupo: 'datos_basicos' },
@@ -824,9 +809,9 @@
     }
 
     function formatearFechaCorta(fechaStr) {
-      if (!fechaStr) return '';
+      if (!fechaStr) return 'Sin fecha';
       const d = new Date(fechaStr);
-      if (isNaN(d.getTime())) return '';
+      if (isNaN(d.getTime())) return 'Sin fecha';
       return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
     }
 
@@ -847,13 +832,13 @@
     function formatearTextoJugadores(juego) {
       const min = parseInt(juego.min_jugadores) || 1;
       const max = parseInt(juego.max_jugadores) || 99;
-      if (max >= 99) return `${min}+`;
-      if (min === max) return `${min}`;
-      return `${min}-${max}`;
+      if (max >= 99) return `${min}+ jug.`;
+      if (min === max) return `${min} jug.`;
+      return `${min}-${max} jug.`;
     }
 
     function formatearGanadoresSimplificado(ganadorStr) {
-      if (!ganadorStr || ganadorStr === 'N/A' || ganadorStr === 'Sin ganador') return 'Sin datos';
+      if (!ganadorStr || ganadorStr === 'N/A' || ganadorStr === 'Sin ganador' || ganadorStr === 'Ninguno') return 'Sin datos';
       return ganadorStr.replace(/P\d+:\s*/g, '').trim();
     }
 
@@ -925,12 +910,12 @@
       document.getElementById('mainApp').classList.remove('hidden');
       
       const userContainer = document.getElementById('userBadgeContainer');
-      const avatarHtml = currentUser.avatar_base64 
-        ? `<img src="${currentUser.avatar_base64}" class="w-7 h-7 rounded-full object-cover border border-amber-300">` 
+      const avatarHtml = (currentUser.avatar_base64 || currentUser.avatar_url)
+        ? `<img src="${currentUser.avatar_base64 || currentUser.avatar_url}" class="w-6 h-6 rounded-full object-cover border border-amber-300">` 
         : `👤`;
 
       userContainer.innerHTML = `
-        <button onclick="abrirPerfilModal()" class="bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-[11px] sm:text-xs px-2.5 py-1.5 rounded-lg shadow-sm flex items-center gap-1.5 transition card-zoom truncate max-w-[130px] sm:max-w-none" title="Ver mi perfil">
+        <button onclick="abrirPerfilModal()" class="bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-[10px] sm:text-xs px-2 py-1 rounded-lg shadow-sm flex items-center gap-1 transition card-zoom truncate max-w-[120px] sm:max-w-none" title="Ver mi perfil">
           ${avatarHtml} <span class="truncate">${escaparHTML(currentUser.nick)}</span>
         </button>
       `;
@@ -964,13 +949,13 @@
         const cont = document.getElementById('checkboxesMecanicasDinamicas');
         cont.innerHTML = '';
         if (mecanicasDinamicasCache.length === 0) {
-          cont.innerHTML = `<span class="text-slate-400 text-[10px]">No hay mecánicas registradas.</span>`;
+          cont.innerHTML = `<span class="text-slate-400 text-[9px]">No hay mecánicas registradas.</span>`;
           return;
         }
 
         mecanicasDinamicasCache.forEach(m => {
           cont.innerHTML += `
-            <label class="bg-slate-100 px-2.5 py-1 rounded-lg border flex items-center gap-1 cursor-pointer hover:bg-slate-200 text-[11px]">
+            <label class="bg-slate-100 px-2 py-0.5 rounded-md border flex items-center gap-1 cursor-pointer hover:bg-slate-200 text-[10px]">
               <input type="checkbox" value="${m}" onchange="filtrarJuegos()" class="rounded text-indigo-600"> ${m}
             </label>
           `;
@@ -1097,7 +1082,7 @@
         if (partidas.length > 0) {
           partidas.forEach(p => {
             const fechaFormateada = formatearFechaCorta(p.fecha);
-            if (p.ganador && p.ganador !== 'Sin ganador' && p.ganador !== 'Empate / Sin ganador') {
+            if (p.ganador && p.ganador !== 'Sin ganador' && p.ganador !== 'Empate / Sin ganador' && p.ganador !== 'Ninguno') {
               p.ganador.split(' | ').forEach(gStr => {
                 const nickG = gStr.replace(/P\d+:\s*/, '').trim();
                 if (nickG && nickG !== 'Empate / Sin ganador') conteoGanadores[nickG] = (conteoGanadores[nickG] || 0) + 1;
@@ -1105,7 +1090,7 @@
             }
 
             listHistorial.innerHTML += `
-              <div class="bg-slate-50 p-2.5 rounded-xl border space-y-1 text-[11px]">
+              <div class="bg-slate-50 p-2 rounded-xl border space-y-0.5 text-[10px]">
                 <div class="flex justify-between text-slate-400">
                   <span>📅 ${fechaFormateada}</span>
                   <span>🎮 ${p.num_partidas || 1} p.</span>
@@ -1115,7 +1100,7 @@
               </div>
             `;
           });
-        } else { listHistorial.innerHTML = `<p class="text-center text-slate-400 py-4">No hay partidas registradas.</p>`; }
+        } else { listHistorial.innerHTML = `<p class="text-center text-slate-400 py-3 text-xs">No hay partidas registradas.</p>`; }
 
         const rankingCont = document.getElementById('listaRankingGanadores');
         rankingCont.innerHTML = '';
@@ -1124,13 +1109,13 @@
           sortedGanadores.forEach(([nick, count], index) => {
             const medalla = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '🎖️';
             rankingCont.innerHTML += `
-              <div class="flex justify-between items-center bg-white p-2 rounded-lg border text-xs">
+              <div class="flex justify-between items-center bg-white p-1.5 rounded-lg border text-[11px]">
                 <span>${medalla} <b>${nick}</b></span>
                 <span class="font-bold text-amber-600">${count} victoria${count > 1 ? 's' : ''}</span>
               </div>
             `;
           });
-        } else { rankingCont.innerHTML = `<p class="text-slate-400 text-[11px]">Sin victorias registradas aún.</p>`; }
+        } else { rankingCont.innerHTML = `<p class="text-slate-400 text-[10px]">Sin victorias registradas aún.</p>`; }
       } catch (err) { console.error(err); }
     }
 
@@ -1189,7 +1174,7 @@
 
       ['info', 'reglas', 'stats', 'historial'].forEach(t => {
         const btn = document.getElementById(`tab${t.charAt(0).toUpperCase() + t.slice(1)}Btn`);
-        btn.className = t === tab ? 'flex-1 py-1.5 rounded-lg text-center transition bg-white text-indigo-700 font-bold shadow-sm' : 'flex-1 py-1.5 rounded-lg text-center transition';
+        btn.className = t === tab ? 'flex-1 py-1 rounded-md text-center transition bg-white text-indigo-700 font-bold shadow-sm' : 'flex-1 py-1 rounded-md text-center transition';
       });
     }
 
@@ -1226,16 +1211,35 @@
       try {
         const res = await fetchSeguro(`/api/juegos`); 
         juegosCache = await res.json();
+        actualizarPestanasCategoriasDinamicas();
         renderizarTarjetas();
       } catch (err) {
-        document.getElementById('mainContainer').innerHTML = `<div class="text-center py-10 text-rose-500">${err.message}</div>`;
+        document.getElementById('mainContainer').innerHTML = `<div class="text-center py-10 text-rose-500 text-xs">${err.message}</div>`;
       }
+    }
+
+    // Genera únicamente las pestañas de categorías de las que existen juegos
+    function actualizarPestanasCategoriasDinamicas() {
+      const cont = document.getElementById('categoriasFiltro');
+      const categoriasExistentes = [...new Set(juegosCache.map(j => j.categoria).filter(Boolean))].sort();
+
+      let html = `
+        <button onclick="filtrarCategoria('Todos', event)" class="cat-btn ${categoriaActual === 'Todos' ? 'bg-indigo-600 text-white' : 'bg-white text-slate-600 border'} px-2.5 py-1 rounded-full font-medium shadow-sm whitespace-nowrap transition">Todos</button>
+        <button onclick="filtrarCategoria('Favoritos', event)" class="cat-btn ${categoriaActual === 'Favoritos' ? 'bg-indigo-600 text-white' : 'bg-white text-slate-600 border'} px-2.5 py-1 rounded-full font-medium shadow-sm whitespace-nowrap transition">❤️ Favoritos</button>
+      `;
+
+      categoriasExistentes.forEach(cat => {
+        const sel = (categoriaActual === cat) ? 'bg-indigo-600 text-white' : 'bg-white text-slate-600 border';
+        html += `<button onclick="filtrarCategoria('${cat}', event)" class="cat-btn ${sel} px-2.5 py-1 rounded-full font-medium shadow-sm whitespace-nowrap transition">${cat}</button>`;
+      });
+
+      cont.innerHTML = html;
     }
 
     function cambiarVista(tipo) {
       vistaActual = tipo;
-      document.getElementById('btnGrid').className = tipo === 'grid' ? 'px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-indigo-600 shadow-sm transition' : 'px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 transition';
-      document.getElementById('btnCompact').className = tipo === 'compact' ? 'px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-indigo-600 shadow-sm transition' : 'px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 transition';
+      document.getElementById('btnGrid').className = tipo === 'grid' ? 'px-2 py-0.5 rounded-lg text-xs font-bold bg-white text-indigo-600 shadow-sm transition' : 'px-2 py-0.5 rounded-lg text-xs font-bold text-slate-600 transition';
+      document.getElementById('btnCompact').className = tipo === 'compact' ? 'px-2 py-0.5 rounded-lg text-xs font-bold bg-white text-indigo-600 shadow-sm transition' : 'px-2 py-0.5 rounded-lg text-xs font-bold text-slate-600 transition';
       renderizarTarjetas();
     }
 
@@ -1248,7 +1252,7 @@
       const mecsChecked = Array.from(document.querySelectorAll('#checkboxesMecanicasDinamicas input:checked')).map(el => el.value);
 
       let filtrados = juegosCache.filter(j => {
-        let okCat = (categoriaActual === 'Favoritos') ? favoritosCache.includes(j.id) : (categoriaActual === 'Todas' || j.categoria === categoriaActual);
+        let okCat = (categoriaActual === 'Favoritos') ? favoritosCache.includes(j.id) : (categoriaActual === 'Todos' || j.categoria === categoriaActual);
         let okNom = j.nombre.toLowerCase().includes(search);
         let okJug = numJug === 0 || ((j.min_jugadores || 1) <= numJug && (j.max_jugadores || 99) >= numJug);
         
@@ -1270,66 +1274,81 @@
       }
 
       if (vistaActual === 'grid') {
-        let gridHTML = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="gridJuegos">';
+        let gridHTML = '<div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="gridJuegos">';
         filtrados.forEach(j => {
           const imagenSrc = j.foto_url || j.foto_base64 || '';
           const tieneImagen = imagenSrc && imagenSrc.trim().length > 0;
           const esFav = favoritosCache.includes(j.id);
 
-          let tiempoMedioStr = "Sin dato";
+          let tiempoMedioStr = "Sin datos";
           if (j.tiempo_medio_segundos && j.tiempo_medio_segundos > 0) {
             const m = Math.floor(j.tiempo_medio_segundos / 60);
             const s = j.tiempo_medio_segundos % 60;
             tiempoMedioStr = m > 0 ? `~${m}m ${s}s` : `~${s}s`;
           }
 
-          let ultimaPartidaFechaStr = j.ultima_partida_fecha ? formatearFechaCorta(j.ultima_partida_fecha) : 'Sin datos';
+          let ultimaPartidaFechaStr = j.ultima_partida_fecha ? formatearFechaCorta(j.ultima_partida_fecha) : 'Sin fecha';
           let ganadoresLimpios = formatearGanadoresSimplificado(j.ultima_partida_ganador);
 
           gridHTML += `
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between relative transition hover:shadow-md">
-              <div class="p-3.5 space-y-2.5">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between transition hover:shadow-md">
+              <div class="p-3 space-y-2">
+                <!-- TÍTULO Y CATEGORÍA A ANCHO COMPLETO -->
                 <div class="flex justify-between items-center gap-2 border-b pb-1.5">
-                  <h4 onclick="abrirFichaDetallada('${j.id}')" class="font-black text-base text-slate-800 leading-snug cursor-pointer hover:text-indigo-600 transition truncate flex-grow" title="${j.nombre}">${j.nombre}</h4>
-                  <span class="bg-slate-900 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shrink-0">${j.categoria}</span>
+                  <h4 onclick="abrirFichaDetallada('${j.id}')" class="font-black text-sm text-slate-800 leading-snug cursor-pointer hover:text-indigo-600 transition truncate flex-grow" title="${j.nombre}">${j.nombre}</h4>
+                  <span class="bg-slate-900 text-white text-[9px] font-bold px-2 py-0.5 rounded-full shrink-0">${j.categoria}</span>
                 </div>
 
-                <div class="flex gap-3 items-stretch">
-                  <div onclick="abrirFichaDetallada('${j.id}')" class="w-36 h-36 bg-slate-900 rounded-2xl relative flex items-center justify-center overflow-hidden cursor-pointer shrink-0 border border-slate-100 shadow-inner">
+                <!-- ESTRUCTURA 50% - 50% OPTIMIZADA -->
+                <div class="grid grid-cols-2 gap-2.5 items-stretch h-40">
+                  <!-- MITAD IZQUIERDA: IMAGEN CUADRADA CON FAVORITO -->
+                  <div onclick="abrirFichaDetallada('${j.id}')" class="w-full h-full bg-slate-900 rounded-xl relative flex items-center justify-center overflow-hidden cursor-pointer shrink-0 border border-slate-100 shadow-inner">
                     <button onclick="event.stopPropagation(); toggleFavorito('${j.id}')" class="absolute top-1.5 left-1.5 w-6 h-6 bg-black/60 hover:bg-black/80 rounded-full flex items-center justify-center text-xs z-20 backdrop-blur-md card-zoom shadow-md text-white">
-                      ${esFav ? '❤' : '🤍'}
+                      ${esFav ? '❤️' : '🤍'}
                     </button>
-                    ${tieneImagen ? `<img src="${imagenSrc}" class="w-full h-full object-contain p-1 relative z-10 rounded-xl">` : '<div class="text-slate-400 text-xs text-center p-2">Sin Foto</div>'}
+                    ${tieneImagen ? `<img src="${imagenSrc}" class="w-full h-full object-contain p-1 relative z-10 rounded-lg">` : '<div class="text-slate-400 text-[10px] text-center p-2">Sin Foto</div>'}
                   </div>
 
-                  <div class="flex-grow min-w-0 flex flex-col justify-between gap-1.5 h-36">
-                    <div class="bg-slate-50 p-2 rounded-xl border border-slate-200 text-[11px] space-y-1 flex-1 flex flex-col justify-center min-h-0">
-                      <div class="text-slate-700 font-semibold text-[10px] leading-tight">
+                  <!-- MITAD DERECHA: DOS RECUADROS ORGANIZADOS -->
+                  <div class="flex flex-col justify-between gap-1.5 h-full min-w-0">
+                    <!-- RECUADRO 1: FICHA TÉCNICA -->
+                    <div class="bg-slate-50 p-1.5 rounded-xl border border-slate-200 text-[10px] flex-1 flex flex-col justify-between min-h-0">
+                      <div>
+                        <!-- Línea 1: Categoría Nivel 2 -->
                         <span class="block text-indigo-900 font-bold truncate">🏷️ ${j.tipologia || 'General'}</span>
-                        <p class="text-slate-600 line-clamp-2 mt-0.5">🧩 ${j.mecanicas || 'Sin mecánicas'}</p>
+                        <!-- Línea 2: Categoría Nivel 3 (Mecánicas, espacio reservado para 2 líneas) -->
+                        <p class="text-slate-600 line-clamp-2 mt-0.5 leading-tight">🧩 ${j.mecanicas || 'Sin mecánicas'}</p>
                       </div>
-                      <p class="text-slate-800 font-medium truncate pt-1 border-t border-slate-200/60 mt-1">
+                      <!-- Separador y Línea 3: Edad y Jugadores -->
+                      <div class="pt-1 border-t border-slate-200/80 text-slate-800 font-medium truncate">
                         👶 ${formatearTextoEdad(j)} • 👥 ${formatearTextoJugadores(j)}
-                      </p>
+                      </div>
                     </div>
 
-                    <div class="bg-indigo-50/70 border border-indigo-100 p-2 rounded-xl text-[10px] space-y-0.5 text-indigo-950 flex-1 flex flex-col justify-center min-h-0">
-                      <p class="font-bold text-indigo-700 truncate">🎮 ${j.veces_jugado || 0} partidas</p>
-                      <p class="truncate text-slate-600">⏱️ ${tiempoMedioStr}</p>
-                      <p class="truncate text-slate-600">🕒 ${ultimaPartidaFechaStr}</p>
-                      <p class="truncate text-emerald-800 font-bold">🏆 ${ganadoresLimpios}</p>
+                    <!-- RECUADRO 2: ESTADÍSTICAS Y PARTIDAS -->
+                    <div class="bg-indigo-50/70 border border-indigo-100 p-1.5 rounded-xl text-[10px] flex-1 flex flex-col justify-between min-h-0">
+                      <!-- Línea 1: Nº Partidas y Tiempo Medio -->
+                      <div class="flex justify-between items-center text-indigo-950 font-bold truncate">
+                        <span class="truncate">🎮 ${j.veces_jugado || 0} part.</span>
+                        <span class="text-slate-600 font-normal shrink-0 text-[9px]">⏱️ ${tiempoMedioStr}</span>
+                      </div>
+                      <!-- Separador, Línea 2: Última partida y Línea 3: Ganadores -->
+                      <div class="pt-1 border-t border-indigo-100/80 space-y-0.5">
+                        <p class="truncate text-slate-500 text-[9px]">🕒 ${ultimaPartidaFechaStr}</p>
+                        <p class="truncate text-emerald-800 font-bold">🏆 ${ganadoresLimpios}</p>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <div class="text-[10px] text-slate-500 pt-0.5 flex justify-between items-center border-t border-slate-100">
+                <div class="text-[9px] text-slate-500 pt-0.5 flex justify-between items-center border-t border-slate-100">
                   <span class="truncate">📍 ${j.ubicacion || 'Sin sitio'}</span>
                   <span class="truncate text-right shrink-0">👤 @${j.creador_nick || 'admin'}</span>
                 </div>
               </div>
 
-              <div class="p-3.5 pt-0">
-                <button onclick="abrirModalPartida('${j.id}', '${j.nombre.replace(/'/g, "\\'")}')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs card-zoom shadow-md flex items-center justify-center">
+              <div class="p-3 pt-0">
+                <button onclick="abrirModalPartida('${j.id}', '${j.nombre.replace(/'/g, "\\'")}')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs card-zoom shadow-md flex items-center justify-center">
                   ¡Vamos a jugar!
                 </button>
               </div>
@@ -1339,40 +1358,40 @@
         gridHTML += '</div>';
         container.innerHTML = gridHTML;
       } else {
-        let listHTML = '<div class="space-y-2.5 max-w-4xl mx-auto">';
+        let listHTML = '<div class="space-y-2 max-w-4xl mx-auto">';
         filtrados.forEach(j => {
           const imagenSrc = j.foto_url || j.foto_base64 || '';
           const tieneImagen = imagenSrc && imagenSrc.trim().length > 0;
           const esFav = favoritosCache.includes(j.id);
 
           listHTML += `
-            <div class="bg-white p-2.5 rounded-2xl shadow-sm border border-slate-200 flex gap-3 items-center hover:border-indigo-200 transition">
-              <div onclick="abrirFichaDetallada('${j.id}')" class="w-14 h-14 aspect-square bg-slate-900 rounded-xl overflow-hidden shrink-0 flex items-center justify-center relative cursor-pointer border border-slate-100 shadow-inner">
-                <button onclick="event.stopPropagation(); toggleFavorito('${j.id}')" class="absolute top-1 left-1 w-5 h-5 bg-black/60 rounded-full flex items-center justify-center text-[10px] z-10 text-white">
+            <div class="bg-white p-2 rounded-2xl shadow-sm border border-slate-200 flex gap-2.5 items-center hover:border-indigo-200 transition">
+              <div onclick="abrirFichaDetallada('${j.id}')" class="w-12 h-12 aspect-square bg-slate-900 rounded-xl overflow-hidden shrink-0 flex items-center justify-center relative cursor-pointer border border-slate-100 shadow-inner">
+                <button onclick="event.stopPropagation(); toggleFavorito('${j.id}')" class="absolute top-0.5 left-0.5 w-4 h-4 bg-black/60 rounded-full flex items-center justify-center text-[9px] z-10 text-white">
                   ${esFav ? '❤️' : '🤍'}
                 </button>
-                ${tieneImagen ? `<img src="${imagenSrc}" class="w-full h-full object-contain">` : '<span class="text-[9px] text-slate-400">Sin Foto</span>'}
+                ${tieneImagen ? `<img src="${imagenSrc}" class="w-full h-full object-contain">` : '<span class="text-[8px] text-slate-400">Sin Foto</span>'}
               </div>
 
-              <div class="flex-grow min-w-0 flex flex-col justify-between py-0.5 gap-1">
+              <div class="flex-grow min-w-0 flex flex-col justify-between py-0.5 gap-0.5">
                 <div class="min-w-0 cursor-pointer" onclick="abrirFichaDetallada('${j.id}')">
-                  <h4 class="font-black text-slate-800 text-sm leading-tight hover:text-indigo-600 transition truncate">${j.nombre}</h4>
-                  <p class="text-[10px] text-slate-500 truncate mt-0.5">
+                  <h4 class="font-black text-slate-800 text-xs leading-tight hover:text-indigo-600 transition truncate">${j.nombre}</h4>
+                  <p class="text-[9px] text-slate-500 truncate mt-0.5">
                     📍 ${j.ubicacion || 'Sin sitio'} • 👶 ${formatearTextoEdad(j)} • 👥 ${formatearTextoJugadores(j)}
                   </p>
                 </div>
 
-                <div class="flex justify-between items-center pt-1 border-t border-slate-100 gap-2">
-                  <div class="flex items-center gap-1.5 truncate">
-                    <span class="bg-slate-100 text-slate-700 text-[10px] font-bold px-2 py-0.5 rounded-md border border-slate-200 truncate">
+                <div class="flex justify-between items-center pt-0.5 border-t border-slate-100 gap-2">
+                  <div class="flex items-center gap-1 truncate">
+                    <span class="bg-slate-100 text-slate-700 text-[9px] font-bold px-1.5 py-0.5 rounded-md border border-slate-200 truncate">
                       ${j.categoria}
                     </span>
-                    <span class="text-[10px] text-slate-500 truncate">
+                    <span class="text-[9px] text-slate-500 truncate">
                       🏷️ ${j.tipologia || 'General'}
                     </span>
                   </div>
 
-                  <button onclick="abrirModalPartida('${j.id}', '${j.nombre.replace(/'/g, "\\'")}')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-3 py-1 rounded-xl text-xs card-zoom shadow-sm flex items-center gap-1 shrink-0">
+                  <button onclick="abrirModalPartida('${j.id}', '${j.nombre.replace(/'/g, "\\'")}')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-2.5 py-0.5 rounded-xl text-xs card-zoom shadow-sm flex items-center gap-1 shrink-0">
                     ¡Jugar!
                   </button>
                 </div>
@@ -1423,7 +1442,7 @@
         document.getElementById('juegoFotoBase64').value = '';
         document.getElementById('pdf_reglas_url').value = '';
         document.getElementById('video_tutorial_url').value = '';
-        document.getElementById('imagePreview').innerHTML = `<span class="text-slate-400 text-xs text-center px-2">Sin fotografía<br><span class="text-[10px] text-slate-500">(Se adaptará a 3:4 / 4:3)</span></span>`;
+        document.getElementById('imagePreview').innerHTML = `<span class="text-slate-400 text-[10px] text-center px-2">Sin fotografía<br><span class="text-[9px] text-slate-500">(Cuadrada)</span></span>`;
         document.getElementById('contenedorBorradoEdicion').classList.add('hidden');
       }
 
@@ -1439,7 +1458,7 @@
       const reader = new FileReader();
       reader.onload = (e) => {
         document.getElementById('pdf_reglas_url').value = e.target.result;
-        alert("📄 Documento PDF listo para ser subido a Cloudflare R2.");
+        alert("📄 Documento PDF listo para subirse.");
       };
       reader.readAsDataURL(file);
     }
@@ -1470,7 +1489,7 @@
         if (check.existe) {
           const confirmarVariante = confirm(
             `⚠️ ATENCIÓN: Ya existe un juego registrado con el nombre "${check.juego_existente}".\n\n` +
-            `Si se trata de una versión o variante diferente, presiona OK para guardarlo como nueva ficha.\n` +
+            `Si se trata de una variante diferente, presiona Aceptar para guardarlo.\n` +
             `De lo contrario, pulsa Cancelar para modificar el nombre.`
           );
           if (!confirmarVariante) return;
@@ -1482,7 +1501,7 @@
 
     async function guardarJuego() {
       const btn = document.getElementById('btnGuardar');
-      btn.innerText = "Subiendo a R2 / Nube...";
+      btn.innerText = "Guardando en la Nube...";
       btn.disabled = true;
 
       const idActual = document.getElementById('juegoId').value;
@@ -1532,10 +1551,10 @@
       });
 
       if (seleccionados.length === 0) {
-        return alert("Por favor, marca al menos una opción para realizar la Consulta Automática.");
+        return alert("Por favor, marca al menos una opción para la consulta con IA.");
       }
 
-      const confirmar = confirm(`🤖 ¿Deseas iniciar la Consulta Automática con IA para las siguientes secciones?\n\n- ${seleccionados.join('\n- ')}\n\nEsta acción consultará a Gemini para autocompletar la ficha.`);
+      const confirmar = confirm(`🤖 ¿Iniciar la Consulta Automática con IA para las siguientes secciones?\n\n- ${seleccionados.join('\n- ')}`);
       if (confirmar) {
         analizarConIA();
       }
@@ -1547,7 +1566,7 @@
       
       seccionesMarcadasIA = Array.from(document.querySelectorAll('#checkboxesSeccionesIA input:checked')).map(el => el.value);
 
-      if (!base64 && !nombreActual) return alert("Sube una foto o escribe el nombre del juego para que Gemini pueda identificarlo.");
+      if (!base64 && !nombreActual) return alert("Sube una foto o escribe el nombre del juego para que la IA pueda identificarlo.");
 
       const btnIA = document.getElementById('btnIA');
       btnIA.innerText = "⏳ Consultando a Gemini...";
@@ -1628,45 +1647,37 @@
         const id = campo.idElem;
 
         bloques.push(`
-          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-2">
-            <span class="font-bold text-slate-700 uppercase text-[10px] block border-b pb-1">${escaparHTML(campo.label)}</span>
-            <div class="grid grid-cols-2 gap-2 text-[11px]">
-              <div id="card_orig_${id}" onclick="seleccionarOpcionComparador('${id}', 'original')" class="p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-white border-slate-200 opacity-60 overflow-hidden">
+          <div class="bg-slate-50 p-2 rounded-xl border border-slate-200 space-y-1.5">
+            <span class="font-bold text-slate-700 uppercase text-[9px] block border-b pb-0.5">${escaparHTML(campo.label)}</span>
+            <div class="grid grid-cols-2 gap-1.5 text-[10px]">
+              <div id="card_orig_${id}" onclick="seleccionarOpcionComparador('${id}', 'original')" class="p-2 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-white border-slate-200 opacity-60 overflow-hidden">
                 <div class="break-words">
-                  <span class="text-[9px] font-bold text-slate-400 block uppercase mb-1">📄 ORIGINAL:</span>
+                  <span class="text-[8px] font-bold text-slate-400 block uppercase mb-0.5">📄 ORIGINAL:</span>
                   <p class="text-slate-700 whitespace-pre-line leading-relaxed">${escaparHTML(valActual) || '(Vacío)'}</p>
                 </div>
-                <span id="check_orig_${id}" class="text-[10px] font-bold text-slate-400 mt-2 block">✕ No seleccionado</span>
+                <span id="check_orig_${id}" class="text-[9px] font-bold text-slate-400 mt-1 block">✕ No seleccionado</span>
               </div>
-              <div id="card_ia_${id}" onclick="seleccionarOpcionComparador('${id}', 'ia')" class="p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-purple-100 border-purple-500 shadow-sm overflow-hidden">
+              <div id="card_ia_${id}" onclick="seleccionarOpcionComparador('${id}', 'ia')" class="p-2 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-purple-100 border-purple-500 shadow-sm overflow-hidden">
                 <div class="break-words">
-                  <span class="text-[9px] font-bold text-purple-700 block uppercase mb-1">✨ SUGERIDO POR IA:</span>
+                  <span class="text-[8px] font-bold text-purple-700 block uppercase mb-0.5">✨ SUGERIDO POR IA:</span>
                   <p class="text-purple-950 font-semibold whitespace-pre-line leading-relaxed">${escaparHTML(valIA)}</p>
                 </div>
-                <span id="check_ia_${id}" class="text-[10px] font-bold text-purple-700 mt-2 block">✓ Seleccionado</span>
+                <span id="check_ia_${id}" class="text-[9px] font-bold text-purple-700 mt-1 block">✓ Seleccionado</span>
               </div>
             </div>
             ${esJugadores ? '' : `
-            <div class="pt-1">
-              <button type="button" onclick="toggleEdicionManualComparador('${id}')" class="text-[10px] text-indigo-600 font-bold underline">✏ Editar manualmente</button>
-              <textarea id="manual_${id}" rows="2" class="w-full p-2 border rounded-lg outline-none text-xs hidden mt-1 bg-white" placeholder="Escribe tu texto personalizado aquí...">${escaparHTML(valIA)}</textarea>
+            <div class="pt-0.5">
+              <button type="button" onclick="toggleEdicionManualComparador('${id}')" class="text-[9px] text-indigo-600 font-bold underline">✏ Editar manualmente</button>
+              <textarea id="manual_${id}" rows="2" class="w-full p-1.5 border rounded-lg outline-none text-xs hidden mt-0.5 bg-white" placeholder="Escribe tu texto aquí...">${escaparHTML(valIA)}</textarea>
             </div>`}
           </div>`);
       });
 
       if (sinDatos.length) {
-        bloques.push(`<div class="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-2">⚠️ La IA no devolvió valor válido para: ${sinDatos.map(escaparHTML).join(', ')}.</div>`);
+        bloques.push(`<div class="text-[10px] text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-1.5">⚠️ Sin datos válidos para: ${sinDatos.map(escaparHTML).join(', ')}.</div>`);
       }
-      if (bloques.length === 0 || bloques.length === 1 && sinDatos.length) {
-        contenedor.innerHTML = `
-          <div class="text-center py-8 text-slate-500 space-y-2">
-            <p class="font-bold">⚠️ No se extrajeron textos comparables.</p>
-            <p class="text-xs">Gemini no devolvió información útil para las secciones marcadas.</p>
-          </div>`;
-      } else {
-        contenedor.innerHTML = bloques.join('');
-      }
-
+      
+      contenedor.innerHTML = bloques.join('');
       document.getElementById('modalComparadorIA').classList.remove('hidden');
     }
 
@@ -1679,20 +1690,20 @@
       const checkIa = document.getElementById(`check_ia_${idElem}`);
 
       if (opcion === 'original') {
-        cardOrig.className = "p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-emerald-50 border-emerald-500 shadow-sm overflow-hidden";
-        checkOrig.className = "text-[10px] font-bold text-emerald-700 mt-2 block";
+        cardOrig.className = "p-2 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-emerald-50 border-emerald-500 shadow-sm overflow-hidden";
+        checkOrig.className = "text-[9px] font-bold text-emerald-700 mt-1 block";
         checkOrig.innerText = "✓ Seleccionado";
 
-        cardIa.className = "p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-white border-slate-200 opacity-60 overflow-hidden";
-        checkIa.className = "text-[10px] font-bold text-slate-400 mt-2 block";
+        cardIa.className = "p-2 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-white border-slate-200 opacity-60 overflow-hidden";
+        checkIa.className = "text-[9px] font-bold text-slate-400 mt-1 block";
         checkIa.innerText = "✕ No seleccionado";
       } else {
-        cardIa.className = "p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-purple-100 border-purple-500 shadow-sm overflow-hidden";
-        checkIa.className = "text-[10px] font-bold text-purple-700 mt-2 block";
+        cardIa.className = "p-2 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-purple-100 border-purple-500 shadow-sm overflow-hidden";
+        checkIa.className = "text-[9px] font-bold text-purple-700 mt-1 block";
         checkIa.innerText = "✓ Seleccionado";
 
-        cardOrig.className = "p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-white border-slate-200 opacity-60 overflow-hidden";
-        checkOrig.className = "text-[10px] font-bold text-slate-400 mt-2 block";
+        cardOrig.className = "p-2 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-white border-slate-200 opacity-60 overflow-hidden";
+        checkOrig.className = "text-[9px] font-bold text-slate-400 mt-1 block";
         checkOrig.innerText = "✕ No seleccionado";
       }
     }
@@ -1741,13 +1752,13 @@
       const id = document.getElementById('juegoId').value;
       if (!id) return;
 
-      if (!confirm("⚠ ¿Estás COMPLETAMENTE seguro de que deseas eliminar permanentemente este juego, su imagen y su manual PDF de Cloudflare R2?")) return;
+      if (!confirm("⚠ ¿Estás seguro de que deseas eliminar permanentemente este juego y sus archivos asociados?")) return;
 
       try {
         await fetchSeguro(`/api/juegos/${id}`, { method: 'DELETE' });
         cerrarModalFormulario();
         cargarJuegos();
-        alert("El juego y todos sus archivos asociados han sido eliminados.");
+        alert("Juego eliminado correctamente.");
       } catch (err) { alert(err.message); }
     }
 
@@ -1760,23 +1771,23 @@
         const img = new Image();
         img.onload = () => {
           const canvas = document.createElement('canvas');
-          canvas.width = 800; canvas.height = 800;
+          canvas.width = 600; canvas.height = 600;
           const ctx = canvas.getContext('2d');
 
           ctx.fillStyle = '#0f172a';
-          ctx.fillRect(0, 0, 800, 800);
+          ctx.fillRect(0, 0, 600, 600);
 
           let drawW, drawH;
           if (img.height >= img.width) {
-            drawH = 800 * 0.95;
+            drawH = 600;
             drawW = drawH * (img.width / img.height);
           } else {
-            drawW = 800 * 0.95;
+            drawW = 600;
             drawH = drawW * (img.height / img.width);
           }
 
-          const offsetX = (800 - drawW) / 2;
-          const offsetY = (800 - drawH) / 2;
+          const offsetX = (600 - drawW) / 2;
+          const offsetY = (600 - drawH) / 2;
 
           ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
 
@@ -1815,7 +1826,7 @@
 
       let seleccionado = null;
       if (modo === 'compensado') {
-        elegibles.sort((a,b) => (a.veces_jugado || 0) - (a.veces_jugado || 0));
+        elegibles.sort((a,b) => (a.veces_jugado || 0) - (b.veces_jugado || 0));
         seleccionado = elegibles[0];
       } else {
         seleccionado = elegibles[Math.floor(Math.random() * elegibles.length)];
@@ -1947,7 +1958,7 @@
       
       const adminIconCont = document.getElementById('adminIconContainer');
       if (currentUser.rol === 'ADMIN') {
-        adminIconCont.innerHTML = `<button type="button" onclick="cerrarPerfilModal(); abrirAdminPanel();" class="text-amber-600 bg-amber-50 font-bold px-2 py-1 rounded-lg text-xs">⚙️ Gestión</button>`;
+        adminIconCont.innerHTML = `<button type="button" onclick="cerrarPerfilModal(); abrirAdminPanel();" class="text-amber-600 bg-amber-50 font-bold px-2 py-0.5 rounded-lg text-xs">⚙️ Gestión</button>`;
       } else adminIconCont.innerHTML = '';
 
       try {
@@ -1959,10 +1970,11 @@
         document.getElementById('perfilNombre').value = perfil.nombre || '';
         document.getElementById('perfilNick').value = perfil.nick || '';
         document.getElementById('perfilBio').value = perfil.bio || '';
-        document.getElementById('perfilAvatarBase64').value = perfil.avatar_base64 || '';
+        document.getElementById('perfilAvatarBase64').value = perfil.avatar_base64 || perfil.avatar_url || '';
 
         const preview = document.getElementById('avatarPreview');
-        preview.innerHTML = perfil.avatar_base64 ? `<img src="${perfil.avatar_base64}" class="w-full h-full object-cover">` : `<span class="text-slate-400 text-xs">Foto</span>`;
+        const imgSrc = perfil.avatar_base64 || perfil.avatar_url;
+        preview.innerHTML = imgSrc ? `<img src="${imgSrc}" class="w-full h-full object-cover">` : `<span class="text-slate-400 text-[10px]">Foto</span>`;
 
         const historialCont = document.getElementById('miHistorialLista');
         historialCont.innerHTML = '';
@@ -1970,30 +1982,30 @@
           perfil.misPartidas.forEach(p => {
             const fechaFormateada = formatearFechaCorta(p.fecha);
             historialCont.innerHTML += `
-              <div class="bg-slate-50 p-2.5 rounded-xl border space-y-1">
+              <div class="bg-slate-50 p-2 rounded-xl border space-y-0.5">
                 <div class="flex justify-between items-center">
-                  <span class="font-bold text-indigo-700">${p.juego_nombre} (${p.num_partidas || 1} part.)</span>
-                  <span class="text-[10px] text-slate-400">${fechaFormateada}</span>
+                  <span class="font-bold text-indigo-700 text-xs">${p.juego_nombre} (${p.num_partidas || 1} p.)</span>
+                  <span class="text-[9px] text-slate-400">${fechaFormateada}</span>
                 </div>
-                <p class="text-[11px] text-slate-600">👥 <b>Participantes:</b> ${p.participantes}</p>
-                <p class="text-[11px] text-emerald-700 font-bold">🏆 ${p.ganador}</p>
+                <p class="text-[10px] text-slate-600">👥 <b>Participantes:</b> ${p.participantes}</p>
+                <p class="text-[10px] text-emerald-700 font-bold">🏆 ${p.ganador}</p>
               </div>
             `;
           });
-        } else historialCont.innerHTML = `<p class="text-center text-slate-400 py-4">No hay partidas registradas.</p>`;
+        } else historialCont.innerHTML = `<p class="text-center text-slate-400 py-3 text-xs">No hay partidas registradas.</p>`;
 
         const misJuegosCont = document.getElementById('misJuegosLista');
         misJuegosCont.innerHTML = '';
         if (perfil.misJuegos && perfil.misJuegos.length > 0) {
           perfil.misJuegos.forEach(j => {
             misJuegosCont.innerHTML += `
-              <div class="bg-slate-50 p-2 rounded-xl border flex justify-between items-center text-xs">
+              <div class="bg-slate-50 p-1.5 rounded-xl border flex justify-between items-center text-xs">
                 <span class="font-bold text-slate-800">${j.nombre}</span>
-                <span class="text-[10px] text-indigo-600 font-medium">${j.categoria}</span>
+                <span class="text-[9px] text-indigo-600 font-medium">${j.categoria}</span>
               </div>
             `;
           });
-        } else misJuegosCont.innerHTML = `<p class="text-center text-slate-400 py-4">No has subido ningún juego aún.</p>`;
+        } else misJuegosCont.innerHTML = `<p class="text-center text-slate-400 py-3 text-xs">No has subido ningún juego aún.</p>`;
       } catch (err) { alert(err.message); }
     }
 
@@ -2004,7 +2016,7 @@
 
       ['historial', 'juegos', 'datos'].forEach(t => {
         const btn = document.getElementById(`tab${t.charAt(0).toUpperCase() + t.slice(1)}PerfilBtn`);
-        btn.className = t === tab ? 'flex-1 py-1.5 rounded-lg text-center transition bg-white text-indigo-700 font-bold shadow-sm' : 'flex-1 py-1.5 rounded-lg text-center transition';
+        btn.className = t === tab ? 'flex-1 py-1 rounded-md text-center transition bg-white text-indigo-700 font-bold shadow-sm' : 'flex-1 py-1 rounded-md text-center transition';
       });
     }
 
@@ -2079,10 +2091,10 @@
           BLOQUEADO: { badge: 'bg-rose-100 text-rose-800',       avatar: 'bg-rose-100 text-rose-700',       borde: 'border-rose-300' }
         };
         const boton = (id, estado, texto, color) =>
-          `<button onclick="cambiarEstadoUsuarioAdmin('${escaparHTML(id)}', '${estado}')" class="text-xs ${color} text-white font-bold px-3 py-1.5 rounded-lg transition">${texto}</button>`;
+          `<button onclick="cambiarEstadoUsuarioAdmin('${escaparHTML(id)}', '${estado}')" class="text-[11px] ${color} text-white font-bold px-2 py-1 rounded-md transition">${texto}</button>`;
 
         const cuenta = e => usuarios.filter(u => u.estado === e).length;
-        const chip = (n, txt, color) => `<span class="px-2.5 py-1 rounded-full ${color}">${n} ${txt}</span>`;
+        const chip = (n, txt, color) => `<span class="px-2 py-0.5 rounded-full ${color}">${n} ${txt}</span>`;
         document.getElementById('resumenUsuarios').innerHTML =
           chip(cuenta('ACTIVO'), cuenta('ACTIVO') === 1 ? 'activo' : 'activos', 'bg-emerald-50 text-emerald-700') +
           chip(cuenta('PENDIENTE'), cuenta('PENDIENTE') === 1 ? 'pendiente' : 'pendientes', 'bg-amber-50 text-amber-700') +
@@ -2101,22 +2113,21 @@
           if (intentos > 0) {
             const color = bloqueado ? 'text-rose-700 bg-rose-50 border-rose-200' : 'text-amber-700 bg-amber-50 border-amber-200';
             const segmentos = Array.from({ length: LIMITE }, (_, k) =>
-              `<span class="h-1.5 w-5 rounded-full ${k < intentos ? (bloqueado ? 'bg-rose-500' : 'bg-amber-500') : 'bg-slate-200'}"></span>`).join('');
+              `<span class="h-1 w-4 rounded-full ${k < intentos ? (bloqueado ? 'bg-rose-500' : 'bg-amber-500') : 'bg-slate-200'}"></span>`).join('');
             const reiniciar = (!bloqueado && u.estado === 'ACTIVO')
               ? boton(u.id, 'ACTIVO', '↺ Reiniciar', 'bg-slate-500 hover:bg-slate-600') : '';
             filaIntentos = `
-              <div class="flex items-center justify-between gap-3 mt-3 px-3 py-2 rounded-xl border ${color}">
+              <div class="flex items-center justify-between gap-2 mt-1.5 px-2 py-1 rounded-lg border ${color}">
                 <div class="min-w-0">
-                  <p class="text-[11px] font-bold">⚠️ Intentos fallidos: ${intentos}/${LIMITE}</p>
-                  <div class="flex gap-1 mt-1">${segmentos}</div>
-                  ${ultimoTxt ? `<p class="text-[10px] opacity-80 mt-1">Último: ${ultimoTxt}</p>` : ''}
+                  <p class="text-[9px] font-bold">⚠️ Intentos fallidos: ${intentos}/${LIMITE}</p>
+                  <div class="flex gap-0.5 mt-0.5">${segmentos}</div>
                 </div>
                 ${reiniciar}
               </div>`;
           }
 
           const filaCodigo = (u.estado === 'PENDIENTE' && u.codigo_verificacion)
-            ? `<div class="mt-3 px-3 py-2 rounded-xl bg-indigo-50 border border-indigo-100 text-[11px] text-indigo-700 flex items-center gap-2">🔑 Código de activación: <span class="font-mono font-bold text-sm tracking-widest">${escaparHTML(u.codigo_verificacion)}</span></div>`
+            ? `<div class="mt-1.5 px-2 py-1 rounded-lg bg-indigo-50 border border-indigo-100 text-[10px] text-indigo-700 flex items-center gap-1">🔑 Código de activación: <span class="font-mono font-bold tracking-widest">${escaparHTML(u.codigo_verificacion)}</span></div>`
             : '';
 
           const acciones = [];
@@ -2124,20 +2135,20 @@
           else if (u.estado === 'PENDIENTE') acciones.push(boton(u.id, 'ACTIVO', '✓ Activar', 'bg-emerald-600 hover:bg-emerald-700'));
           else if (!esProtegido) acciones.push(boton(u.id, 'PENDIENTE', 'Desactivar', 'bg-amber-500 hover:bg-amber-600'));
           if (u.id !== 'admin-root') {
-            acciones.push(`<button onclick="borrarUsuarioAdmin('${escaparHTML(u.id)}')" title="Borrar usuario" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold px-3 py-1.5 rounded-lg transition">🗑️</button>`);
+            acciones.push(`<button onclick="borrarUsuarioAdmin('${escaparHTML(u.id)}')" title="Borrar usuario" class="text-[11px] bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold px-2 py-1 rounded-md transition">🗑️</button>`);
           }
           const filaAcciones = acciones.length
-            ? `<div class="flex justify-end gap-2 mt-3 pt-3 border-t border-slate-200">${acciones.join('')}</div>` : '';
+            ? `<div class="flex justify-end gap-1.5 mt-2 pt-1.5 border-t border-slate-100">${acciones.join('')}</div>` : '';
 
           return `
-            <div class="bg-white p-3.5 rounded-2xl border ${t.borde} shadow-sm">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 shrink-0 rounded-full flex items-center justify-center font-bold ${t.avatar}">${inicial}</div>
+            <div class="bg-white p-2.5 rounded-xl border ${t.borde} shadow-sm">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 shrink-0 rounded-full flex items-center justify-center font-bold text-xs ${t.avatar}">${inicial}</div>
                 <div class="min-w-0 flex-1">
-                  <p class="font-bold text-slate-800 truncate">${escaparHTML(u.nombre)}</p>
-                  <p class="text-xs text-slate-500 truncate">@${escaparHTML(u.nick)}${u.rol === 'ADMIN' ? ' · <span class="font-bold text-indigo-600">Administrador</span>' : ''}</p>
+                  <p class="font-bold text-slate-800 text-xs truncate">${escaparHTML(u.nombre)}</p>
+                  <p class="text-[10px] text-slate-500 truncate">@${escaparHTML(u.nick)}${u.rol === 'ADMIN' ? ' · <span class="font-bold text-indigo-600">Admin</span>' : ''}</p>
                 </div>
-                <span class="text-[10px] px-2.5 py-1 rounded-full font-bold ${t.badge}">${escaparHTML(u.estado)}</span>
+                <span class="text-[9px] px-2 py-0.5 rounded-full font-bold ${t.badge}">${escaparHTML(u.estado)}</span>
               </div>
               ${filaCodigo}${filaIntentos}${filaAcciones}
             </div>`;
@@ -2188,7 +2199,7 @@
         jugadores.forEach(j => {
           const marcado = (j === currentUser.nick) ? 'checked' : '';
           contenedor.innerHTML += `
-            <label class="flex items-center gap-2 p-1.5 bg-white rounded-lg border cursor-pointer hover:bg-slate-100">
+            <label class="flex items-center gap-1.5 p-1 bg-white rounded-lg border cursor-pointer hover:bg-slate-100 text-xs">
               <input type="checkbox" name="jugadorCheck" value="${j}" ${marcado} class="rounded text-indigo-600">
               <span class="truncate font-medium text-slate-700">${j}</span>
             </label>
@@ -2262,9 +2273,9 @@
         seleccionados.forEach(j => { opcionesHtml += `<option value="${j}">${j}</option>`; });
 
         contenedor.innerHTML += `
-          <div class="p-2 bg-slate-50 rounded-xl border flex items-center justify-between gap-2">
-            <span class="font-bold text-slate-700">🏆 Ganador Partida ${i}:</span>
-            <select id="ganadorPartida_${i}" class="p-1 border rounded-lg bg-white outline-none font-semibold text-indigo-700">
+          <div class="p-1.5 bg-slate-50 rounded-xl border flex items-center justify-between gap-1.5 text-xs">
+            <span class="font-bold text-slate-700">🏆 Partida ${i}:</span>
+            <select id="ganadorPartida_${i}" class="p-1 border rounded-lg bg-white outline-none font-semibold text-indigo-700 text-xs">
               ${opcionesHtml}
             </select>
           </div>
@@ -2315,9 +2326,9 @@
     function filtrarCategoria(cat, event) {
       categoriaActual = cat;
       document.querySelectorAll('.cat-btn').forEach(b => {
-        b.className = "cat-btn bg-white text-slate-600 border px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition";
+        b.className = "cat-btn bg-white text-slate-600 border px-2.5 py-1 rounded-full font-medium shadow-sm whitespace-nowrap transition";
       });
-      event.target.className = "cat-btn bg-indigo-600 text-white px-3 py-1.5 rounded-full font-medium shadow-sm whitespace-nowrap transition";
+      event.target.className = "cat-btn bg-indigo-600 text-white px-2.5 py-1 rounded-full font-medium shadow-sm whitespace-nowrap transition";
       renderizarTarjetas();
     }
 
