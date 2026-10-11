@@ -527,13 +527,13 @@
               <div class="bg-slate-50 p-1.5 rounded-xl border border-slate-200">
                 <span class="font-bold text-slate-600 uppercase text-[8px] block">Nº Jugadores <span class="text-rose-500">*</span></span>
                 <div class="grid grid-cols-2 gap-1 mt-0.5">
-                  <select id="minJugadoresSelect" required class="w-full p-1 border rounded-lg bg-white text-[11px]">
+                  <select id="minJugadoresSelect" class="w-full p-1 border rounded-lg bg-white text-[11px]">
                     <option value="1">Mín 1</option>
                     <option value="2" selected>Mín 2</option>
                     <option value="3">Mín 3</option>
                     <option value="4">Mín 4</option>
                   </select>
-                  <select id="maxJugadoresSelect" required class="w-full p-1 border rounded-lg bg-white text-[11px]">
+                  <select id="maxJugadoresSelect" class="w-full p-1 border rounded-lg bg-white text-[11px]">
                     <option value="1">Máx 1</option>
                     <option value="2">Máx 2</option>
                     <option value="4" selected>Máx 4</option>
@@ -633,7 +633,7 @@
                 <label class="font-bold text-slate-600 uppercase text-[9px]">Ubicación del Juego <span class="text-rose-500">*</span></label>
                 <button type="button" onclick="crearNuevaUbicacionPrompt()" class="text-[9px] text-indigo-600 font-bold">＋ Crear Nueva</button>
               </div>
-              <select id="ubicacionSelect" required class="w-full p-2.5 border rounded-xl outline-none bg-white font-bold text-xs text-indigo-900">
+              <select id="ubicacionSelect" class="w-full p-2.5 border rounded-xl outline-none bg-white font-bold text-xs text-indigo-900">
                 <option value="">Selecciona ubicación...</option>
               </select>
             </div>
@@ -1824,7 +1824,25 @@
       } catch (err) { alert(err.message); }
     }
 
-    async function guardarJuego() {
+async function guardarJuego() {
+      const nombre = document.getElementById('nombre').value.trim();
+      const ubicacion = document.getElementById('ubicacionSelect').value;
+
+      // Validación explícita por JS para evitar bloqueos de formulario en elementos ocultos
+      if (!nombre) {
+        alert("El Nombre del juego es obligatorio.");
+        pasoWizardActual = 1;
+        actualizarVistaPasoWizard();
+        return;
+      }
+
+      if (!ubicacion) {
+        alert("Debes seleccionar una Ubicación en el Paso 4.");
+        pasoWizardActual = 4;
+        actualizarVistaPasoWizard();
+        return;
+      }
+
       const btn = document.getElementById('btnGuardar');
       btn.innerText = "Guardando en la Nube...";
       btn.disabled = true;
@@ -1838,11 +1856,11 @@
 
       const nuevoJuego = {
         id: idActual || crypto.randomUUID(),
-        nombre: document.getElementById('nombre').value,
+        nombre: nombre,
         fabricante: document.getElementById('fabricante').value,
         categoria: document.getElementById('categoria').value,
         tipologia: document.getElementById('tipologia').value,
-        ubicacion: document.getElementById('ubicacionSelect').value,
+        ubicacion: ubicacion,
         edad: document.getElementById('edad').value,
         min_jugadores: document.getElementById('minJugadoresSelect').value,
         max_jugadores: document.getElementById('maxJugadoresSelect').value,
