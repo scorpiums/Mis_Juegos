@@ -574,9 +574,10 @@
               <input type="text" id="mecanicas" required placeholder="Ej. Deducción, Reflejos, Plataformas" class="w-full p-2 border rounded-xl outline-none mt-0.5 text-xs">
             </div>
 
-            <div id="contenedorBotonAuditarIA" class="hidden bg-purple-50 p-2 rounded-xl border border-purple-200">
-              <button type="button" onclick="solicitarAuditoriaTextoIA()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-1.5 rounded-xl text-xs card-zoom shadow-sm">
-                🔍 Auditar / Revisar Texto con IA
+            <!-- BOTÓN IA ESPECÍFICO PARA AUDITAR CLASIFICACIÓN (PASO 2) -->
+            <div id="contenedorBotonAuditarClasificacion" class="hidden bg-purple-50 p-2 rounded-xl border border-purple-200">
+              <button type="button" onclick="solicitarAuditoriaSeccion('clasificacion')" id="btnAuditarClasificacion" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-1.5 rounded-xl text-xs card-zoom shadow-sm flex items-center justify-center gap-1">
+                🔍 Auditar Clasificación con IA (Tipología y Mecánicas)
               </button>
             </div>
           </div>
@@ -591,6 +592,13 @@
             <div>
               <label class="font-bold text-slate-600 uppercase text-[9px]">Reglas Completas Paso a Paso (Estructuradas)</label>
               <textarea id="instruccionesCompletas" rows="4" placeholder="1. Preparación: ...&#10;2. Desarrollo del turno: ...&#10;3. Condición de victoria: ..." class="w-full p-2 border rounded-xl outline-none mt-0.5 text-xs leading-relaxed"></textarea>
+            </div>
+
+            <!-- BOTÓN IA ESPECÍFICO PARA AUDITAR REGLAS (PASO 3) -->
+            <div id="contenedorBotonAuditarReglas" class="hidden bg-purple-50 p-2 rounded-xl border border-purple-200">
+              <button type="button" onclick="solicitarAuditoriaSeccion('reglas')" id="btnAuditarReglas" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-1.5 rounded-xl text-xs card-zoom shadow-sm flex items-center justify-center gap-1">
+                🔍 Auditar Reglas con IA (Básicas y Completas)
+              </button>
             </div>
 
             <div class="bg-slate-50 p-2 rounded-xl border border-slate-200 space-y-2">
@@ -849,7 +857,9 @@
     let seleccionesComparadorIA = {};
     let audioCtx = null;
 
+    // MAPA UNIFICADO DE CAMPOS DE AUDITORÍA
     const MAPA_CAMPOS_AUDITORIA_IA = [
+      { key: 'tipologia', label: 'Tipología / Soporte (Nivel 2)', idElem: 'tipologia' },
       { key: 'mecanicas', label: 'Mecánicas (Nivel 3 - Máx 3)', idElem: 'mecanicas' },
       { key: 'instrucciones', label: 'Reglas Básicas (Resumen)', idElem: 'instrucciones' },
       { key: 'instrucciones_completas', label: 'Reglas Completas Paso a Paso', idElem: 'instruccionesCompletas' }
@@ -1511,7 +1521,8 @@
         document.getElementById('imagePreview').innerHTML = foto ? `<img src="${foto}" class="w-full h-full object-contain">` : `<span class="text-slate-400 text-xs">Sin fotografía</span>`;
 
         document.getElementById('contenedorBotonIAPaso1').classList.add('hidden');
-        document.getElementById('contenedorBotonAuditarIA').classList.remove('hidden');
+        document.getElementById('contenedorBotonAuditarClasificacion').classList.remove('hidden');
+        document.getElementById('contenedorBotonAuditarReglas').classList.remove('hidden');
         document.getElementById('contenedorBorradoEdicion').classList.remove('hidden');
       } else {
         esEdicion = false;
@@ -1525,7 +1536,8 @@
         document.getElementById('imagePreview').innerHTML = `<span class="text-slate-400 text-[10px] text-center px-2">Sin fotografía<br><span class="text-[9px] text-slate-500">(Cuadrada)</span></span>`;
 
         document.getElementById('contenedorBotonIAPaso1').classList.remove('hidden');
-        document.getElementById('contenedorBotonAuditarIA').classList.add('hidden');
+        document.getElementById('contenedorBotonAuditarClasificacion').classList.add('hidden');
+        document.getElementById('contenedorBotonAuditarReglas').classList.add('hidden');
         document.getElementById('contenedorBorradoEdicion').classList.add('hidden');
       }
 
@@ -1608,8 +1620,8 @@
       finally { btn.innerText = "🤖 Reconocer por IA (Autocompletar Todo)"; btn.disabled = false; }
     }
 
-    // 2. AUDITORÍA / REVISIÓN LIGERA DE TEXTO SIN IMAGEN EN EDICIÓN
-    async function solicitarAuditoriaTextoIA() {
+    // 2. AUDITORÍA LIGERA POR SECCIÓN EN EDICIÓN (CLASIFICACIÓN O REGLAS)
+    async function solicitarAuditoriaSeccion(tipoSeccion) {
       const datosBasicos = {
         nombre: document.getElementById('nombre').value,
         fabricante: document.getElementById('fabricante').value,
@@ -1619,13 +1631,30 @@
         max_jugadores: document.getElementById('maxJugadoresSelect').value
       };
 
-      const textoActual = {
-        mecanicas: document.getElementById('mecanicas').value,
-        instrucciones: document.getElementById('instrucciones').value,
-        instrucciones_completas: document.getElementById('instruccionesCompletas').value
-      };
+      let secciones = [];
+      let textoActual = {};
+      let btnElem = null;
+      let textoOriginalBtn = "";
 
-      const secciones = ['mecanicas', 'reglas_basicas', 'reglas_completas'];
+      if (tipoSeccion === 'clasificacion') {
+        secciones = ['tipologia', 'mecanicas'];
+        textoActual = {
+          tipologia: document.getElementById('tipologia').value,
+          mecanicas: document.getElementById('mecanicas').value
+        };
+        btnElem = document.getElementById('btnAuditarClasificacion');
+        textoOriginalBtn = "🔍 Auditar Clasificación con IA (Tipología y Mecánicas)";
+      } else if (tipoSeccion === 'reglas') {
+        secciones = ['reglas_basicas', 'reglas_completas'];
+        textoActual = {
+          instrucciones: document.getElementById('instrucciones').value,
+          instrucciones_completas: document.getElementById('instruccionesCompletas').value
+        };
+        btnElem = document.getElementById('btnAuditarReglas');
+        textoOriginalBtn = "🔍 Auditar Reglas con IA (Básicas y Completas)";
+      }
+
+      if (btnElem) { btnElem.innerText = "⏳ Auditando con IA..."; btnElem.disabled = true; }
 
       try {
         const res = await fetchSeguro(`/api/analizar-texto-ia`, {
@@ -1641,6 +1670,9 @@
 
         abrirComparadorIA();
       } catch (err) { alert(err.message); }
+      finally {
+        if (btnElem) { btnElem.innerText = textoOriginalBtn; btnElem.disabled = false; }
+      }
     }
 
     function abrirComparadorIA() {
@@ -1652,7 +1684,7 @@
 
       MAPA_CAMPOS_AUDITORIA_IA.forEach(campo => {
         const valIA = datosAnalizadosIA[campo.key];
-        if (!valIA) return;
+        if (!valIA) return; // Si la clave no vino en la respuesta de esta sección, se ignora.
 
         const valActual = document.getElementById(campo.idElem)?.value || '';
         const id = campo.idElem;
