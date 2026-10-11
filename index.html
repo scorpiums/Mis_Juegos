@@ -160,7 +160,7 @@
       </div>
     </header>
 
-    <!-- BARRA SUPERIOR Y FILTROS REORGANIZADOS -->
+    <!-- BARRA SUPERIOR Y FILTROS -->
     <div class="sticky top-[44px] z-30 bg-slate-100 p-2.5 border-b border-slate-200 shadow-sm">
       <div class="max-w-4xl mx-auto space-y-2">
         <div class="flex gap-1.5">
@@ -175,7 +175,7 @@
           </button>
         </div>
 
-        <!-- PANEL DE FILTROS INDIVIDUALES POR CAMPO -->
+        <!-- PANEL DE FILTROS AVANZADOS -->
         <div id="panelFiltrosAvanzados" class="hidden bg-white p-3 rounded-2xl border border-slate-200 shadow-md space-y-2.5 text-xs">
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
             <div>
@@ -196,17 +196,6 @@
               <label class="font-bold text-slate-500 uppercase text-[9px]">👶 Edad Apto</label>
               <select id="filtroEdadMinima" onchange="filtrarJuegos()" class="w-full p-1.5 border rounded-xl outline-none mt-0.5 bg-slate-50 text-[11px]">
                 <option value="">Todas las edades</option>
-                <option value="3">Hasta +3 años</option>
-                <option value="4">Hasta +4 años</option>
-                <option value="5">Hasta +5 años</option>
-                <option value="6">Hasta +6 años</option>
-                <option value="7">Hasta +7 años</option>
-                <option value="8">Hasta +8 años</option>
-                <option value="10">Hasta +10 años</option>
-                <option value="12">Hasta +12 años</option>
-                <option value="14">Hasta +14 años</option>
-                <option value="16">Hasta +16 años</option>
-                <option value="18">Hasta +18 años</option>
               </select>
             </div>
 
@@ -251,7 +240,6 @@
         </div>
         
         <div class="flex justify-between items-center gap-2">
-          <!-- Pestañas de categorías generadas dinámicamente -->
           <div class="flex gap-1 overflow-x-auto pb-0.5 text-xs scrollbar-none flex-grow" id="categoriasFiltro">
             <button onclick="filtrarCategoria('Todos', event)" class="cat-btn bg-indigo-600 text-white px-2.5 py-1 rounded-full font-medium shadow-sm whitespace-nowrap transition">Todos</button>
             <button onclick="filtrarCategoria('Favoritos', event)" class="cat-btn bg-white text-slate-600 border px-2.5 py-1 rounded-full font-medium shadow-sm whitespace-nowrap transition">❤️ Favoritos</button>
@@ -443,18 +431,16 @@
     </div>
   </div>
 
-  <!-- MODAL ASISTENTE (WIZARD DE 4 PASOS) PARA CREACIÓN / EDICIÓN -->
+  <!-- MODAL ASISTENTE (WIZARD DE 4 PASOS) -->
   <div id="modalForm" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-2.5">
     <div class="bg-white rounded-2xl max-w-md w-full h-[90vh] max-h-[630px] flex flex-col shadow-2xl overflow-hidden relative border border-slate-100">
       
-      <!-- CABECERA DEL WIZARD -->
       <div class="p-2.5 border-b bg-slate-900 text-white shrink-0 space-y-1.5">
         <div class="flex justify-between items-center">
           <h3 class="text-xs font-bold text-amber-300 truncate" id="modalTitulo">Nuevo Juego (Asistente)</h3>
           <button onclick="cerrarModalFormulario()" class="text-slate-400 hover:text-white text-base font-bold px-1">✕</button>
         </div>
 
-        <!-- INDICADOR VISUAL DE PASOS -->
         <div class="grid grid-cols-4 gap-1 text-[9px] font-bold text-center">
           <div id="stepBadge_1" class="py-1 rounded-md bg-indigo-600 text-white">1. Básicos</div>
           <div id="stepBadge_2" class="py-1 rounded-md bg-slate-800 text-slate-400">2. Clasificación</div>
@@ -463,14 +449,12 @@
         </div>
       </div>
 
-      <!-- CUERPO PRINCIPAL DEL WIZARD CON SCROLL INDEPENDIENTE -->
       <div class="flex-grow overflow-y-auto p-3 text-xs" id="wizardScrollContainer">
         
         <form id="juegoForm" onsubmit="preprocesarGuardadoJuego(event)" class="space-y-3">
           <input type="hidden" id="juegoId">
           <input type="hidden" id="juegoFotoBase64">
 
-          <!-- PASO 1: INFORMACIÓN BÁSICA & RECONOCIMIENTO FOTO -->
           <div id="wizardStep_1" class="space-y-2.5">
             <div class="bg-slate-50 p-2 rounded-2xl border border-slate-200 space-y-1.5">
               <div id="imagePreview" class="w-36 h-36 mx-auto bg-slate-900 rounded-xl flex items-center justify-center border-2 border-dashed border-slate-300 overflow-hidden relative shadow-inner">
@@ -498,34 +482,22 @@
 
             <div>
               <label class="font-bold text-slate-600 uppercase text-[9px]">Nombre del Juego <span class="text-rose-500">*</span></label>
-              <input type="text" id="nombre" required placeholder="Ej. ¿Quién es Quién?" class="w-full p-2 border rounded-xl outline-none mt-0.5 text-xs font-bold text-slate-800">
+              <input type="text" id="nombre" placeholder="Ej. ¿Quién es Quién?" class="w-full p-2 border rounded-xl outline-none mt-0.5 text-xs font-bold text-slate-800">
             </div>
 
             <div>
-              <label class="font-bold text-slate-600 uppercase text-[9px]">Fabricante / Editorial <span class="text-rose-500">*</span></label>
-              <input type="text" id="fabricante" required placeholder="Ej. Hasbro, Ravensburger, Nintendo, Genérico..." class="w-full p-2 border rounded-xl outline-none mt-0.5 text-xs">
+              <label class="font-bold text-slate-600 uppercase text-[9px]">Fabricante / Editorial</label>
+              <input type="text" id="fabricante" placeholder="Ej. Hasbro, Ravensburger, Nintendo..." class="w-full p-2 border rounded-xl outline-none mt-0.5 text-xs">
             </div>
 
             <div class="grid grid-cols-2 gap-2">
               <div>
-                <label class="font-bold text-slate-600 uppercase text-[9px]">Edad Recomendada <span class="text-rose-500">*</span></label>
-                <select id="edad" required class="w-full p-2 border rounded-xl outline-none mt-0.5 bg-white font-semibold text-xs">
-                  <option value="+3">+3 años</option>
-                  <option value="+4">+4 años</option>
-                  <option value="+5">+5 años</option>
-                  <option value="+6" selected>+6 años</option>
-                  <option value="+7">+7 años</option>
-                  <option value="+8">+8 años</option>
-                  <option value="+10">+10 años</option>
-                  <option value="+12">+12 años</option>
-                  <option value="+14">+14 años</option>
-                  <option value="+16">+16 años</option>
-                  <option value="+18">+18 años</option>
-                </select>
+                <label class="font-bold text-slate-600 uppercase text-[9px]">Edad Recomendada</label>
+                <select id="edad" class="w-full p-2 border rounded-xl outline-none mt-0.5 bg-white font-semibold text-xs"></select>
               </div>
 
               <div class="bg-slate-50 p-1.5 rounded-xl border border-slate-200">
-                <span class="font-bold text-slate-600 uppercase text-[8px] block">Nº Jugadores <span class="text-rose-500">*</span></span>
+                <span class="font-bold text-slate-600 uppercase text-[8px] block">Nº Jugadores</span>
                 <div class="grid grid-cols-2 gap-1 mt-0.5">
                   <select id="minJugadoresSelect" class="w-full p-1 border rounded-lg bg-white text-[11px]">
                     <option value="1">Mín 1</option>
@@ -546,35 +518,22 @@
             </div>
           </div>
 
-          <!-- PASO 2: CLASIFICACIÓN EN 3 NIVELES -->
           <div id="wizardStep_2" class="space-y-2.5 hidden">
             <div>
-              <label class="font-bold text-slate-600 uppercase text-[9px]">Categoría (Nivel 1) <span class="text-rose-500">*</span></label>
-              <select id="categoria" required class="w-full p-2 border rounded-xl outline-none mt-0.5 bg-white font-medium text-xs">
-                <option value="Juego de Mesa">Juego de Mesa</option>
-                <option value="Habilidad">Habilidad</option>
-                <option value="Puzles">Puzles</option>
-                <option value="Construcción">Construcción</option>
-                <option value="Exterior">Exterior</option>
-                <option value="Consola">Consola</option>
-                <option value="Juguetes">Juguetes</option>
-                <option value="Lectura">Lectura</option>
-                <option value="Manualidades">Manualidades</option>
-                <option value="Música">Música</option>
-              </select>
+              <label class="font-bold text-slate-600 uppercase text-[9px]">Categoría (Nivel 1)</label>
+              <select id="categoria" class="w-full p-2 border rounded-xl outline-none mt-0.5 bg-white font-medium text-xs"></select>
             </div>
 
             <div>
-              <label class="font-bold text-slate-600 uppercase text-[9px]">Tipología / Soporte (Nivel 2) <span class="text-rose-500">*</span></label>
-              <input type="text" id="tipologia" required placeholder="Ej. Tablero, Tarjetas" class="w-full p-2 border rounded-xl outline-none mt-0.5 text-xs">
+              <label class="font-bold text-slate-600 uppercase text-[9px]">Tipología / Soporte (Nivel 2)</label>
+              <input type="text" id="tipologia" placeholder="Ej. Tablero, Tarjetas" class="w-full p-2 border rounded-xl outline-none mt-0.5 text-xs">
             </div>
 
             <div>
-              <label class="font-bold text-slate-600 uppercase text-[9px]">Mecánicas (Nivel 3 - Máx 3) <span class="text-rose-500">*</span></label>
-              <input type="text" id="mecanicas" required placeholder="Ej. Deducción, Reflejos, Plataformas" class="w-full p-2 border rounded-xl outline-none mt-0.5 text-xs">
+              <label class="font-bold text-slate-600 uppercase text-[9px]">Mecánicas (Nivel 3 - Máx 3)</label>
+              <input type="text" id="mecanicas" placeholder="Ej. Deducción, Reflejos, Plataformas" class="w-full p-2 border rounded-xl outline-none mt-0.5 text-xs">
             </div>
 
-            <!-- BOTÓN IA ESPECÍFICO PARA AUDITAR CLASIFICACIÓN (PASO 2) -->
             <div id="contenedorBotonAuditarClasificacion" class="hidden bg-purple-50 p-2 rounded-xl border border-purple-200">
               <button type="button" onclick="solicitarAuditoriaSeccion('clasificacion')" id="btnAuditarClasificacion" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-1.5 rounded-xl text-xs card-zoom shadow-sm flex items-center justify-center gap-1">
                 🔍 Auditar Clasificación con IA (Tipología y Mecánicas)
@@ -582,7 +541,6 @@
             </div>
           </div>
 
-          <!-- PASO 3: REGLAS Y TUTORIALES -->
           <div id="wizardStep_3" class="space-y-2.5 hidden">
             <div>
               <label class="font-bold text-slate-600 uppercase text-[9px]">Reglas Básicas (Resumen 2-3 frases)</label>
@@ -590,11 +548,10 @@
             </div>
 
             <div>
-              <label class="font-bold text-slate-600 uppercase text-[9px]">Reglas Completas Paso a Paso (Estructuradas)</label>
+              <label class="font-bold text-slate-600 uppercase text-[9px]">Reglas Completas Paso a Paso</label>
               <textarea id="instruccionesCompletas" rows="4" placeholder="1. Preparación: ...&#10;2. Desarrollo del turno: ...&#10;3. Condición de victoria: ..." class="w-full p-2 border rounded-xl outline-none mt-0.5 text-xs leading-relaxed"></textarea>
             </div>
 
-            <!-- BOTÓN IA ESPECÍFICO PARA AUDITAR REGLAS (PASO 3) -->
             <div id="contenedorBotonAuditarReglas" class="hidden bg-purple-50 p-2 rounded-xl border border-purple-200">
               <button type="button" onclick="solicitarAuditoriaSeccion('reglas')" id="btnAuditarReglas" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-1.5 rounded-xl text-xs card-zoom shadow-sm flex items-center justify-center gap-1">
                 🔍 Auditar Reglas con IA (Básicas y Completas)
@@ -626,7 +583,6 @@
             </div>
           </div>
 
-          <!-- PASO 4: UBICACIÓN & GUARDADO FINAL -->
           <div id="wizardStep_4" class="space-y-3 hidden">
             <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-2">
               <div class="flex justify-between items-center">
@@ -651,7 +607,6 @@
         </form>
       </div>
 
-      <!-- BOTONES INFERIORES DE NAVEGACIÓN DEL WIZARD -->
       <div class="p-2.5 border-t bg-slate-50 shrink-0 flex justify-between gap-2">
         <button type="button" id="btnWizardPrev" onclick="cambiarPasoWizard(-1)" class="w-1/3 bg-slate-200 text-slate-700 font-bold py-2 rounded-xl text-xs hidden">
           ⬅ Atrás
@@ -707,12 +662,7 @@
 
         <div class="bg-slate-50 p-2 rounded-xl border space-y-1.5">
           <span class="font-bold text-slate-600 uppercase text-[9px] block">Condicionar por categoría:</span>
-          <div class="grid grid-cols-2 gap-1" id="checkboxesRuletaCat">
-            <label class="flex items-center gap-1"><input type="checkbox" value="Juego de Mesa" checked> Mesa</label>
-            <label class="flex items-center gap-1"><input type="checkbox" value="Construcción" checked> Construcción</label>
-            <label class="flex items-center gap-1"><input type="checkbox" value="Exterior" checked> Exterior</label>
-            <label class="flex items-center gap-1"><input type="checkbox" value="Consola" checked> Consola</label>
-          </div>
+          <div class="grid grid-cols-2 gap-1" id="checkboxesRuletaCat"></div>
         </div>
 
         <button onclick="girarRuletaClasica()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-black py-2.5 rounded-xl shadow-lg card-zoom text-xs">
@@ -842,6 +792,7 @@
     let mecanicasDinamicasCache = [];
     let fabricantesCache = [];
     let tipologiasCache = [];
+    let catalogosServidor = { categorias: [], tipologias: [], mecanicas: [], edades: [] };
     let bolsaDescarteRuleta = [];
     let categoriaActual = 'Todos';
     let vistaActual = 'grid'; 
@@ -857,13 +808,25 @@
     let seleccionesComparadorIA = {};
     let audioCtx = null;
 
-    // MAPA UNIFICADO DE CAMPOS DE AUDITORÍA
     const MAPA_CAMPOS_AUDITORIA_IA = [
       { key: 'tipologia', label: 'Tipología / Soporte (Nivel 2)', idElem: 'tipologia' },
       { key: 'mecanicas', label: 'Mecánicas (Nivel 3 - Máx 3)', idElem: 'mecanicas' },
       { key: 'instrucciones', label: 'Reglas Básicas (Resumen)', idElem: 'instrucciones' },
       { key: 'instrucciones_completas', label: 'Reglas Completas Paso a Paso', idElem: 'instruccionesCompletas' }
     ];
+
+    function escaparHTML(v) {
+      return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
+    function sanitizarUrl(url) {
+      if (!url) return '';
+      const limpia = String(url).trim();
+      if (limpia.startsWith('data:image/') || limpia.startsWith('http://') || limpia.startsWith('https://')) {
+        return escaparHTML(limpia);
+      }
+      return '';
+    }
 
     function aTextoPlano(val) {
       if (val === null || val === undefined) return '';
@@ -891,7 +854,7 @@
 
     function formatearTextoEdad(juego) {
       const num = obtenerEdadNumerica(juego);
-      return num > 0 ? `+${num} años` : (juego.edad || 'N/A');
+      return num > 0 ? `+${num} años` : (escaparHTML(juego.edad) || 'N/A');
     }
 
     function formatearTextoJugadores(juego) {
@@ -904,7 +867,7 @@
 
     function formatearGanadoresSimplificado(ganadorStr) {
       if (!ganadorStr || ganadorStr === 'N/A' || ganadorStr === 'Sin ganador' || ganadorStr === 'Ninguno') return 'Sin datos';
-      return ganadorStr.replace(/P\d+:\s*/g, '').trim();
+      return escaparHTML(ganadorStr.replace(/P\d+:\s*/g, '').trim());
     }
 
     function reproducirSonidoClick() {
@@ -975,8 +938,9 @@
       document.getElementById('mainApp').classList.remove('hidden');
       
       const userContainer = document.getElementById('userBadgeContainer');
-      const avatarHtml = (currentUser.avatar_base64 || currentUser.avatar_url)
-        ? `<img src="${currentUser.avatar_base64 || currentUser.avatar_url}" class="w-6 h-6 rounded-full object-cover border border-amber-300">` 
+      const avatarSrc = sanitizarUrl(currentUser.avatar_base64 || currentUser.avatar_url);
+      const avatarHtml = avatarSrc
+        ? `<img src="${avatarSrc}" class="w-6 h-6 rounded-full object-cover border border-amber-300">` 
         : `👤`;
 
       userContainer.innerHTML = `
@@ -985,10 +949,47 @@
         </button>
       `;
 
+      await cargarCatalogosServidor();
       await cargarFavoritos();
       await cargarUbicaciones();
       await cargarMecanicasDinamicas();
       cargarJuegos();
+    }
+
+    async function cargarCatalogosServidor() {
+      try {
+        const res = await fetch(`${WORKER_URL}/api/catalogos`);
+        catalogosServidor = await res.json();
+        poblarSelectoresCatalogos();
+      } catch (e) { console.error("Error al cargar catálogos:", e); }
+    }
+
+    function poblarSelectoresCatalogos() {
+      const selCat = document.getElementById('categoria');
+      selCat.innerHTML = '';
+      (catalogosServidor.categorias || []).forEach(c => {
+        selCat.innerHTML += `<option value="${escaparHTML(c)}">${escaparHTML(c)}</option>`;
+      });
+
+      const selEdad = document.getElementById('edad');
+      selEdad.innerHTML = '';
+      (catalogosServidor.edades || []).forEach(e => {
+        selEdad.innerHTML += `<option value="+${e}">+${e} años</option>`;
+      });
+
+      const selEdadMin = document.getElementById('filtroEdadMinima');
+      selEdadMin.innerHTML = `<option value="">Todas las edades</option>`;
+      (catalogosServidor.edades || []).forEach(e => {
+        selEdadMin.innerHTML += `<option value="${e}">Hasta +${e} años</option>`;
+      });
+
+      const contCheckRuleta = document.getElementById('checkboxesRuletaCat');
+      contCheckRuleta.innerHTML = '';
+      (catalogosServidor.categorias || []).forEach(c => {
+        contCheckRuleta.innerHTML += `
+          <label class="flex items-center gap-1"><input type="checkbox" value="${escaparHTML(c)}" checked> ${escaparHTML(c)}</label>
+        `;
+      });
     }
 
     async function cargarFavoritos() {
@@ -1022,7 +1023,7 @@
         mecanicasDinamicasCache.forEach(m => {
           cont.innerHTML += `
             <label class="bg-slate-100 px-2 py-0.5 rounded-md border flex items-center gap-1 cursor-pointer hover:bg-slate-200 text-[10px]">
-              <input type="checkbox" value="${m}" onchange="filtrarJuegos()" class="rounded text-indigo-600"> ${m}
+              <input type="checkbox" value="${escaparHTML(m)}" onchange="filtrarJuegos()" class="rounded text-indigo-600"> ${escaparHTML(m)}
             </label>
           `;
         });
@@ -1035,15 +1036,15 @@
 
       const selFab = document.getElementById('filtroFabricante');
       selFab.innerHTML = `<option value="">Todos los fabricantes</option>`;
-      fabricantesCache.forEach(f => { selFab.innerHTML += `<option value="${f}">${f}</option>`; });
+      fabricantesCache.forEach(f => { selFab.innerHTML += `<option value="${escaparHTML(f)}">${escaparHTML(f)}</option>`; });
 
       const selTipo = document.getElementById('filtroTipologia');
       selTipo.innerHTML = `<option value="">Todas las tipologías</option>`;
-      tipologiasCache.forEach(t => { selTipo.innerHTML += `<option value="${t}">${t}</option>`; });
+      tipologiasCache.forEach(t => { selTipo.innerHTML += `<option value="${escaparHTML(t)}">${escaparHTML(t)}</option>`; });
 
       const selUbi = document.getElementById('filtroUbicacion');
       selUbi.innerHTML = `<option value="">Todas las ubicaciones</option>`;
-      ubicacionesCache.forEach(u => { selUbi.innerHTML += `<option value="${u}">${u}</option>`; });
+      ubicacionesCache.forEach(u => { selUbi.innerHTML += `<option value="${escaparHTML(u)}">${escaparHTML(u)}</option>`; });
     }
 
     function poblarSelectUbicaciones(ubicacionSeleccionada = '') {
@@ -1052,7 +1053,7 @@
       
       ubicacionesCache.forEach(u => {
         const selAttr = u === ubicacionSeleccionada ? 'selected' : '';
-        select.innerHTML += `<option value="${u}" ${selAttr}>${u}</option>`;
+        select.innerHTML += `<option value="${escaparHTML(u)}" ${selAttr}>${escaparHTML(u)}</option>`;
       });
     }
 
@@ -1106,11 +1107,11 @@
       document.getElementById('fichaTipologia').innerText = juegoActualFicha.tipologia || 'General';
       
       const fechaCreacionStr = formatearFechaCorta(juegoActualFicha.fecha_creacion);
-      let autoriaText = `👤 <b>Añadido por:</b> @${juegoActualFicha.creador_nick || 'Sistema'} · ${fechaCreacionStr}`;
+      let autoriaText = `👤 <b>Añadido por:</b> @${escaparHTML(juegoActualFicha.creador_nick || 'Sistema')} · ${fechaCreacionStr}`;
       
       if (juegoActualFicha.modificador_nick && juegoActualFicha.fecha_modificacion) {
         const fechaModStr = formatearFechaCorta(juegoActualFicha.fecha_modificacion);
-        autoriaText += `<br>✏️ <b>Actualizado por:</b> @${juegoActualFicha.modificador_nick} · ${fechaModStr}`;
+        autoriaText += `<br>✏️ <b>Actualizado por:</b> @${escaparHTML(juegoActualFicha.modificador_nick)} · ${fechaModStr}`;
       }
       document.getElementById('fichaAutoriaTexto').innerHTML = autoriaText;
 
@@ -1129,7 +1130,7 @@
         pintarReglasCompletas(juegoActualFicha);
       }
 
-      const imagenSrc = juegoActualFicha.foto_url || juegoActualFicha.foto_base64 || '';
+      const imagenSrc = sanitizarUrl(juegoActualFicha.foto_url || juegoActualFicha.foto_base64 || '');
       const imgContainer = document.getElementById('fichaImagenContainer');
       imgContainer.innerHTML = imagenSrc ? `<img src="${imagenSrc}" class="w-full h-full object-contain p-2">` : `<span class="text-slate-400 text-xs">Sin Foto</span>`;
 
@@ -1180,8 +1181,8 @@
                   <span>📅 ${fechaFormateada}</span>
                   <span>🎮 ${p.num_partidas || 1} p.</span>
                 </div>
-                <p class="text-slate-700">👥 <b>Jugadores:</b> ${p.participantes}</p>
-                <p class="text-emerald-700 font-bold">🏆 ${p.ganador}</p>
+                <p class="text-slate-700">👥 <b>Jugadores:</b> ${escaparHTML(p.participantes)}</p>
+                <p class="text-emerald-700 font-bold">🏆 ${escaparHTML(p.ganador)}</p>
               </div>
             `;
           });
@@ -1195,7 +1196,7 @@
             const medalla = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '🎖️';
             rankingCont.innerHTML += `
               <div class="flex justify-between items-center bg-white p-1.5 rounded-lg border text-[11px]">
-                <span>${medalla} <b>${nick}</b></span>
+                <span>${medalla} <b>${escaparHTML(nick)}</b></span>
                 <span class="font-bold text-amber-600">${count} victoria${count > 1 ? 's' : ''}</span>
               </div>
             `;
@@ -1300,7 +1301,7 @@
         poblarFiltrosEspeciales();
         renderizarTarjetas();
       } catch (err) {
-        document.getElementById('mainContainer').innerHTML = `<div class="text-center py-10 text-rose-500 text-xs">${err.message}</div>`;
+        document.getElementById('mainContainer').innerHTML = `<div class="text-center py-10 text-rose-500 text-xs">${escaparHTML(err.message)}</div>`;
       }
     }
 
@@ -1315,7 +1316,7 @@
 
       categoriasExistentes.forEach(cat => {
         const sel = (categoriaActual === cat) ? 'bg-indigo-600 text-white' : 'bg-white text-slate-600 border';
-        html += `<button onclick="filtrarCategoria('${cat}', event)" class="cat-btn ${sel} px-2.5 py-1 rounded-full font-medium shadow-sm whitespace-nowrap transition">${cat}</button>`;
+        html += `<button onclick="filtrarCategoria('${escaparHTML(cat)}', event)" class="cat-btn ${sel} px-2.5 py-1 rounded-full font-medium shadow-sm whitespace-nowrap transition">${escaparHTML(cat)}</button>`;
       });
 
       cont.innerHTML = html;
@@ -1368,7 +1369,7 @@
       if (vistaActual === 'grid') {
         let gridHTML = '<div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="gridJuegos">';
         filtrados.forEach(j => {
-          const imagenSrc = j.foto_url || j.foto_base64 || '';
+          const imagenSrc = sanitizarUrl(j.foto_url || j.foto_base64 || '');
           const tieneImagen = imagenSrc && imagenSrc.trim().length > 0;
           const esFav = favoritosCache.includes(j.id);
 
@@ -1387,10 +1388,10 @@
               <div class="p-3 space-y-2">
                 <div class="flex justify-between items-center gap-2 border-b pb-1.5">
                   <div class="truncate flex-grow">
-                    <h4 onclick="abrirFichaDetallada('${j.id}')" class="font-black text-sm text-slate-800 leading-snug cursor-pointer hover:text-indigo-600 transition truncate" title="${j.nombre}">${j.nombre}</h4>
-                    <span class="text-[9px] font-semibold text-indigo-700 truncate block">🏭 ${j.fabricante || 'Genérico'}</span>
+                    <h4 onclick="abrirFichaDetallada('${j.id}')" class="font-black text-sm text-slate-800 leading-snug cursor-pointer hover:text-indigo-600 transition truncate" title="${escaparHTML(j.nombre)}">${escaparHTML(j.nombre)}</h4>
+                    <span class="text-[9px] font-semibold text-indigo-700 truncate block">🏭 ${escaparHTML(j.fabricante || 'Genérico')}</span>
                   </div>
-                  <span class="bg-slate-900 text-white text-[9px] font-bold px-2 py-0.5 rounded-full shrink-0">${j.categoria}</span>
+                  <span class="bg-slate-900 text-white text-[9px] font-bold px-2 py-0.5 rounded-full shrink-0">${escaparHTML(j.categoria)}</span>
                 </div>
 
                 <div class="grid grid-cols-2 gap-2.5 items-stretch h-40">
@@ -1404,8 +1405,8 @@
                   <div class="flex flex-col justify-between gap-1.5 h-full min-w-0">
                     <div class="bg-slate-50 p-1.5 rounded-xl border border-slate-200 text-[10px] flex-1 flex flex-col justify-between min-h-0">
                       <div>
-                        <span class="block text-indigo-900 font-bold truncate">🏷️ ${j.tipologia || 'General'}</span>
-                        <p class="text-slate-600 line-clamp-2 mt-0.5 leading-tight">🧩 ${j.mecanicas || 'Sin mecánicas'}</p>
+                        <span class="block text-indigo-900 font-bold truncate">🏷️ ${escaparHTML(j.tipologia || 'General')}</span>
+                        <p class="text-slate-600 line-clamp-2 mt-0.5 leading-tight">🧩 ${escaparHTML(j.mecanicas || 'Sin mecánicas')}</p>
                       </div>
                       <div class="pt-1 border-t border-slate-200/80 text-slate-800 font-medium truncate">
                         👶 ${formatearTextoEdad(j)} • 👥 ${formatearTextoJugadores(j)}
@@ -1426,13 +1427,13 @@
                 </div>
 
                 <div class="text-[9px] text-slate-500 pt-0.5 flex justify-between items-center border-t border-slate-100">
-                  <span class="truncate">📍 ${j.ubicacion || 'Sin sitio'}</span>
-                  <span class="truncate text-right shrink-0">👤 @${j.creador_nick || 'admin'}</span>
+                  <span class="truncate">📍 ${escaparHTML(j.ubicacion || 'Sin sitio')}</span>
+                  <span class="truncate text-right shrink-0">👤 @${escaparHTML(j.creador_nick || 'admin')}</span>
                 </div>
               </div>
 
               <div class="p-3 pt-0">
-                <button onclick="abrirModalPartida('${j.id}', '${j.nombre.replace(/'/g, "\\'")}')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs card-zoom shadow-md flex items-center justify-center">
+                <button onclick="abrirModalPartida('${j.id}', '${escaparHTML(j.nombre)}')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs card-zoom shadow-md flex items-center justify-center">
                   ¡Vamos a jugar!
                 </button>
               </div>
@@ -1444,7 +1445,7 @@
       } else {
         let listHTML = '<div class="space-y-2 max-w-4xl mx-auto">';
         filtrados.forEach(j => {
-          const imagenSrc = j.foto_url || j.foto_base64 || '';
+          const imagenSrc = sanitizarUrl(j.foto_url || j.foto_base64 || '');
           const tieneImagen = imagenSrc && imagenSrc.trim().length > 0;
           const esFav = favoritosCache.includes(j.id);
 
@@ -1459,23 +1460,23 @@
 
               <div class="flex-grow min-w-0 flex flex-col justify-between py-0.5 gap-0.5">
                 <div class="min-w-0 cursor-pointer" onclick="abrirFichaDetallada('${j.id}')">
-                  <h4 class="font-black text-slate-800 text-xs leading-tight hover:text-indigo-600 transition truncate">${j.nombre}</h4>
+                  <h4 class="font-black text-slate-800 text-xs leading-tight hover:text-indigo-600 transition truncate">${escaparHTML(j.nombre)}</h4>
                   <p class="text-[9px] text-slate-500 truncate mt-0.5">
-                    🏭 ${j.fabricante || 'Genérico'} • 📍 ${j.ubicacion || 'Sin sitio'} • 👶 ${formatearTextoEdad(j)} • 👥 ${formatearTextoJugadores(j)}
+                    🏭 ${escaparHTML(j.fabricante || 'Genérico')} • 📍 ${escaparHTML(j.ubicacion || 'Sin sitio')} • 👶 ${formatearTextoEdad(j)} • 👥 ${formatearTextoJugadores(j)}
                   </p>
                 </div>
 
                 <div class="flex justify-between items-center pt-0.5 border-t border-slate-100 gap-2">
                   <div class="flex items-center gap-1 truncate">
                     <span class="bg-slate-100 text-slate-700 text-[9px] font-bold px-1.5 py-0.5 rounded-md border border-slate-200 truncate">
-                      ${j.categoria}
+                      ${escaparHTML(j.categoria)}
                     </span>
                     <span class="text-[9px] text-slate-500 truncate">
-                      🏷️ ${j.tipologia || 'General'}
+                      🏷️ ${escaparHTML(j.tipologia || 'General')}
                     </span>
                   </div>
 
-                  <button onclick="abrirModalPartida('${j.id}', '${j.nombre.replace(/'/g, "\\'")}')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-2.5 py-0.5 rounded-xl text-xs card-zoom shadow-sm flex items-center gap-1 shrink-0">
+                  <button onclick="abrirModalPartida('${j.id}', '${escaparHTML(j.nombre)}')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-2.5 py-0.5 rounded-xl text-xs card-zoom shadow-sm flex items-center gap-1 shrink-0">
                     ¡Jugar!
                   </button>
                 </div>
@@ -1488,7 +1489,6 @@
       }
     }
 
-    // NAVEGACIÓN Y FUNCIONES DEL WIZARD / ASISTENTE POR PASOS
     function abrirModalFormulario(juegoAEditar = null) {
       const form = document.getElementById('juegoForm');
       form.reset();
@@ -1516,7 +1516,7 @@
         document.getElementById('pdf_reglas_url').value = juegoAEditar.pdf_reglas_url || '';
         document.getElementById('video_tutorial_url').value = juegoAEditar.video_tutorial_url || '';
 
-        const foto = juegoAEditar.foto_url || juegoAEditar.foto_base64 || '';
+        const foto = sanitizarUrl(juegoAEditar.foto_url || juegoAEditar.foto_base64 || '');
         document.getElementById('juegoFotoBase64').value = foto;
         document.getElementById('imagePreview').innerHTML = foto ? `<img src="${foto}" class="w-full h-full object-contain">` : `<span class="text-slate-400 text-xs">Sin fotografía</span>`;
 
@@ -1585,7 +1585,6 @@
 
     function cerrarModalFormulario() { document.getElementById('modalForm').classList.add('hidden'); }
 
-    // 1. RECONOCIMIENTO COMPLETO CON FOTO PARA ALTA DE JUEGO
     async function reconocerJuegoCompletoConIA() {
       const base64 = document.getElementById('juegoFotoBase64').value;
       const nombreActual = document.getElementById('nombre').value;
@@ -1620,7 +1619,6 @@
       finally { btn.innerText = "🤖 Reconocer por IA (Autocompletar Todo)"; btn.disabled = false; }
     }
 
-    // 2. AUDITORÍA LIGERA POR SECCIÓN EN EDICIÓN (CLASIFICACIÓN O REGLAS)
     async function solicitarAuditoriaSeccion(tipoSeccion) {
       const datosBasicos = {
         nombre: document.getElementById('nombre').value,
@@ -1684,7 +1682,7 @@
 
       MAPA_CAMPOS_AUDITORIA_IA.forEach(campo => {
         const valIA = datosAnalizadosIA[campo.key];
-        if (!valIA) return; // Si la clave no vino en la respuesta de esta sección, se ignora.
+        if (!valIA) return;
 
         const valActual = document.getElementById(campo.idElem)?.value || '';
         const id = campo.idElem;
@@ -1824,11 +1822,10 @@
       } catch (err) { alert(err.message); }
     }
 
-async function guardarJuego() {
+    async function guardarJuego() {
       const nombre = document.getElementById('nombre').value.trim();
       const ubicacion = document.getElementById('ubicacionSelect').value;
 
-      // Validación explícita por JS para evitar bloqueos de formulario en elementos ocultos
       if (!nombre) {
         alert("El Nombre del juego es obligatorio.");
         pasoWizardActual = 1;
@@ -1997,7 +1994,7 @@ async function guardarJuego() {
 
           document.getElementById('ruletaResultadoNombre').innerText = seleccionado.nombre;
           const imgCont = document.getElementById('ruletaResultadoImagen');
-          const imgSrc = seleccionado.foto_url || seleccionado.foto_base64 || '';
+          const imgSrc = sanitizarUrl(seleccionado.foto_url || seleccionado.foto_base64 || '');
           imgCont.innerHTML = imgSrc ? `<img src="${imgSrc}" class="w-full h-full object-contain p-2">` : `<span class="text-slate-400 text-xs">Sin Foto</span>`;
 
           document.getElementById('btnJugarRuleta').onclick = () => {
@@ -2110,7 +2107,7 @@ async function guardarJuego() {
         document.getElementById('perfilAvatarBase64').value = perfil.avatar_base64 || perfil.avatar_url || '';
 
         const preview = document.getElementById('avatarPreview');
-        const imgSrc = perfil.avatar_base64 || perfil.avatar_url;
+        const imgSrc = sanitizarUrl(perfil.avatar_base64 || perfil.avatar_url);
         preview.innerHTML = imgSrc ? `<img src="${imgSrc}" class="w-full h-full object-cover">` : `<span class="text-slate-400 text-[10px]">Foto</span>`;
 
         const historialCont = document.getElementById('miHistorialLista');
@@ -2121,11 +2118,11 @@ async function guardarJuego() {
             historialCont.innerHTML += `
               <div class="bg-slate-50 p-2 rounded-xl border space-y-0.5">
                 <div class="flex justify-between items-center">
-                  <span class="font-bold text-indigo-700 text-xs">${p.juego_nombre} (${p.num_partidas || 1} p.)</span>
+                  <span class="font-bold text-indigo-700 text-xs">${escaparHTML(p.juego_nombre)} (${p.num_partidas || 1} p.)</span>
                   <span class="text-[9px] text-slate-400">${fechaFormateada}</span>
                 </div>
-                <p class="text-[10px] text-slate-600">👥 <b>Participantes:</b> ${p.participantes}</p>
-                <p class="text-[10px] text-emerald-700 font-bold">🏆 ${p.ganador}</p>
+                <p class="text-[10px] text-slate-600">👥 <b>Participantes:</b> ${escaparHTML(p.participantes)}</p>
+                <p class="text-[10px] text-emerald-700 font-bold">🏆 ${escaparHTML(p.ganador)}</p>
               </div>
             `;
           });
@@ -2137,8 +2134,8 @@ async function guardarJuego() {
           perfil.misJuegos.forEach(j => {
             misJuegosCont.innerHTML += `
               <div class="bg-slate-50 p-1.5 rounded-xl border flex justify-between items-center text-xs">
-                <span class="font-bold text-slate-800">${j.nombre}</span>
-                <span class="text-[9px] text-indigo-600 font-medium">${j.categoria}</span>
+                <span class="font-bold text-slate-800">${escaparHTML(j.nombre)}</span>
+                <span class="text-[9px] text-indigo-600 font-medium">${escaparHTML(j.categoria)}</span>
               </div>
             `;
           });
@@ -2242,8 +2239,6 @@ async function guardarJuego() {
           const intentos = Math.min(parseInt(u.intentos_fallidos) || 0, LIMITE);
           const bloqueado = u.estado === 'BLOQUEADO';
           const esProtegido = u.id === 'admin-root' || u.id === currentUser.id;
-          const ultimo = u.ultimo_intento_fallido ? new Date(u.ultimo_intento_fallido) : null;
-          const ultimoTxt = ultimo && !isNaN(ultimo) ? ultimo.toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' }) : '';
           const inicial = escaparHTML((u.nombre || u.nick || '?').trim().charAt(0).toUpperCase());
 
           let filaIntentos = '';
@@ -2337,8 +2332,8 @@ async function guardarJuego() {
           const marcado = (j === currentUser.nick) ? 'checked' : '';
           contenedor.innerHTML += `
             <label class="flex items-center gap-1.5 p-1 bg-white rounded-lg border cursor-pointer hover:bg-slate-100 text-xs">
-              <input type="checkbox" name="jugadorCheck" value="${j}" ${marcado} class="rounded text-indigo-600">
-              <span class="truncate font-medium text-slate-700">${j}</span>
+              <input type="checkbox" name="jugadorCheck" value="${escaparHTML(j)}" ${marcado} class="rounded text-indigo-600">
+              <span class="truncate font-medium text-slate-700">${escaparHTML(j)}</span>
             </label>
           `;
         });
@@ -2407,7 +2402,7 @@ async function guardarJuego() {
 
       for (let i = 1; i <= numPartidas; i++) {
         let opcionesHtml = `<option value="Empate / Sin ganador">Empate / Sin ganador</option>`;
-        seleccionados.forEach(j => { opcionesHtml += `<option value="${j}">${j}</option>`; });
+        seleccionados.forEach(j => { opcionesHtml += `<option value="${escaparHTML(j)}">${escaparHTML(j)}</option>`; });
 
         contenedor.innerHTML += `
           <div class="p-1.5 bg-slate-50 rounded-xl border flex items-center justify-between gap-1.5 text-xs">
@@ -2476,10 +2471,6 @@ async function guardarJuego() {
       localStorage.removeItem('session_user');
       localStorage.removeItem('auth_token'); 
       location.reload();
-    }
-
-    function escaparHTML(v) {
-      return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     }
   </script>
 </body>
