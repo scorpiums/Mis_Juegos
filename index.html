@@ -2,16 +2,25 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Mis Juegos y Juguetes</title>
+  
+  <!-- Soportes PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#4f46e5">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="MisJuegos">
+  <link rel="apple-touch-icon" href="/media/icon-192.png">
+
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .card-zoom { transition: transform 0.15s ease-in-out; }
     .card-zoom:active { transform: scale(0.96); }
     .scrollbar-none::-webkit-scrollbar { display: none; }
     .logo-gaming {
-      font-family: 'Impact', sans-serif;
-      letter-spacing: -1px;
+      font-family: 'Impact', 'Arial Black', sans-serif;
+      letter-spacing: -0.5px;
       text-shadow: 2px 2px 0px #000, -1px -1px 0px #000, 1px -1px 0px #000, -1px 1px 0px #000;
     }
     .roulette-container {
@@ -76,6 +85,34 @@
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen pb-16">
 
+  <!-- SISTEMA DE NOTIFICACIONES TOAST -->
+  <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-3"></div>
+
+  <!-- MODAL DE CONFIRMACIÓN REUTILIZABLE -->
+  <div id="modalConfirmacion" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-4 space-y-3 shadow-2xl border border-slate-200">
+      <h3 id="confirmTitulo" class="font-bold text-sm text-slate-900">Confirmación</h3>
+      <p id="confirmMensaje" class="text-xs text-slate-600 leading-relaxed"></p>
+      <div class="flex gap-2 pt-2 justify-end">
+        <button id="btnConfirmCancelar" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl text-xs">Cancelar</button>
+        <button id="btnConfirmAceptar" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs shadow-md">Aceptar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE PROMPT / ENTRADA DE TEXTO -->
+  <div id="modalPrompt" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-4 space-y-3 shadow-2xl border border-slate-200">
+      <h3 id="promptTitulo" class="font-bold text-sm text-slate-900">Entrada de texto</h3>
+      <p id="promptMensaje" class="text-xs text-slate-600"></p>
+      <input type="text" id="promptInput" class="w-full p-2 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-xs">
+      <div class="flex gap-2 pt-1 justify-end">
+        <button id="btnPromptCancelar" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl text-xs">Cancelar</button>
+        <button id="btnPromptAceptar" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow-md">Guardar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- PANTALLA DE AUTENTICACIÓN -->
   <div id="authScreen" class="fixed inset-0 bg-indigo-900 z-50 flex items-center justify-center p-3">
     <div class="bg-white rounded-3xl p-5 max-w-sm w-full shadow-2xl space-y-3.5">
@@ -84,53 +121,53 @@
           <div class="w-9 h-9 bg-amber-400 rounded-xl border-2 border-black flex items-center justify-center shadow-md font-bold text-black text-sm">🎮</div>
           <h2 class="text-2xl font-black text-indigo-900 tracking-tight">MIS JUEGOS</h2>
         </div>
-        <p class="text-[11px] text-slate-500">Inicia sesión para acceder a la colección</p>
+        <p class="text-xs text-slate-500">Inicia sesión para acceder a la colección</p>
       </div>
 
       <form id="loginForm" onsubmit="procesarLogin(event)" class="space-y-2.5">
         <div>
-          <label class="text-[10px] font-bold text-slate-500 uppercase">Usuario / Nick</label>
+          <label class="text-xs font-bold text-slate-500 uppercase">Usuario / Nick</label>
           <input type="text" id="loginNick" required class="w-full p-2.5 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-xs">
         </div>
         <div>
-          <label class="text-[10px] font-bold text-slate-500 uppercase">Contraseña</label>
+          <label class="text-xs font-bold text-slate-500 uppercase">Contraseña</label>
           <input type="password" id="loginPassword" required class="w-full p-2.5 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-xs">
         </div>
         <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl card-zoom text-xs shadow-md">
           Entrar
         </button>
-        <p class="text-center text-[11px] text-slate-500 pt-1">
+        <p class="text-center text-xs text-slate-500 pt-1">
           ¿No tienes cuenta? <a href="#" onclick="toggleAuthMode('registro')" class="text-indigo-600 font-bold">Regístrate</a>
         </p>
       </form>
 
       <form id="registroForm" onsubmit="procesarRegistro(event)" class="space-y-2.5 hidden" autocomplete="off">
         <div>
-          <label class="text-[10px] font-bold text-slate-500 uppercase">Nombre Completo</label>
+          <label class="text-xs font-bold text-slate-500 uppercase">Nombre Completo</label>
           <input type="text" id="regNombre" required class="w-full p-2 border rounded-xl outline-none text-xs">
         </div>
         <div>
-          <label class="text-[10px] font-bold text-slate-500 uppercase">Nick de Usuario</label>
+          <label class="text-xs font-bold text-slate-500 uppercase">Nick de Usuario</label>
           <input type="text" id="regNick" required class="w-full p-2 border rounded-xl outline-none text-xs">
         </div>
         <div>
-          <label class="text-[10px] font-bold text-slate-500 uppercase">Contraseña</label>
+          <label class="text-xs font-bold text-slate-500 uppercase">Contraseña</label>
           <input type="password" id="regPass1" required class="w-full p-2 border rounded-xl outline-none text-xs">
         </div>
         <div>
-          <label class="text-[10px] font-bold text-slate-500 uppercase">Repetir Contraseña</label>
+          <label class="text-xs font-bold text-slate-500 uppercase">Repetir Contraseña</label>
           <input type="password" id="regPass2" required class="w-full p-2 border rounded-xl outline-none text-xs">
         </div>
         <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl card-zoom text-xs shadow-md">
           Solicitar Cuenta
         </button>
-        <p class="text-center text-[11px] text-slate-500 pt-1">
+        <p class="text-center text-xs text-slate-500 pt-1">
           ¿Ya tienes cuenta? <a href="#" onclick="toggleAuthMode('login')" class="text-indigo-600 font-bold">Inicia Sesión</a>
         </p>
       </form>
 
       <div id="codigoForm" class="space-y-2.5 hidden">
-        <p class="text-[11px] text-slate-600 text-center">Introduce el código de 6 dígitos proporcionado por el Administrador:</p>
+        <p class="text-xs text-slate-600 text-center">Introduce el código de 6 dígitos proporcionado por el Administrador:</p>
         <input type="text" id="valCodigo" placeholder="000000" maxlength="6" class="w-full p-2.5 border text-center font-bold text-lg tracking-widest rounded-xl outline-none">
         <button type="button" onclick="validarCodigoAcceso()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 rounded-xl text-xs shadow-md">
           Validar y Activar
@@ -146,7 +183,7 @@
         <div class="w-7 h-7 bg-amber-400 rounded-lg border-2 border-black flex items-center justify-center shadow-md text-black font-black text-xs">🎮</div>
         <div class="leading-tight">
           <span class="text-amber-300 font-black text-xs sm:text-sm logo-gaming tracking-wider">MIS JUEGOS</span>
-          <span class="block text-[8px] text-indigo-200 uppercase font-semibold">Colección Familiar</span>
+          <span class="block text-xs text-indigo-200 uppercase font-semibold">Colección Familiar</span>
         </div>
       </div>
 
@@ -179,29 +216,29 @@
         <div id="panelFiltrosAvanzados" class="hidden bg-white p-3 rounded-2xl border border-slate-200 shadow-md space-y-2.5 text-xs">
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
             <div>
-              <label class="font-bold text-slate-500 uppercase text-[9px]">🏭 Fabricante</label>
-              <select id="filtroFabricante" onchange="filtrarJuegos()" class="w-full p-1.5 border rounded-xl outline-none mt-0.5 bg-slate-50 text-[11px]">
+              <label class="font-bold text-slate-500 uppercase text-xs">🏭 Fabricante</label>
+              <select id="filtroFabricante" onchange="filtrarJuegos()" class="w-full p-1.5 border rounded-xl outline-none mt-0.5 bg-slate-50 text-xs">
                 <option value="">Todos los fabricantes</option>
               </select>
             </div>
 
             <div>
-              <label class="font-bold text-slate-500 uppercase text-[9px]">🏷️ Tipología (N2)</label>
-              <select id="filtroTipologia" onchange="filtrarJuegos()" class="w-full p-1.5 border rounded-xl outline-none mt-0.5 bg-slate-50 text-[11px]">
+              <label class="font-bold text-slate-500 uppercase text-xs">🏷️ Tipología (N2)</label>
+              <select id="filtroTipologia" onchange="filtrarJuegos()" class="w-full p-1.5 border rounded-xl outline-none mt-0.5 bg-slate-50 text-xs">
                 <option value="">Todas las tipologías</option>
               </select>
             </div>
 
             <div>
-              <label class="font-bold text-slate-500 uppercase text-[9px]">👶 Edad Apto</label>
-              <select id="filtroEdadMinima" onchange="filtrarJuegos()" class="w-full p-1.5 border rounded-xl outline-none mt-0.5 bg-slate-50 text-[11px]">
+              <label class="font-bold text-slate-500 uppercase text-xs">👶 Edad Apto</label>
+              <select id="filtroEdadMinima" onchange="filtrarJuegos()" class="w-full p-1.5 border rounded-xl outline-none mt-0.5 bg-slate-50 text-xs">
                 <option value="">Todas las edades</option>
               </select>
             </div>
 
             <div>
-              <label class="font-bold text-slate-500 uppercase text-[9px]">👥 Nº Jugadores</label>
-              <select id="filtroNumJugadores" onchange="filtrarJuegos()" class="w-full p-1.5 border rounded-xl outline-none mt-0.5 bg-slate-50 text-[11px]">
+              <label class="font-bold text-slate-500 uppercase text-xs">👥 Nº Jugadores</label>
+              <select id="filtroNumJugadores" onchange="filtrarJuegos()" class="w-full p-1.5 border rounded-xl outline-none mt-0.5 bg-slate-50 text-xs">
                 <option value="">Cualquier número</option>
                 <option value="1">1 Jugador</option>
                 <option value="2">2 Jugadores</option>
@@ -214,15 +251,15 @@
 
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="font-bold text-slate-500 uppercase text-[9px]">📍 Ubicación</label>
-              <select id="filtroUbicacion" onchange="filtrarJuegos()" class="w-full p-1.5 border rounded-xl outline-none mt-0.5 bg-slate-50 text-[11px]">
+              <label class="font-bold text-slate-500 uppercase text-xs">📍 Ubicación</label>
+              <select id="filtroUbicacion" onchange="filtrarJuegos()" class="w-full p-1.5 border rounded-xl outline-none mt-0.5 bg-slate-50 text-xs">
                 <option value="">Todas las ubicaciones</option>
               </select>
             </div>
 
             <div>
-              <label class="font-bold text-slate-500 uppercase text-[9px]">📊 Ordenar Por</label>
-              <select id="filtroOrdenacion" onchange="filtrarJuegos()" class="w-full p-1.5 border rounded-xl outline-none mt-0.5 bg-indigo-50 text-indigo-900 font-bold text-[11px]">
+              <label class="font-bold text-slate-500 uppercase text-xs">📊 Ordenar Por</label>
+              <select id="filtroOrdenacion" onchange="filtrarJuegos()" class="w-full p-1.5 border rounded-xl outline-none mt-0.5 bg-indigo-50 text-indigo-900 font-bold text-xs">
                 <option value="nombre_asc">Nombre (A - Z)</option>
                 <option value="mas_jugados">Más jugados primero</option>
                 <option value="menos_jugados">Menos jugados primero</option>
@@ -232,9 +269,9 @@
           </div>
 
           <div>
-            <label class="font-bold text-slate-500 uppercase text-[9px] block mb-1">🧩 Mecánicas (N3):</label>
+            <label class="font-bold text-slate-500 uppercase text-xs block mb-1">🧩 Mecánicas (N3):</label>
             <div class="flex flex-wrap gap-1" id="checkboxesMecanicasDinamicas">
-              <span class="text-slate-400 text-[10px]">Cargando mecánicas...</span>
+              <span class="text-slate-400 text-xs">Cargando mecánicas...</span>
             </div>
           </div>
         </div>
@@ -269,14 +306,14 @@
       <div class="p-2.5 border-b flex justify-between items-center bg-slate-50 shrink-0">
         <h3 class="font-bold text-sm text-slate-800 truncate pr-2" id="fichaTitulo">Detalles del Juego</h3>
         <div class="flex items-center gap-1">
-          <button id="btnEditarDesdeFicha" class="text-[11px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-2 py-0.5 rounded-lg transition">✏ Editar</button>
+          <button id="btnEditarDesdeFicha" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-2 py-0.5 rounded-lg transition">✏ Editar</button>
           <button onclick="cerrarFichaModal()" class="text-slate-400 font-bold text-lg px-1">✕</button>
         </div>
       </div>
 
       <div class="h-40 bg-slate-900 overflow-hidden relative flex items-center justify-center shrink-0 shadow-inner" id="fichaImagenContainer"></div>
 
-      <div class="flex bg-slate-100 p-0.5 text-[10px] font-bold text-slate-600 justify-between shrink-0 border-y border-slate-200">
+      <div class="flex bg-slate-100 p-0.5 text-xs font-bold text-slate-600 justify-between shrink-0 border-y border-slate-200">
         <button onclick="cambiarTabFicha('info')" id="tabInfoBtn" class="flex-1 py-1 rounded-md text-center transition">Info</button>
         <button onclick="cambiarTabFicha('reglas')" id="tabReglasBtn" class="flex-1 py-1 rounded-md text-center transition">Reglas & IA</button>
         <button onclick="cambiarTabFicha('stats')" id="tabStatsBtn" class="flex-1 py-1 rounded-md text-center transition">Estadísticas</button>
@@ -288,30 +325,30 @@
           <div class="border-b pb-1 space-y-0.5">
             <p class="text-slate-700">🏭 <b>Fabricante:</b> <span id="fichaFabricante" class="font-semibold text-indigo-900"></span></p>
             <p class="text-slate-700">📍 <b>Ubicación:</b> <span id="fichaUbicacion"></span></p>
-            <p class="text-slate-600 text-[10px]" id="fichaAutoriaTexto"></p>
+            <p class="text-slate-600 text-xs" id="fichaAutoriaTexto"></p>
           </div>
 
           <div class="bg-slate-50 p-2 rounded-xl border border-slate-200 space-y-1">
-            <span class="font-bold text-slate-500 uppercase text-[9px] block tracking-wider">📦 Ficha Técnica</span>
+            <span class="font-bold text-slate-500 uppercase text-xs block tracking-wider">📦 Ficha Técnica</span>
             <p class="text-slate-700">🏷️ <b>Tipología:</b> <span id="fichaTipologia"></span></p>
             <p class="text-slate-700">🧩 <b>Mecánicas:</b> <span id="fichaMecanicas"></span></p>
             <p class="text-slate-700">👶 <b>Edad:</b> <span id="fichaEdad"></span> • 👥 <b>Jugadores:</b> <span id="fichaJugadores"></span></p>
           </div>
 
           <div class="bg-indigo-50/50 p-2 rounded-xl border border-indigo-100 space-y-0.5">
-            <p class="font-bold text-indigo-900 uppercase text-[9px] tracking-wider">⚡ Reglas Básicas (Resumen Rápido):</p>
-            <p id="fichaReglasBasicasText" class="text-slate-700 leading-relaxed text-[11px]"></p>
+            <p class="font-bold text-indigo-900 uppercase text-xs tracking-wider">⚡ Reglas Básicas (Resumen Rápido):</p>
+            <p id="fichaReglasBasicasText" class="text-slate-700 leading-relaxed text-xs"></p>
           </div>
         </div>
 
         <div id="tabReglasContent" class="space-y-2.5 hidden">
           <div class="space-y-1">
-            <p class="font-bold text-slate-700 uppercase text-[9px] tracking-wider">📖 Instrucciones Oficiales Completas:</p>
-            <div id="fichaReglasCompletasText" class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-slate-700 leading-relaxed whitespace-pre-line text-[11px] max-h-36 overflow-y-auto"></div>
+            <p class="font-bold text-slate-700 uppercase text-xs tracking-wider">📖 Instrucciones Oficiales Completas:</p>
+            <div id="fichaReglasCompletasText" class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-slate-700 leading-relaxed whitespace-pre-line text-xs max-h-36 overflow-y-auto"></div>
           </div>
 
           <div class="bg-slate-50 p-2 rounded-xl border border-slate-200 space-y-1.5">
-            <span class="font-bold text-slate-600 uppercase text-[9px] block">📎 Recursos Adjuntos</span>
+            <span class="font-bold text-slate-600 uppercase text-xs block">📎 Recursos Adjuntos</span>
             
             <div id="contenedorBotonPdf" class="w-full">
               <input type="file" id="inputSubirPdfModal" accept="application/pdf" onchange="subirPdfJuegoDirecto(event)" class="hidden">
@@ -331,7 +368,7 @@
                 Preguntar
               </button>
             </div>
-            <div id="respuestaArbitroIA" class="hidden bg-white p-2 rounded-xl border border-purple-200 text-[10px] text-purple-900 leading-relaxed"></div>
+            <div id="respuestaArbitroIA" class="hidden bg-white p-2 rounded-xl border border-purple-200 text-xs text-purple-900 leading-relaxed"></div>
           </div>
         </div>
 
@@ -339,16 +376,16 @@
           <div class="grid grid-cols-2 gap-2 text-center">
             <div class="bg-amber-50 border border-amber-200 p-2 rounded-xl">
               <span class="block text-base font-black text-amber-600" id="statPartidas">0</span>
-              <span class="text-[8px] text-amber-800 font-bold uppercase">Partidas Jugadas</span>
+              <span class="text-xs text-amber-800 font-bold uppercase">Partidas Jugadas</span>
             </div>
             <div class="bg-indigo-50 border border-indigo-200 p-2 rounded-xl">
               <span class="block text-base font-black text-indigo-600" id="statTiempoMedio">0 min</span>
-              <span class="text-[8px] text-indigo-800 font-bold uppercase">Tiempo Medio</span>
+              <span class="text-xs text-indigo-800 font-bold uppercase">Tiempo Medio</span>
             </div>
           </div>
 
           <div class="bg-slate-50 p-2 rounded-xl border border-slate-200 space-y-1">
-            <p class="font-bold text-slate-700 uppercase text-[9px] tracking-wider">🏆 Ránking de Victorias:</p>
+            <p class="font-bold text-slate-700 uppercase text-xs tracking-wider">🏆 Ránking de Victorias:</p>
             <div id="listaRankingGanadores" class="space-y-1"></div>
           </div>
         </div>
@@ -379,19 +416,19 @@
 
       <div class="p-2.5 bg-slate-900 text-white flex items-center gap-2.5 shrink-0 shadow-inner">
         <div id="avatarPreview" class="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center border-2 border-amber-400 overflow-hidden relative shrink-0">
-          <span class="text-slate-400 text-[10px]">Foto</span>
+          <span class="text-slate-400 text-xs">Foto</span>
         </div>
         <div class="min-w-0 flex-grow">
           <h4 id="perfilHeaderNombre" class="font-bold text-xs truncate">Usuario</h4>
-          <p id="perfilHeaderNick" class="text-[10px] text-amber-300 font-medium truncate">@nick</p>
+          <p id="perfilHeaderNick" class="text-xs text-amber-300 font-medium truncate">@nick</p>
           <input type="file" id="inputAvatar" accept="image/*" onchange="procesarAvatar(event)" class="hidden">
-          <button type="button" onclick="document.getElementById('inputAvatar').click()" class="text-[9px] bg-white/20 hover:bg-white/30 text-white font-semibold px-1.5 py-0.5 rounded-md mt-0.5 transition">
+          <button type="button" onclick="document.getElementById('inputAvatar').click()" class="text-xs bg-white/20 hover:bg-white/30 text-white font-semibold px-1.5 py-0.5 rounded-md mt-0.5 transition">
             📷 Cambiar Avatar
           </button>
         </div>
       </div>
 
-      <div class="flex bg-slate-100 p-0.5 text-[10px] font-bold text-slate-600 justify-between shrink-0 border-y border-slate-200">
+      <div class="flex bg-slate-100 p-0.5 text-xs font-bold text-slate-600 justify-between shrink-0 border-y border-slate-200">
         <button onclick="cambiarTabPerfil('historial')" id="tabHistorialPerfilBtn" class="flex-1 py-1 rounded-md text-center transition">Historial</button>
         <button onclick="cambiarTabPerfil('juegos')" id="tabJuegosPerfilBtn" class="flex-1 py-1 rounded-md text-center transition">Mis Juegos</button>
         <button onclick="cambiarTabPerfil('datos')" id="tabDatosPerfilBtn" class="flex-1 py-1 rounded-md text-center transition">Mis Datos</button>
@@ -410,15 +447,15 @@
           <form id="perfilForm" onsubmit="guardarPerfil(event)" class="space-y-2">
             <input type="hidden" id="perfilAvatarBase64">
             <div>
-              <label class="text-[9px] font-bold text-slate-500 uppercase">Nombre Completo</label>
+              <label class="text-xs font-bold text-slate-500 uppercase">Nombre Completo</label>
               <input type="text" id="perfilNombre" required class="w-full p-1.5 border rounded-xl outline-none text-xs">
             </div>
             <div>
-              <label class="text-[9px] font-bold text-slate-500 uppercase">Nick de Usuario</label>
+              <label class="text-xs font-bold text-slate-500 uppercase">Nick de Usuario</label>
               <input type="text" id="perfilNick" required class="w-full p-1.5 border rounded-xl outline-none text-xs">
             </div>
             <div>
-              <label class="text-[9px] font-bold text-slate-500 uppercase">Bio / Datos Personales</label>
+              <label class="text-xs font-bold text-slate-500 uppercase">Bio / Datos Personales</label>
               <textarea id="perfilBio" rows="2" placeholder="Escribe algo sobre ti..." class="w-full p-1.5 border rounded-xl outline-none text-xs"></textarea>
             </div>
 
@@ -441,7 +478,7 @@
           <button onclick="cerrarModalFormulario()" class="text-slate-400 hover:text-white text-base font-bold px-1">✕</button>
         </div>
 
-        <div class="grid grid-cols-4 gap-1 text-[9px] font-bold text-center">
+        <div class="grid grid-cols-4 gap-1 text-xs font-bold text-center">
           <div id="stepBadge_1" class="py-1 rounded-md bg-indigo-600 text-white">1. Básicos</div>
           <div id="stepBadge_2" class="py-1 rounded-md bg-slate-800 text-slate-400">2. Clasificación</div>
           <div id="stepBadge_3" class="py-1 rounded-md bg-slate-800 text-slate-400">3. Reglas</div>
@@ -458,17 +495,17 @@
           <div id="wizardStep_1" class="space-y-2.5">
             <div class="bg-slate-50 p-2 rounded-2xl border border-slate-200 space-y-1.5">
               <div id="imagePreview" class="w-36 h-36 mx-auto bg-slate-900 rounded-xl flex items-center justify-center border-2 border-dashed border-slate-300 overflow-hidden relative shadow-inner">
-                <span class="text-slate-400 text-[10px] text-center px-2">Sin fotografía<br><span class="text-[9px] text-slate-500">(Cuadrada)</span></span>
+                <span class="text-slate-400 text-xs text-center px-2">Sin fotografía<br><span class="text-xs text-slate-500">(Cuadrada)</span></span>
               </div>
 
               <input type="file" id="inputCamara" accept="image/*" capture="environment" onchange="procesarFoto(event)" class="hidden">
               <input type="file" id="inputGaleria" accept="image/*" onchange="procesarFoto(event)" class="hidden">
 
               <div class="grid grid-cols-2 gap-1.5">
-                <button type="button" onclick="document.getElementById('inputCamara').click()" class="bg-white border text-slate-700 font-semibold py-1 px-2 rounded-xl text-[10px] flex items-center justify-center gap-1 shadow-sm">
+                <button type="button" onclick="document.getElementById('inputCamara').click()" class="bg-white border text-slate-700 font-semibold py-1 px-2 rounded-xl text-xs flex items-center justify-center gap-1 shadow-sm">
                   📷 Cámara
                 </button>
-                <button type="button" onclick="document.getElementById('inputGaleria').click()" class="bg-white border text-slate-700 font-semibold py-1 px-2 rounded-xl text-[10px] flex items-center justify-center gap-1 shadow-sm">
+                <button type="button" onclick="document.getElementById('inputGaleria').click()" class="bg-white border text-slate-700 font-semibold py-1 px-2 rounded-xl text-xs flex items-center justify-center gap-1 shadow-sm">
                   🖼️ Galería
                 </button>
               </div>
@@ -481,31 +518,31 @@
             </div>
 
             <div>
-              <label class="font-bold text-slate-600 uppercase text-[9px]">Nombre del Juego <span class="text-rose-500">*</span></label>
+              <label class="font-bold text-slate-600 uppercase text-xs">Nombre del Juego <span class="text-rose-500">*</span></label>
               <input type="text" id="nombre" placeholder="Ej. ¿Quién es Quién?" class="w-full p-2 border rounded-xl outline-none mt-0.5 text-xs font-bold text-slate-800">
             </div>
 
             <div>
-              <label class="font-bold text-slate-600 uppercase text-[9px]">Fabricante / Editorial</label>
+              <label class="font-bold text-slate-600 uppercase text-xs">Fabricante / Editorial</label>
               <input type="text" id="fabricante" placeholder="Ej. Hasbro, Ravensburger, Nintendo..." class="w-full p-2 border rounded-xl outline-none mt-0.5 text-xs">
             </div>
 
             <div class="grid grid-cols-2 gap-2">
               <div>
-                <label class="font-bold text-slate-600 uppercase text-[9px]">Edad Recomendada</label>
+                <label class="font-bold text-slate-600 uppercase text-xs">Edad Recomendada <span class="text-rose-500">*</span></label>
                 <select id="edad" class="w-full p-2 border rounded-xl outline-none mt-0.5 bg-white font-semibold text-xs"></select>
               </div>
 
               <div class="bg-slate-50 p-1.5 rounded-xl border border-slate-200">
-                <span class="font-bold text-slate-600 uppercase text-[8px] block">Nº Jugadores</span>
+                <span class="font-bold text-slate-600 uppercase text-xs block">Nº Jugadores</span>
                 <div class="grid grid-cols-2 gap-1 mt-0.5">
-                  <select id="minJugadoresSelect" class="w-full p-1 border rounded-lg bg-white text-[11px]">
+                  <select id="minJugadoresSelect" class="w-full p-1 border rounded-lg bg-white text-xs">
                     <option value="1">Mín 1</option>
                     <option value="2" selected>Mín 2</option>
                     <option value="3">Mín 3</option>
                     <option value="4">Mín 4</option>
                   </select>
-                  <select id="maxJugadoresSelect" class="w-full p-1 border rounded-lg bg-white text-[11px]">
+                  <select id="maxJugadoresSelect" class="w-full p-1 border rounded-lg bg-white text-xs">
                     <option value="1">Máx 1</option>
                     <option value="2">Máx 2</option>
                     <option value="4" selected>Máx 4</option>
@@ -520,17 +557,17 @@
 
           <div id="wizardStep_2" class="space-y-2.5 hidden">
             <div>
-              <label class="font-bold text-slate-600 uppercase text-[9px]">Categoría (Nivel 1)</label>
+              <label class="font-bold text-slate-600 uppercase text-xs">Categoría (Nivel 1) <span class="text-rose-500">*</span></label>
               <select id="categoria" class="w-full p-2 border rounded-xl outline-none mt-0.5 bg-white font-medium text-xs"></select>
             </div>
 
             <div>
-              <label class="font-bold text-slate-600 uppercase text-[9px]">Tipología / Soporte (Nivel 2)</label>
+              <label class="font-bold text-slate-600 uppercase text-xs">Tipología / Soporte (Nivel 2)</label>
               <input type="text" id="tipologia" placeholder="Ej. Tablero, Tarjetas" class="w-full p-2 border rounded-xl outline-none mt-0.5 text-xs">
             </div>
 
             <div>
-              <label class="font-bold text-slate-600 uppercase text-[9px]">Mecánicas (Nivel 3 - Máx 3)</label>
+              <label class="font-bold text-slate-600 uppercase text-xs">Mecánicas (Nivel 3 - Máx 3)</label>
               <input type="text" id="mecanicas" placeholder="Ej. Deducción, Reflejos, Plataformas" class="w-full p-2 border rounded-xl outline-none mt-0.5 text-xs">
             </div>
 
@@ -543,12 +580,12 @@
 
           <div id="wizardStep_3" class="space-y-2.5 hidden">
             <div>
-              <label class="font-bold text-slate-600 uppercase text-[9px]">Reglas Básicas (Resumen 2-3 frases)</label>
+              <label class="font-bold text-slate-600 uppercase text-xs">Reglas Básicas (Resumen 2-3 frases)</label>
               <textarea id="instrucciones" rows="2" placeholder="Resumen rápido del juego..." class="w-full p-2 border rounded-xl outline-none mt-0.5 text-xs"></textarea>
             </div>
 
             <div>
-              <label class="font-bold text-slate-600 uppercase text-[9px]">Reglas Completas Paso a Paso</label>
+              <label class="font-bold text-slate-600 uppercase text-xs">Reglas Completas Paso a Paso</label>
               <textarea id="instruccionesCompletas" rows="4" placeholder="1. Preparación: ...&#10;2. Desarrollo del turno: ...&#10;3. Condición de victoria: ..." class="w-full p-2 border rounded-xl outline-none mt-0.5 text-xs leading-relaxed"></textarea>
             </div>
 
@@ -559,15 +596,15 @@
             </div>
 
             <div class="bg-slate-50 p-2 rounded-xl border border-slate-200 space-y-2">
-              <span class="font-bold text-slate-600 uppercase text-[9px] block">📎 Enlaces de Recursos (PDF R2 y Vídeo)</span>
+              <span class="font-bold text-slate-600 uppercase text-xs block">📎 Enlaces de Recursos (PDF R2 y Vídeo)</span>
               
               <div class="space-y-1">
                 <div class="flex justify-between items-center">
-                  <label class="text-[8px] text-slate-500 font-bold uppercase">Documento PDF Instrucciones</label>
+                  <label class="text-xs text-slate-500 font-bold uppercase">Documento PDF Instrucciones</label>
                   <div class="flex gap-1">
                     <input type="file" id="inputPdfForm" accept="application/pdf" onchange="cargarPdfEnFormulario(event)" class="hidden">
-                    <button type="button" onclick="document.getElementById('inputPdfForm').click()" class="text-[8px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-1.5 py-0.5 rounded">📄 Cargar PDF</button>
-                    <button type="button" onclick="borrarPdfFormulario()" class="text-[8px] bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold px-1.5 py-0.5 rounded">🗑️ Borrar</button>
+                    <button type="button" onclick="document.getElementById('inputPdfForm').click()" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-1.5 py-0.5 rounded">📄 Cargar PDF</button>
+                    <button type="button" onclick="borrarPdfFormulario()" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold px-1.5 py-0.5 rounded">🗑️ Borrar</button>
                   </div>
                 </div>
                 <input type="url" id="pdf_reglas_url" placeholder="URL o archivo cargado..." class="w-full p-1.5 border rounded-xl outline-none bg-white text-xs" readonly>
@@ -575,8 +612,8 @@
 
               <div class="space-y-1 border-t pt-1.5">
                 <div class="flex justify-between items-center">
-                  <label class="text-[8px] text-slate-500 font-bold uppercase">Vídeo Explicativo YouTube</label>
-                  <button type="button" onclick="borrarVideoFormulario()" class="text-[8px] bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold px-1.5 py-0.5 rounded">🗑️ Borrar Enlace</button>
+                  <label class="text-xs text-slate-500 font-bold uppercase">Vídeo Explicativo YouTube</label>
+                  <button type="button" onclick="borrarVideoFormulario()" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold px-1.5 py-0.5 rounded">🗑️ Borrar Enlace</button>
                 </div>
                 <input type="url" id="video_tutorial_url" placeholder="https://www.youtube.com/watch?v=..." class="w-full p-1.5 border rounded-xl outline-none bg-white text-xs">
               </div>
@@ -586,8 +623,8 @@
           <div id="wizardStep_4" class="space-y-3 hidden">
             <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-2">
               <div class="flex justify-between items-center">
-                <label class="font-bold text-slate-600 uppercase text-[9px]">Ubicación del Juego <span class="text-rose-500">*</span></label>
-                <button type="button" onclick="crearNuevaUbicacionPrompt()" class="text-[9px] text-indigo-600 font-bold">＋ Crear Nueva</button>
+                <label class="font-bold text-slate-600 uppercase text-xs">Ubicación del Juego <span class="text-rose-500">*</span></label>
+                <button type="button" onclick="crearNuevaUbicacionPrompt()" class="text-xs text-indigo-600 font-bold">＋ Crear Nueva</button>
               </div>
               <select id="ubicacionSelect" class="w-full p-2.5 border rounded-xl outline-none bg-white font-bold text-xs text-indigo-900">
                 <option value="">Selecciona ubicación...</option>
@@ -626,7 +663,7 @@
         <button onclick="cerrarComparadorIA()" class="text-purple-200 font-bold text-lg px-1">✕</button>
       </div>
 
-      <div class="p-2 bg-purple-50 text-purple-900 text-[10px] font-medium shrink-0 border-b border-purple-100">
+      <div class="p-2 bg-purple-50 text-purple-900 text-xs font-medium shrink-0 border-b border-purple-100">
         Revisa las sugerencias de la IA. Si la información actual era correcta, se marcará como verificada.
       </div>
 
@@ -651,7 +688,7 @@
 
       <div id="pasoRuletaConfig" class="space-y-2.5 text-xs">
         <div>
-          <label class="font-bold text-slate-600 uppercase text-[9px]">Modo de Selección:</label>
+          <label class="font-bold text-slate-600 uppercase text-xs">Modo de Selección:</label>
           <select id="ruletaModo" class="w-full p-2 border rounded-xl outline-none font-bold text-indigo-700 bg-indigo-50 mt-0.5 text-xs">
             <option value="azar">🎲 Aleatorio Puro (Cualquier juego)</option>
             <option value="descarte">🔄 Modo Descarte (Sin repetir hasta vaciar bolsa)</option>
@@ -661,7 +698,7 @@
         </div>
 
         <div class="bg-slate-50 p-2 rounded-xl border space-y-1.5">
-          <span class="font-bold text-slate-600 uppercase text-[9px] block">Condicionar por categoría:</span>
+          <span class="font-bold text-slate-600 uppercase text-xs block">Condicionar por categoría:</span>
           <div class="grid grid-cols-2 gap-1" id="checkboxesRuletaCat"></div>
         </div>
 
@@ -681,7 +718,7 @@
 
       <div id="pasoRuletaResultado" class="hidden space-y-2.5">
         <div class="text-center">
-          <span class="text-[9px] bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full uppercase">🎉 ¡El juego elegido es!</span>
+          <span class="text-xs bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full uppercase">🎉 ¡El juego elegido es!</span>
           <h4 class="font-black text-lg text-indigo-900 mt-0.5" id="ruletaResultadoNombre">Juego</h4>
         </div>
 
@@ -718,19 +755,19 @@
         <div class="grid grid-cols-2 gap-2">
           <button type="button" onclick="elegirModoPartida('ahora')" class="bg-indigo-50 hover:bg-indigo-100 border-2 border-indigo-500 text-indigo-900 p-3 rounded-2xl font-bold text-center card-zoom text-xs">
             ⏱️ <br>¡Jugar Ahora!
-            <span class="block text-[9px] font-normal text-slate-500 mt-0.5">Con cronómetro en directo</span>
+            <span class="block text-xs font-normal text-slate-500 mt-0.5">Con cronómetro en directo</span>
           </button>
           <button type="button" onclick="elegirModoPartida('pasado')" class="bg-slate-50 hover:bg-slate-100 border-2 border-slate-300 text-slate-800 p-3 rounded-2xl font-bold text-center card-zoom text-xs">
             📝 <br>Ya hemos jugado
-            <span class="block text-[9px] font-normal text-slate-500 mt-0.5">Introducir datos a mano</span>
+            <span class="block text-xs font-normal text-slate-500 mt-0.5">Introducir datos a mano</span>
           </button>
         </div>
       </div>
 
       <div id="pasoJugadoresSelector" class="space-y-2.5 hidden">
         <div class="flex justify-between items-center">
-          <label class="text-[10px] font-bold text-slate-500 uppercase">Selecciona los participantes:</label>
-          <button type="button" onclick="abrirPromptInvitado()" class="text-[10px] bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold px-2 py-0.5 rounded-lg">
+          <label class="text-xs font-bold text-slate-500 uppercase">Selecciona los participantes:</label>
+          <button type="button" onclick="abrirPromptInvitado()" class="text-xs bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold px-2 py-0.5 rounded-lg">
             ＋ Añadir invitado
           </button>
         </div>
@@ -746,7 +783,7 @@
         <div class="bg-slate-900 text-amber-400 font-mono text-3xl font-black py-4 rounded-2xl tracking-widest shadow-inner" id="cronometroDisplay">
           00:00
         </div>
-        <p class="text-[10px] text-slate-500 animate-pulse">Partida en curso... ¡Diviértete!</p>
+        <p class="text-xs text-slate-500 animate-pulse">Partida en curso... ¡Diviértete!</p>
         <button type="button" onclick="detenerCronometroYFinalizar()" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-lg card-zoom">
           ⏹️ Terminar Partida
         </button>
@@ -754,14 +791,14 @@
 
       <div id="pasoResultadosFinales" class="space-y-2.5 hidden text-xs">
         <div>
-          <label class="font-bold text-slate-600 uppercase text-[10px]">¿Cuántas partidas se han jugado?</label>
+          <label class="font-bold text-slate-600 uppercase text-xs">¿Cuántas partidas se han jugado?</label>
           <input type="number" id="inputNumPartidas" value="1" min="1" onchange="generarSelectoresGanadores()" class="w-full p-1.5 border rounded-xl outline-none font-bold text-xs mt-0.5">
         </div>
 
         <div id="contenedorGanadoresPartidas" class="space-y-1.5 max-h-36 overflow-y-auto"></div>
 
         <div id="campoDuracionManualContainer">
-          <label class="font-bold text-slate-600 uppercase text-[10px]">Duración total (opcional, minutos)</label>
+          <label class="font-bold text-slate-600 uppercase text-xs">Duración total (opcional, minutos)</label>
           <input type="number" id="inputDuracionMinutos" placeholder="Ej. 30" class="w-full p-1.5 border rounded-xl outline-none mt-0.5 text-xs">
         </div>
 
@@ -779,7 +816,7 @@
         <h3 class="font-bold text-sm text-slate-800">⚙️ Gestión Avanzada de Usuarios</h3>
         <button onclick="cerrarAdminPanel()" class="text-slate-400 font-bold text-lg px-1">✕</button>
       </div>
-      <div id="resumenUsuarios" class="flex flex-wrap gap-1.5 text-[10px] font-bold"></div>
+      <div id="resumenUsuarios" class="flex flex-wrap gap-1.5 text-xs font-bold"></div>
       <div id="listaUsuarios" class="space-y-2 text-xs"></div>
     </div>
   </div>
@@ -799,7 +836,6 @@
     let currentUser = null;
     let juegoActualFicha = null;
     let pasoWizardActual = 1;
-    let esEdicion = false;
 
     let cronometroInterval = null;
     let segundosTranscurridos = 0;
@@ -815,9 +851,82 @@
       { key: 'instrucciones_completas', label: 'Reglas Completas Paso a Paso', idElem: 'instruccionesCompletas' }
     ];
 
-    function escaparHTML(v) {
+    // REGISTRO DE SERVICE WORKER PARA PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW no registrado:', err));
+      });
+    }
+
+    // COMPONENTES UI REUTILIZABLES (TOASTS & MODALES)
+    function mostrarToast(mensaje, tipo = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      
+      const colores = {
+        exito: 'bg-emerald-600 text-white',
+        error: 'bg-rose-600 text-white',
+        aviso: 'bg-amber-500 text-white',
+        info: 'bg-indigo-600 text-white'
+      };
+
+      toast.className = `${colores[tipo] || colores.info} p-3 rounded-2xl shadow-xl text-xs font-bold flex items-center justify-between pointer-events-auto transition-all transform translate-y-2 opacity-0 border border-white/20`;
+      toast.innerHTML = `<span>${escaparHTML(mensaje)}</span><button onclick="this.parentElement.remove()" class="ml-2 font-black text-sm">✕</button>`;
+      
+      container.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      }, 50);
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+
+    function mostrarConfirmacion(titulo, mensaje, onAceptar) {
+      const modal = document.getElementById('modalConfirmacion');
+      document.getElementById('confirmTitulo').innerText = titulo;
+      document.getElementById('confirmMensaje').innerText = mensaje;
+      
+      const btnAceptar = document.getElementById('btnConfirmAceptar');
+      const btnCancelar = document.getElementById('btnConfirmCancelar');
+
+      const limpiar = () => { modal.classList.add('hidden'); };
+
+      btnAceptar.onclick = () => { limpiar(); onAceptar(); };
+      btnCancelar.onclick = () => { limpiar(); };
+
+      modal.classList.remove('hidden');
+    }
+
+    function mostrarPromptModal(titulo, mensaje, onAceptar) {
+      const modal = document.getElementById('modalPrompt');
+      document.getElementById('promptTitulo').innerText = titulo;
+      document.getElementById('promptMensaje').innerText = mensaje;
+      const input = document.getElementById('promptInput');
+      input.value = '';
+
+      const btnAceptar = document.getElementById('btnPromptAceptar');
+      const btnCancelar = document.getElementById('btnPromptCancelar');
+
+      const limpiar = () => { modal.classList.add('hidden'); };
+
+      btnAceptar.onclick = () => {
+        const val = input.value.trim();
+        if (val) { limpiar(); onAceptar(val); }
+      };
+      btnCancelar.onclick = () => { limpiar(); };
+
+      modal.classList.remove('hidden');
+      input.focus();
+    }
+
+    function escapingSano(v) {
       return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     }
+    const escaparHTML = escapingSano;
 
     function sanitizarUrl(url) {
       if (!url) return '';
@@ -826,14 +935,6 @@
         return escaparHTML(limpia);
       }
       return '';
-    }
-
-    function aTextoPlano(val) {
-      if (val === null || val === undefined) return '';
-      if (typeof val === 'string') return val;
-      if (Array.isArray(val)) return val.map(v => aTextoPlano(v)).join(', ');
-      if (typeof val === 'object') return val.resumen || val.texto || val.descripcion || Object.values(val).map(v => aTextoPlano(v)).join('\n');
-      return String(val);
     }
 
     function formatearFechaCorta(fechaStr) {
@@ -915,7 +1016,7 @@
       const res = await fetch(`${WORKER_URL}${ruta}`, { ...opciones, headers });
       if (res.status === 401) {
         cerrarSesion();
-        throw new Error("Sesión caducada o cuenta desactivada. Vuelve a iniciar sesión.");
+        throw new Error("Sesión caducada o token no válido. Por favor, vuelve a iniciar sesión.");
       }
       if (res.status === 403) {
         const motivo = await res.clone().json().catch(() => ({}));
@@ -944,7 +1045,7 @@
         : `👤`;
 
       userContainer.innerHTML = `
-        <button onclick="abrirPerfilModal()" class="bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-[10px] sm:text-xs px-2 py-1 rounded-lg shadow-sm flex items-center gap-1 transition card-zoom truncate max-w-[120px] sm:max-w-none" title="Ver mi perfil">
+        <button onclick="abrirPerfilModal()" class="bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-xs px-2 py-1 rounded-lg shadow-sm flex items-center gap-1 transition card-zoom truncate max-w-[120px] sm:max-w-none" title="Ver mi perfil">
           ${avatarHtml} <span class="truncate">${escaparHTML(currentUser.nick)}</span>
         </button>
       `;
@@ -972,7 +1073,7 @@
       });
 
       const selEdad = document.getElementById('edad');
-      selEdad.innerHTML = '';
+      selEdad.innerHTML = `<option value="">Selecciona edad recomendada...</option>`;
       (catalogosServidor.edades || []).forEach(e => {
         selEdad.innerHTML += `<option value="+${e}">+${e} años</option>`;
       });
@@ -987,7 +1088,7 @@
       contCheckRuleta.innerHTML = '';
       (catalogosServidor.categorias || []).forEach(c => {
         contCheckRuleta.innerHTML += `
-          <label class="flex items-center gap-1"><input type="checkbox" value="${escaparHTML(c)}" checked> ${escaparHTML(c)}</label>
+          <label class="flex items-center gap-1 text-xs"><input type="checkbox" value="${escaparHTML(c)}" checked> ${escaparHTML(c)}</label>
         `;
       });
     }
@@ -1016,13 +1117,13 @@
         const cont = document.getElementById('checkboxesMecanicasDinamicas');
         cont.innerHTML = '';
         if (mecanicasDinamicasCache.length === 0) {
-          cont.innerHTML = `<span class="text-slate-400 text-[9px]">No hay mecánicas registradas.</span>`;
+          cont.innerHTML = `<span class="text-slate-400 text-xs">No hay mecánicas registradas.</span>`;
           return;
         }
 
         mecanicasDinamicasCache.forEach(m => {
           cont.innerHTML += `
-            <label class="bg-slate-100 px-2 py-0.5 rounded-md border flex items-center gap-1 cursor-pointer hover:bg-slate-200 text-[10px]">
+            <label class="bg-slate-100 px-2 py-0.5 rounded-md border flex items-center gap-1 cursor-pointer hover:bg-slate-200 text-xs">
               <input type="checkbox" value="${escaparHTML(m)}" onchange="filtrarJuegos()" class="rounded text-indigo-600"> ${escaparHTML(m)}
             </label>
           `;
@@ -1058,8 +1159,7 @@
     }
 
     function crearNuevaUbicacionPrompt() {
-      const nueva = prompt("Introduce el nombre de la nueva ubicación:");
-      if (nueva && nueva.trim()) {
+      mostrarPromptModal("Nueva Ubicación", "Introduce el nombre del lugar físico donde se guarda el juego:", (nueva) => {
         const limpia = nueva.trim();
         if (!ubicacionesCache.includes(limpia)) {
           ubicacionesCache.push(limpia);
@@ -1067,7 +1167,8 @@
         }
         poblarSelectUbicaciones(limpia);
         poblarFiltrosEspeciales();
-      }
+        mostrarToast("Ubicación añadida", "exito");
+      });
     }
 
     async function toggleFavorito(juegoId) {
@@ -1080,7 +1181,7 @@
         if (json.favorito) favoritosCache.push(juegoId);
         else favoritosCache = favoritosCache.filter(id => id !== juegoId);
         renderizarTarjetas();
-      } catch (err) { alert("Error al actualizar favoritos"); }
+      } catch (err) { mostrarToast("Error al actualizar favoritos", "error"); }
     }
 
     function togglePanelFiltros() {
@@ -1107,11 +1208,11 @@
       document.getElementById('fichaTipologia').innerText = juegoActualFicha.tipologia || 'General';
       
       const fechaCreacionStr = formatearFechaCorta(juegoActualFicha.fecha_creacion);
-      let autoriaText = `👤 <b>Añadido por:</b> @${escaparHTML(juegoActualFicha.creador_nick || 'Sistema')} · ${fechaCreacionStr}`;
+      let autoriaText = `👤 <b>Añadido por:</b> ${escaparHTML(juegoActualFicha.creador_nick || 'Sistema')} · ${fechaCreacionStr}`;
       
       if (juegoActualFicha.modificador_nick && juegoActualFicha.fecha_modificacion) {
         const fechaModStr = formatearFechaCorta(juegoActualFicha.fecha_modificacion);
-        autoriaText += `<br>✏️ <b>Actualizado por:</b> @${escaparHTML(juegoActualFicha.modificador_nick)} · ${fechaModStr}`;
+        autoriaText += `<br>✏️ <b>Actualizado por:</b> ${escaparHTML(juegoActualFicha.modificador_nick)} · ${fechaModStr}`;
       }
       document.getElementById('fichaAutoriaTexto').innerHTML = autoriaText;
 
@@ -1176,7 +1277,7 @@
             }
 
             listHistorial.innerHTML += `
-              <div class="bg-slate-50 p-2 rounded-xl border space-y-0.5 text-[10px]">
+              <div class="bg-slate-50 p-2 rounded-xl border space-y-0.5 text-xs">
                 <div class="flex justify-between text-slate-400">
                   <span>📅 ${fechaFormateada}</span>
                   <span>🎮 ${p.num_partidas || 1} p.</span>
@@ -1195,13 +1296,13 @@
           sortedGanadores.forEach(([nick, count], index) => {
             const medalla = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '🎖️';
             rankingCont.innerHTML += `
-              <div class="flex justify-between items-center bg-white p-1.5 rounded-lg border text-[11px]">
+              <div class="flex justify-between items-center bg-white p-1.5 rounded-lg border text-xs">
                 <span>${medalla} <b>${escaparHTML(nick)}</b></span>
                 <span class="font-bold text-amber-600">${count} victoria${count > 1 ? 's' : ''}</span>
               </div>
             `;
           });
-        } else { rankingCont.innerHTML = `<p class="text-slate-400 text-[10px]">Sin victorias registradas aún.</p>`; }
+        } else { rankingCont.innerHTML = `<p class="text-slate-400 text-xs">Sin victorias registradas aún.</p>`; }
       } catch (err) { console.error(err); }
     }
 
@@ -1246,8 +1347,8 @@
           const json = await res.json();
           juegoActualFicha.pdf_reglas_url = json.pdf_url || base64Pdf;
           actualizarBotonesRecursosFicha();
-          alert("✅ Documento PDF guardado correctamente en Cloudflare R2.");
-        } catch(err) { alert(err.message); }
+          mostrarToast("Documento PDF guardado en la nube", "exito");
+        } catch(err) { mostrarToast(err.message, "error"); }
       };
       reader.readAsDataURL(file);
     }
@@ -1289,7 +1390,7 @@
         if (json.error) throw new Error(json.error);
         respBox.innerText = json.respuesta || "Sin respuesta";
         respBox.classList.remove('hidden');
-      } catch (err) { alert(err.message); }
+      } catch (err) { mostrarToast(err.message, "error"); }
       finally { btn.innerText = "Preguntar"; btn.disabled = false; }
     }
 
@@ -1389,9 +1490,9 @@
                 <div class="flex justify-between items-center gap-2 border-b pb-1.5">
                   <div class="truncate flex-grow">
                     <h4 onclick="abrirFichaDetallada('${j.id}')" class="font-black text-sm text-slate-800 leading-snug cursor-pointer hover:text-indigo-600 transition truncate" title="${escaparHTML(j.nombre)}">${escaparHTML(j.nombre)}</h4>
-                    <span class="text-[9px] font-semibold text-indigo-700 truncate block">🏭 ${escaparHTML(j.fabricante || 'Genérico')}</span>
+                    <span class="text-xs font-semibold text-indigo-700 truncate block">🏭 ${escaparHTML(j.fabricante || 'Genérico')}</span>
                   </div>
-                  <span class="bg-slate-900 text-white text-[9px] font-bold px-2 py-0.5 rounded-full shrink-0">${escaparHTML(j.categoria)}</span>
+                  <span class="bg-slate-900 text-white text-xs font-bold px-2 py-0.5 rounded-full shrink-0">${escaparHTML(j.categoria)}</span>
                 </div>
 
                 <div class="grid grid-cols-2 gap-2.5 items-stretch h-40">
@@ -1399,11 +1500,11 @@
                     <button onclick="event.stopPropagation(); toggleFavorito('${j.id}')" class="absolute top-1.5 left-1.5 w-6 h-6 bg-black/60 hover:bg-black/80 rounded-full flex items-center justify-center text-xs z-20 backdrop-blur-md card-zoom shadow-md text-white">
                       ${esFav ? '❤️' : '🤍'}
                     </button>
-                    ${tieneImagen ? `<img src="${imagenSrc}" class="w-full h-full object-contain p-1 relative z-10 rounded-lg">` : '<div class="text-slate-400 text-[10px] text-center p-2">Sin Foto</div>'}
+                    ${tieneImagen ? `<img src="${imagenSrc}" class="w-full h-full object-contain p-1 relative z-10 rounded-lg">` : '<div class="text-slate-400 text-xs text-center p-2">Sin Foto</div>'}
                   </div>
 
                   <div class="flex flex-col justify-between gap-1.5 h-full min-w-0">
-                    <div class="bg-slate-50 p-1.5 rounded-xl border border-slate-200 text-[10px] flex-1 flex flex-col justify-between min-h-0">
+                    <div class="bg-slate-50 p-1.5 rounded-xl border border-slate-200 text-xs flex-1 flex flex-col justify-between min-h-0">
                       <div>
                         <span class="block text-indigo-900 font-bold truncate">🏷️ ${escaparHTML(j.tipologia || 'General')}</span>
                         <p class="text-slate-600 line-clamp-2 mt-0.5 leading-tight">🧩 ${escaparHTML(j.mecanicas || 'Sin mecánicas')}</p>
@@ -1413,22 +1514,22 @@
                       </div>
                     </div>
 
-                    <div class="bg-indigo-50/70 border border-indigo-100 p-1.5 rounded-xl text-[10px] flex-1 flex flex-col justify-between min-h-0">
+                    <div class="bg-indigo-50/70 border border-indigo-100 p-1.5 rounded-xl text-xs flex-1 flex flex-col justify-between min-h-0">
                       <div class="flex justify-between items-center text-indigo-950 font-bold truncate">
                         <span class="truncate">🎮 ${j.veces_jugado || 0} part.</span>
-                        <span class="text-slate-600 font-normal shrink-0 text-[9px]">⏱️ ${tiempoMedioStr}</span>
+                        <span class="text-slate-600 font-normal shrink-0 text-xs">⏱️ ${tiempoMedioStr}</span>
                       </div>
                       <div class="pt-1 border-t border-indigo-100/80 space-y-0.5">
-                        <p class="truncate text-slate-500 text-[9px]">🕒 ${ultimaPartidaFechaStr}</p>
+                        <p class="truncate text-slate-500 text-xs">🕒 ${ultimaPartidaFechaStr}</p>
                         <p class="truncate text-emerald-800 font-bold">🏆 ${ganadoresLimpios}</p>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div class="text-[9px] text-slate-500 pt-0.5 flex justify-between items-center border-t border-slate-100">
+                <div class="text-xs text-slate-500 pt-0.5 flex justify-between items-center border-t border-slate-100">
                   <span class="truncate">📍 ${escaparHTML(j.ubicacion || 'Sin sitio')}</span>
-                  <span class="truncate text-right shrink-0">👤 @${escaparHTML(j.creador_nick || 'admin')}</span>
+                  <span class="truncate text-right shrink-0">👤 ${escaparHTML(j.creador_nick || 'admin')}</span>
                 </div>
               </div>
 
@@ -1452,26 +1553,26 @@
           listHTML += `
             <div class="bg-white p-2 rounded-2xl shadow-sm border border-slate-200 flex gap-2.5 items-center hover:border-indigo-200 transition">
               <div onclick="abrirFichaDetallada('${j.id}')" class="w-12 h-12 aspect-square bg-slate-900 rounded-xl overflow-hidden shrink-0 flex items-center justify-center relative cursor-pointer border border-slate-100 shadow-inner">
-                <button onclick="event.stopPropagation(); toggleFavorito('${j.id}')" class="absolute top-0.5 left-0.5 w-4 h-4 bg-black/60 rounded-full flex items-center justify-center text-[9px] z-10 text-white">
+                <button onclick="event.stopPropagation(); toggleFavorito('${j.id}')" class="absolute top-0.5 left-0.5 w-4 h-4 bg-black/60 rounded-full flex items-center justify-center text-xs z-10 text-white">
                   ${esFav ? '❤️' : '🤍'}
                 </button>
-                ${tieneImagen ? `<img src="${imagenSrc}" class="w-full h-full object-contain">` : '<span class="text-[8px] text-slate-400">Sin Foto</span>'}
+                ${tieneImagen ? `<img src="${imagenSrc}" class="w-full h-full object-contain">` : '<span class="text-xs text-slate-400">Sin Foto</span>'}
               </div>
 
               <div class="flex-grow min-w-0 flex flex-col justify-between py-0.5 gap-0.5">
                 <div class="min-w-0 cursor-pointer" onclick="abrirFichaDetallada('${j.id}')">
                   <h4 class="font-black text-slate-800 text-xs leading-tight hover:text-indigo-600 transition truncate">${escaparHTML(j.nombre)}</h4>
-                  <p class="text-[9px] text-slate-500 truncate mt-0.5">
+                  <p class="text-xs text-slate-500 truncate mt-0.5">
                     🏭 ${escaparHTML(j.fabricante || 'Genérico')} • 📍 ${escaparHTML(j.ubicacion || 'Sin sitio')} • 👶 ${formatearTextoEdad(j)} • 👥 ${formatearTextoJugadores(j)}
                   </p>
                 </div>
 
                 <div class="flex justify-between items-center pt-0.5 border-t border-slate-100 gap-2">
                   <div class="flex items-center gap-1 truncate">
-                    <span class="bg-slate-100 text-slate-700 text-[9px] font-bold px-1.5 py-0.5 rounded-md border border-slate-200 truncate">
+                    <span class="bg-slate-100 text-slate-700 text-xs font-bold px-1.5 py-0.5 rounded-md border border-slate-200 truncate">
                       ${escaparHTML(j.categoria)}
                     </span>
-                    <span class="text-[9px] text-slate-500 truncate">
+                    <span class="text-xs text-slate-500 truncate">
                       🏷️ ${escaparHTML(j.tipologia || 'General')}
                     </span>
                   </div>
@@ -1496,7 +1597,6 @@
       pasoWizardActual = 1;
 
       if (juegoAEditar) {
-        esEdicion = true;
         document.getElementById('modalTitulo').innerText = "Editar Ficha (Asistente)";
         document.getElementById('juegoId').value = juegoAEditar.id;
         document.getElementById('nombre').value = juegoAEditar.nombre || '';
@@ -1525,7 +1625,6 @@
         document.getElementById('contenedorBotonAuditarReglas').classList.remove('hidden');
         document.getElementById('contenedorBorradoEdicion').classList.remove('hidden');
       } else {
-        esEdicion = false;
         document.getElementById('modalTitulo').innerText = "Nuevo Juego (Asistente)";
         document.getElementById('juegoId').value = '';
         document.getElementById('fabricante').value = '';
@@ -1533,7 +1632,7 @@
         document.getElementById('juegoFotoBase64').value = '';
         document.getElementById('pdf_reglas_url').value = '';
         document.getElementById('video_tutorial_url').value = '';
-        document.getElementById('imagePreview').innerHTML = `<span class="text-slate-400 text-[10px] text-center px-2">Sin fotografía<br><span class="text-[9px] text-slate-500">(Cuadrada)</span></span>`;
+        document.getElementById('imagePreview').innerHTML = `<span class="text-slate-400 text-xs text-center px-2">Sin fotografía<br><span class="text-xs text-slate-500">(Cuadrada)</span></span>`;
 
         document.getElementById('contenedorBotonIAPaso1').classList.remove('hidden');
         document.getElementById('contenedorBotonAuditarClasificacion').classList.add('hidden');
@@ -1589,7 +1688,7 @@
       const base64 = document.getElementById('juegoFotoBase64').value;
       const nombreActual = document.getElementById('nombre').value;
 
-      if (!base64 && !nombreActual) return alert("Sube una foto o escribe el nombre para que la IA reconozca el juego.");
+      if (!base64 && !nombreActual) return mostrarToast("Sube una foto o escribe el nombre para analizar con la IA", "aviso");
 
       const btn = document.getElementById('btnIAStart');
       btn.innerText = "⏳ Identificando Juego...";
@@ -1614,8 +1713,8 @@
         if (ia.instrucciones) document.getElementById('instrucciones').value = ia.instrucciones;
         if (ia.instrucciones_completas) document.getElementById('instruccionesCompletas').value = ia.instrucciones_completas;
 
-        alert("✨ ¡Juego identificado! Revisa los datos en los siguientes pasos del asistente.");
-      } catch (err) { alert(err.message); }
+        mostrarToast("¡Juego identificado! Revisa la información introducida", "exito");
+      } catch (err) { mostrarToast(err.message, "error"); }
       finally { btn.innerText = "🤖 Reconocer por IA (Autocompletar Todo)"; btn.disabled = false; }
     }
 
@@ -1667,7 +1766,7 @@
         if (datosAnalizadosIA.error) throw new Error(datosAnalizadosIA.error);
 
         abrirComparadorIA();
-      } catch (err) { alert(err.message); }
+      } catch (err) { mostrarToast(err.message, "error"); }
       finally {
         if (btnElem) { btnElem.innerText = textoOriginalBtn; btnElem.disabled = false; }
       }
@@ -1691,10 +1790,10 @@
           contenedor.innerHTML += `
             <div class="bg-emerald-50 border border-emerald-300 p-2.5 rounded-xl space-y-1">
               <div class="flex justify-between items-center border-b border-emerald-200 pb-1">
-                <span class="font-bold text-emerald-900 uppercase text-[9px]">${escaparHTML(campo.label)}</span>
-                <span class="bg-emerald-600 text-white text-[8px] font-bold px-1.5 py-0.5 rounded">✓ Verificado por IA (Sin cambios)</span>
+                <span class="font-bold text-emerald-900 uppercase text-xs">${escaparHTML(campo.label)}</span>
+                <span class="bg-emerald-600 text-white text-xs font-bold px-1.5 py-0.5 rounded">✓ Verificado por IA (Sin cambios)</span>
               </div>
-              <p class="text-emerald-950 font-medium whitespace-pre-line text-[10px] leading-relaxed">${escaparHTML(valActual) || '(Sin texto)'}</p>
+              <p class="text-emerald-950 font-medium whitespace-pre-line text-xs leading-relaxed">${escaparHTML(valActual) || '(Sin texto)'}</p>
             </div>
           `;
           seleccionesComparadorIA[id] = 'original';
@@ -1702,21 +1801,21 @@
           seleccionesComparadorIA[id] = 'ia';
           contenedor.innerHTML += `
             <div class="bg-slate-50 p-2 rounded-xl border border-slate-200 space-y-1.5">
-              <span class="font-bold text-slate-700 uppercase text-[9px] block border-b pb-0.5">${escaparHTML(campo.label)}</span>
-              <div class="grid grid-cols-2 gap-1.5 text-[10px]">
+              <span class="font-bold text-slate-700 uppercase text-xs block border-b pb-0.5">${escaparHTML(campo.label)}</span>
+              <div class="grid grid-cols-2 gap-1.5 text-xs">
                 <div id="card_orig_${id}" onclick="seleccionarOpcionComparador('${id}', 'original')" class="p-2 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-white border-slate-200 opacity-60 overflow-hidden">
                   <div class="break-words">
-                    <span class="text-[8px] font-bold text-slate-400 block uppercase mb-0.5">📄 ORIGINAL:</span>
+                    <span class="text-xs font-bold text-slate-400 block uppercase mb-0.5">📄 ORIGINAL:</span>
                     <p class="text-slate-700 whitespace-pre-line leading-relaxed">${escaparHTML(valActual) || '(Vacío)'}</p>
                   </div>
-                  <span id="check_orig_${id}" class="text-[9px] font-bold text-slate-400 mt-1 block">✕ No seleccionado</span>
+                  <span id="check_orig_${id}" class="text-xs font-bold text-slate-400 mt-1 block">✕ No seleccionado</span>
                 </div>
                 <div id="card_ia_${id}" onclick="seleccionarOpcionComparador('${id}', 'ia')" class="p-2 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-purple-100 border-purple-500 shadow-sm overflow-hidden">
                   <div class="break-words">
-                    <span class="text-[8px] font-bold text-purple-700 block uppercase mb-0.5">✨ SUGERIDO POR IA:</span>
+                    <span class="text-xs font-bold text-purple-700 block uppercase mb-0.5">✨ SUGERIDO POR IA:</span>
                     <p class="text-purple-950 font-semibold whitespace-pre-line leading-relaxed">${escaparHTML(valIA)}</p>
                   </div>
-                  <span id="check_ia_${id}" class="text-[9px] font-bold text-purple-700 mt-1 block">✓ Seleccionado</span>
+                  <span id="check_ia_${id}" class="text-xs font-bold text-purple-700 mt-1 block">✓ Seleccionado</span>
                 </div>
               </div>
             </div>
@@ -1737,19 +1836,19 @@
 
       if (opcion === 'original') {
         cardOrig.className = "p-2 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-emerald-50 border-emerald-500 shadow-sm overflow-hidden";
-        checkOrig.className = "text-[9px] font-bold text-emerald-700 mt-1 block";
+        checkOrig.className = "text-xs font-bold text-emerald-700 mt-1 block";
         checkOrig.innerText = "✓ Seleccionado";
 
         cardIa.className = "p-2 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-white border-slate-200 opacity-60 overflow-hidden";
-        checkIa.className = "text-[9px] font-bold text-slate-400 mt-1 block";
+        checkIa.className = "text-xs font-bold text-slate-400 mt-1 block";
         checkIa.innerText = "✕ No seleccionado";
       } else {
         cardIa.className = "p-2 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-purple-100 border-purple-500 shadow-sm overflow-hidden";
-        checkIa.className = "text-[9px] font-bold text-purple-700 mt-1 block";
+        checkIa.className = "text-xs font-bold text-purple-700 mt-1 block";
         checkIa.innerText = "✓ Seleccionado";
 
         cardOrig.className = "p-2 rounded-xl border cursor-pointer transition flex flex-col justify-between bg-white border-slate-200 opacity-60 overflow-hidden";
-        checkOrig.className = "text-[9px] font-bold text-slate-400 mt-1 block";
+        checkOrig.className = "text-xs font-bold text-slate-400 mt-1 block";
         checkOrig.innerText = "✕ No seleccionado";
       }
     }
@@ -1771,7 +1870,7 @@
       });
 
       cerrarComparadorIA();
-      alert(aplicados ? `✅ ${aplicados} campo(s) actualizados en el formulario.` : "No fue necesario aplicar cambios.");
+      mostrarToast(aplicados ? `Se han aplicado ${aplicados} propuesta(s) de la IA` : "No se aplicaron cambios", aplicados ? "exito" : "info");
     }
 
     function cargarPdfEnFormulario(event) {
@@ -1781,7 +1880,7 @@
       const reader = new FileReader();
       reader.onload = (e) => {
         document.getElementById('pdf_reglas_url').value = e.target.result;
-        alert("📄 Documento PDF listo para subirse.");
+        mostrarToast("Archivo PDF cargado", "exito");
       };
       reader.readAsDataURL(file);
     }
@@ -1789,12 +1888,12 @@
     function borrarPdfFormulario() {
       document.getElementById('pdf_reglas_url').value = '';
       document.getElementById('inputPdfForm').value = '';
-      alert("📄 Archivo PDF desvinculado.");
+      mostrarToast("Documento PDF eliminado", "aviso");
     }
 
     function borrarVideoFormulario() {
       document.getElementById('video_tutorial_url').value = '';
-      alert("🎬 Enlace de vídeo eliminado.");
+      mostrarToast("Enlace de vídeo borrado", "aviso");
     }
 
     async function preprocesarGuardadoJuego(e) {
@@ -1810,31 +1909,47 @@
         const check = await res.json();
 
         if (check.existe) {
-          const confirmarVariante = confirm(
-            `⚠️ ATENCIÓN: Ya existe un juego registrado con el nombre "${check.juego_existente}".\n\n` +
-            `Si se trata de una variante diferente, presiona Aceptar para guardarlo.\n` +
-            `De lo contrario, pulsa Cancelar para modificar el nombre.`
+          mostrarConfirmacion(
+            "Posible Juego Duplicado",
+            `Ya existe un registro con el nombre "${check.juego_existente}". ¿Deseas guardarlo de todas formas como una nueva edición o variante?`,
+            () => guardarJuego()
           );
-          if (!confirmarVariante) return;
+          return;
         }
 
         guardarJuego();
-      } catch (err) { alert(err.message); }
+      } catch (err) { mostrarToast(err.message, "error"); }
     }
 
     async function guardarJuego() {
       const nombre = document.getElementById('nombre').value.trim();
+      const edad = document.getElementById('edad').value;
+      const categoria = document.getElementById('categoria').value;
       const ubicacion = document.getElementById('ubicacionSelect').value;
 
       if (!nombre) {
-        alert("El Nombre del juego es obligatorio.");
+        mostrarToast("El Nombre del juego es obligatorio.", "aviso");
         pasoWizardActual = 1;
         actualizarVistaPasoWizard();
         return;
       }
 
+      if (!edad) {
+        mostrarToast("Debes seleccionar una Edad Recomendada.", "aviso");
+        pasoWizardActual = 1;
+        actualizarVistaPasoWizard();
+        return;
+      }
+
+      if (!categoria) {
+        mostrarToast("Debes seleccionar una Categoría en el Paso 2.", "aviso");
+        pasoWizardActual = 2;
+        actualizarVistaPasoWizard();
+        return;
+      }
+
       if (!ubicacion) {
-        alert("Debes seleccionar una Ubicación en el Paso 4.");
+        mostrarToast("Debes seleccionar una Ubicación en el Paso 4.", "aviso");
         pasoWizardActual = 4;
         actualizarVistaPasoWizard();
         return;
@@ -1855,10 +1970,10 @@
         id: idActual || crypto.randomUUID(),
         nombre: nombre,
         fabricante: document.getElementById('fabricante').value,
-        categoria: document.getElementById('categoria').value,
+        categoria: categoria,
         tipologia: document.getElementById('tipologia').value,
         ubicacion: ubicacion,
-        edad: document.getElementById('edad').value,
+        edad: edad,
         min_jugadores: document.getElementById('minJugadoresSelect').value,
         max_jugadores: document.getElementById('maxJugadoresSelect').value,
         mecanicas: mecsVal,
@@ -1878,22 +1993,27 @@
         await cargarUbicaciones();
         await cargarMecanicasDinamicas();
         cargarJuegos();
-      } catch (err) { alert(err.message); }
+        mostrarToast("¡Juego guardado correctamente!", "exito");
+      } catch (err) { mostrarToast(err.message, "error"); }
       finally { btn.innerText = "💾 GUARDAR JUEGO EN LA NUBE"; btn.disabled = false; }
     }
 
-    async function confirmarBorradoSeguro() {
+    function confirmarBorradoSeguro() {
       const id = document.getElementById('juegoId').value;
       if (!id) return;
 
-      if (!confirm("⚠ ¿Estás seguro de que deseas eliminar permanentemente este juego y sus archivos asociados?")) return;
-
-      try {
-        await fetchSeguro(`/api/juegos/${id}`, { method: 'DELETE' });
-        cerrarModalFormulario();
-        cargarJuegos();
-        alert("Juego eliminado correctamente.");
-      } catch (err) { alert(err.message); }
+      mostrarConfirmacion(
+        "Eliminar Juego",
+        "¿Estás seguro de que deseas eliminar este juego y todos sus archivos asociados de forma permanente?",
+        async () => {
+          try {
+            await fetchSeguro(`/api/juegos/${id}`, { method: 'DELETE' });
+            cerrarModalFormulario();
+            cargarJuegos();
+            mostrarToast("Juego eliminado de la colección", "aviso");
+          } catch (err) { mostrarToast(err.message, "error"); }
+        }
+      );
     }
 
     function procesarFoto(event) {
@@ -1948,7 +2068,7 @@
       const catsElegidas = Array.from(document.querySelectorAll('#checkboxesRuletaCat input:checked')).map(el => el.value);
 
       let elegibles = juegosCache.filter(j => catsElegidas.includes(j.categoria));
-      if (elegibles.length === 0) return alert("No hay juegos disponibles con las categorías seleccionadas.");
+      if (elegibles.length === 0) return mostrarToast("No hay juegos disponibles para las categorías seleccionadas", "aviso");
 
       if (modo === 'descarte') {
         if (bolsaDescarteRuleta.length === 0) bolsaDescarteRuleta = [...elegibles.map(j => j.id)];
@@ -2035,7 +2155,7 @@
         localStorage.setItem('session_user', JSON.stringify(currentUser));
         localStorage.setItem('auth_token', json.token); 
         iniciarApp();
-      } catch (err) { alert(err.message); }
+      } catch (err) { mostrarToast(err.message, "error"); }
     }
 
     async function procesarRegistro(e) {
@@ -2045,7 +2165,7 @@
       const pass1 = document.getElementById('regPass1').value;
       const pass2 = document.getElementById('regPass2').value;
 
-      if (pass1 !== pass2) return alert("Las contraseñas no coinciden");
+      if (pass1 !== pass2) return mostrarToast("Las contraseñas no coinciden", "aviso");
 
       try {
         const res = await fetch(`${WORKER_URL}/api/registro`, {
@@ -2056,10 +2176,10 @@
         const json = await res.json();
         if (json.error) throw new Error(json.error);
 
-        alert("¡Solicitud enviada!\n\nTu cuenta se encuentra pendiente de activación por el Administrador.");
+        mostrarToast("Solicitud registrada. Introduce el código de activación.", "info");
         document.getElementById('registroForm').classList.add('hidden');
         document.getElementById('codigoForm').classList.remove('hidden');
-      } catch (err) { alert(err.message); }
+      } catch (err) { mostrarToast(err.message, "error"); }
     }
 
     async function validarCodigoAcceso() {
@@ -2075,9 +2195,9 @@
         const json = await res.json();
         if (json.error) throw new Error(json.error);
 
-        alert("¡Cuenta activada! Inicia sesión.");
+        mostrarToast("¡Cuenta activada con éxito! Inicia sesión.", "exito");
         toggleAuthMode('login');
-      } catch (err) { alert(err.message); }
+      } catch (err) { mostrarToast(err.message, "error"); }
     }
 
     function toggleAuthMode(mode) {
@@ -2108,7 +2228,7 @@
 
         const preview = document.getElementById('avatarPreview');
         const imgSrc = sanitizarUrl(perfil.avatar_base64 || perfil.avatar_url);
-        preview.innerHTML = imgSrc ? `<img src="${imgSrc}" class="w-full h-full object-cover">` : `<span class="text-slate-400 text-[10px]">Foto</span>`;
+        preview.innerHTML = imgSrc ? `<img src="${imgSrc}" class="w-full h-full object-cover">` : `<span class="text-slate-400 text-xs">Foto</span>`;
 
         const historialCont = document.getElementById('miHistorialLista');
         historialCont.innerHTML = '';
@@ -2119,10 +2239,10 @@
               <div class="bg-slate-50 p-2 rounded-xl border space-y-0.5">
                 <div class="flex justify-between items-center">
                   <span class="font-bold text-indigo-700 text-xs">${escaparHTML(p.juego_nombre)} (${p.num_partidas || 1} p.)</span>
-                  <span class="text-[9px] text-slate-400">${fechaFormateada}</span>
+                  <span class="text-xs text-slate-400">${fechaFormateada}</span>
                 </div>
-                <p class="text-[10px] text-slate-600">👥 <b>Participantes:</b> ${escaparHTML(p.participantes)}</p>
-                <p class="text-[10px] text-emerald-700 font-bold">🏆 ${escaparHTML(p.ganador)}</p>
+                <p class="text-xs text-slate-600">👥 <b>Participantes:</b> ${escaparHTML(p.participantes)}</p>
+                <p class="text-xs text-emerald-700 font-bold">🏆 ${escaparHTML(p.ganador)}</p>
               </div>
             `;
           });
@@ -2135,12 +2255,12 @@
             misJuegosCont.innerHTML += `
               <div class="bg-slate-50 p-1.5 rounded-xl border flex justify-between items-center text-xs">
                 <span class="font-bold text-slate-800">${escaparHTML(j.nombre)}</span>
-                <span class="text-[9px] text-indigo-600 font-medium">${escaparHTML(j.categoria)}</span>
+                <span class="text-xs text-indigo-600 font-medium">${escaparHTML(j.categoria)}</span>
               </div>
             `;
           });
         } else misJuegosCont.innerHTML = `<p class="text-center text-slate-400 py-3 text-xs">No has subido ningún juego aún.</p>`;
-      } catch (err) { alert(err.message); }
+      } catch (err) { mostrarToast(err.message, "error"); }
     }
 
     function cambiarTabPerfil(tab) {
@@ -2196,10 +2316,10 @@
         currentUser = json.usuario;
         if (json.token) localStorage.setItem('auth_token', json.token);
         localStorage.setItem('session_user', JSON.stringify(currentUser));
-        alert("Perfil actualizado correctamente");
+        mostrarToast("Perfil actualizado correctamente", "exito");
         iniciarApp();
         cerrarPerfilModal();
-      } catch (err) { alert(err.message); }
+      } catch (err) { mostrarToast(err.message, "error"); }
     }
 
     async function abrirAdminPanel() {
@@ -2225,7 +2345,7 @@
           BLOQUEADO: { badge: 'bg-rose-100 text-rose-800',       avatar: 'bg-rose-100 text-rose-700',       borde: 'border-rose-300' }
         };
         const boton = (id, estado, texto, color) =>
-          `<button onclick="cambiarEstadoUsuarioAdmin('${escaparHTML(id)}', '${estado}')" class="text-[11px] ${color} text-white font-bold px-2 py-1 rounded-md transition">${texto}</button>`;
+          `<button onclick="cambiarEstadoUsuarioAdmin('${escaparHTML(id)}', '${estado}')" class="text-xs ${color} text-white font-bold px-2 py-1 rounded-md transition">${texto}</button>`;
 
         const cuenta = e => usuarios.filter(u => u.estado === e).length;
         const chip = (n, txt, color) => `<span class="px-2 py-0.5 rounded-full ${color}">${n} ${txt}</span>`;
@@ -2251,7 +2371,7 @@
             filaIntentos = `
               <div class="flex items-center justify-between gap-2 mt-1.5 px-2 py-1 rounded-lg border ${color}">
                 <div class="min-w-0">
-                  <p class="text-[9px] font-bold">⚠️ Intentos fallidos: ${intentos}/${LIMITE}</p>
+                  <p class="text-xs font-bold">⚠️ Intentos fallidos: ${intentos}/${LIMITE}</p>
                   <div class="flex gap-0.5 mt-0.5">${segmentos}</div>
                 </div>
                 ${reiniciar}
@@ -2259,7 +2379,7 @@
           }
 
           const filaCodigo = (u.estado === 'PENDIENTE' && u.codigo_verificacion)
-            ? `<div class="mt-1.5 px-2 py-1 rounded-lg bg-indigo-50 border border-indigo-100 text-[10px] text-indigo-700 flex items-center gap-1">🔑 Código de activación: <span class="font-mono font-bold tracking-widest">${escaparHTML(u.codigo_verificacion)}</span></div>`
+            ? `<div class="mt-1.5 px-2 py-1 rounded-lg bg-indigo-50 border border-indigo-100 text-xs text-indigo-700 flex items-center gap-1">🔑 Código de activación: <span class="font-mono font-bold tracking-widest">${escaparHTML(u.codigo_verificacion)}</span></div>`
             : '';
 
           const acciones = [];
@@ -2267,7 +2387,7 @@
           else if (u.estado === 'PENDIENTE') acciones.push(boton(u.id, 'ACTIVO', '✓ Activar', 'bg-emerald-600 hover:bg-emerald-700'));
           else if (!esProtegido) acciones.push(boton(u.id, 'PENDIENTE', 'Desactivar', 'bg-amber-500 hover:bg-amber-600'));
           if (u.id !== 'admin-root') {
-            acciones.push(`<button onclick="borrarUsuarioAdmin('${escaparHTML(u.id)}')" title="Borrar usuario" class="text-[11px] bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold px-2 py-1 rounded-md transition">🗑️</button>`);
+            acciones.push(`<button onclick="borrarUsuarioAdmin('${escaparHTML(u.id)}')" title="Borrar usuario" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold px-2 py-1 rounded-md transition">🗑️</button>`);
           }
           const filaAcciones = acciones.length
             ? `<div class="flex justify-end gap-1.5 mt-2 pt-1.5 border-t border-slate-100">${acciones.join('')}</div>` : '';
@@ -2278,14 +2398,14 @@
                 <div class="w-8 h-8 shrink-0 rounded-full flex items-center justify-center font-bold text-xs ${t.avatar}">${inicial}</div>
                 <div class="min-w-0 flex-1">
                   <p class="font-bold text-slate-800 text-xs truncate">${escaparHTML(u.nombre)}</p>
-                  <p class="text-[10px] text-slate-500 truncate">@${escaparHTML(u.nick)}${u.rol === 'ADMIN' ? ' · <span class="font-bold text-indigo-600">Admin</span>' : ''}</p>
+                  <p class="text-xs text-slate-500 truncate">@${escaparHTML(u.nick)}${u.rol === 'ADMIN' ? ' · <span class="font-bold text-indigo-600">Admin</span>' : ''}</p>
                 </div>
-                <span class="text-[9px] px-2 py-0.5 rounded-full font-bold ${t.badge}">${escaparHTML(u.estado)}</span>
+                <span class="text-xs px-2 py-0.5 rounded-full font-bold ${t.badge}">${escaparHTML(u.estado)}</span>
               </div>
               ${filaCodigo}${filaIntentos}${filaAcciones}
             </div>`;
         }).join('');
-      } catch (err) { alert(err.message); }
+      } catch (err) { mostrarToast(err.message, "error"); }
     }
 
     async function cambiarEstadoUsuarioAdmin(userId, nuevoEstado) {
@@ -2297,15 +2417,22 @@
         const json = await res.json();
         if (json.error) throw new Error(json.error);
         cargarUsuariosAdmin();
-      } catch (err) { alert(err.message); }
+        mostrarToast("Estado de usuario actualizado", "exito");
+      } catch (err) { mostrarToast(err.message, "error"); }
     }
 
-    async function borrarUsuarioAdmin(userId) {
-      if (!confirm("¿Seguro que deseas borrar este usuario?")) return;
-      try {
-        await fetchSeguro(`/api/admin/usuarios/${userId}`, { method: 'DELETE' });
-        cargarUsuariosAdmin();
-      } catch (err) { alert(err.message); }
+    function borrarUsuarioAdmin(userId) {
+      mostrarConfirmacion(
+        "Borrar Usuario",
+        "¿Seguro que deseas borrar este usuario? Sus juegos creados pasarán a ser propiedad de 'admin'.",
+        async () => {
+          try {
+            await fetchSeguro(`/api/admin/usuarios/${userId}`, { method: 'DELETE' });
+            cargarUsuariosAdmin();
+            mostrarToast("Usuario eliminado correctamente", "aviso");
+          } catch (err) { mostrarToast(err.message, "error"); }
+        }
+      );
     }
 
     async function abrirModalPartida(juegoId, juegoNombre) {
@@ -2341,11 +2468,13 @@
     }
 
     function abrirPromptInvitado() {
-      const nom = prompt("Introduce el nombre del invitado:");
-      if (nom && nom.trim()) {
+      mostrarPromptModal("Añadir Invitado", "Introduce el nombre o apodo del invitado:", (nom) => {
         fetchSeguro(`/api/invitados`, { method: 'POST', body: JSON.stringify({ nombre: nom.trim() }) })
-          .then(() => cargarJugadoresDisponibles());
-      }
+          .then(() => {
+            cargarJugadoresDisponibles();
+            mostrarToast("Invitado añadido", "exito");
+          });
+      });
     }
 
     function elegirModoPartida(modo) {
@@ -2361,7 +2490,7 @@
 
     function avanzarAFormularioFinal() {
       const seleccionados = Array.from(document.querySelectorAll('input[name="jugadorCheck"]:checked')).map(el => el.value);
-      if (seleccionados.length === 0) return alert("Selecciona al menos un jugador participante.");
+      if (seleccionados.length === 0) return mostrarToast("Selecciona al menos un jugador participante.", "aviso");
 
       document.getElementById('pasoJugadoresSelector').classList.add('hidden');
 
@@ -2401,7 +2530,7 @@
       contenedor.innerHTML = '';
 
       for (let i = 1; i <= numPartidas; i++) {
-        let opcionesHtml = `<option value="Empate / Sin ganador">Empate / Sin ganador</option>`;
+        let opcionesHtml = `<option value="Sin ganador">Sin ganador</option>`;
         seleccionados.forEach(j => { opcionesHtml += `<option value="${escaparHTML(j)}">${escaparHTML(j)}</option>`; });
 
         contenedor.innerHTML += `
@@ -2445,9 +2574,9 @@
         if (json.error) throw new Error(json.error);
 
         cerrarModalPartida();
-        alert("¡Partida registrada y estadísticas actualizadas con éxito!");
+        mostrarToast("¡Partida registrada y estadísticas actualizadas!", "exito");
         cargarJuegos();
-      } catch (err) { alert(err.message); }
+      } catch (err) { mostrarToast(err.message, "error"); }
     }
 
     function cerrarModalPartida() {
