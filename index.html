@@ -11,7 +11,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="MisJuegos">
-  <link rel="apple-touch-icon" href="/media/icon-192.png">
+  <link rel="apple-touch-icon" href="/icon-192.png">
 
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -1644,7 +1644,41 @@
       document.getElementById('modalForm').classList.remove('hidden');
     }
 
+    function validarPasoWizard(paso) {
+      let ok = true;
+      const marcarError = (elemId) => {
+        const el = document.getElementById(elemId);
+        if (!el) return;
+        el.classList.add('border-rose-500', 'ring-2', 'ring-rose-200');
+        setTimeout(() => el.classList.remove('border-rose-500', 'ring-2', 'ring-rose-200'), 3000);
+        ok = false;
+      };
+
+      if (paso === 1) {
+        if (!document.getElementById('nombre').value.trim()) {
+          mostrarToast('Introduce el nombre del juego', 'aviso');
+          marcarError('nombre');
+        }
+        if (!document.getElementById('edad').value) {
+          mostrarToast('Selecciona la edad recomendada', 'aviso');
+          marcarError('edad');
+        }
+      } else if (paso === 2) {
+        if (!document.getElementById('categoria').value) {
+          mostrarToast('Selecciona la categoría', 'aviso');
+          marcarError('categoria');
+        }
+      } else if (paso === 3) {
+        if (!document.getElementById('mecanicas').value.trim()) {
+          mostrarToast('Indica al menos una mecánica', 'aviso');
+          marcarError('mecanicas');
+        }
+      }
+      return ok;
+    }
+
     function cambiarPasoWizard(delta) {
+      if (delta > 0 && !validarPasoWizard(pasoWizardActual)) return;
       const nuevoPaso = pasoWizardActual + delta;
       if (nuevoPaso < 1 || nuevoPaso > 4) return;
       pasoWizardActual = nuevoPaso;
