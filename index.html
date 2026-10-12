@@ -6,7 +6,7 @@
   <title>Mis Juegos y Juguetes</title>
   
   <!-- Soportes PWA -->
-  <link rel="manifest" href="/manifest.json">
+  <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#4f46e5">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -874,7 +874,7 @@
     // REGISTRO DE SERVICE WORKER PARA PWA
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW no registrado:', err));
+        navigator.serviceWorker.register('sw.js').catch(err => console.log('SW no registrado:', err));
       });
     }
 
