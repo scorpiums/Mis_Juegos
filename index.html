@@ -85,8 +85,8 @@
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen pb-16">
 
-  <!-- SISTEMA DE NOTIFICACIONES TOAST -->
-  <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-3"></div>
+  <!-- SISTEMA DE NOTIFICACIONES TOAST (Z-INDEX 100 PARA SUPERPONERSE A LOS MODALES BORROSOS) -->
+  <div id="toastContainer" class="fixed bottom-4 right-4 z-[100] flex flex-col gap-2 max-w-sm w-full pointer-events-none px-3"></div>
 
   <!-- MODAL DE CONFIRMACIÓN REUTILIZABLE -->
   <div id="modalConfirmacion" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
@@ -468,7 +468,7 @@
     </div>
   </div>
 
-  <!-- MODAL ASISTENTE (WIZARD DE 4 PASOS) -->
+  <!-- MODAL ASISTENTE (WIZARD DE 4 PASOS CON OPCIONES DE GUARDADO DIRECTO) -->
   <div id="modalForm" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-2.5">
     <div class="bg-white rounded-2xl max-w-md w-full h-[90vh] max-h-[630px] flex flex-col shadow-2xl overflow-hidden relative border border-slate-100">
       
@@ -487,7 +487,6 @@
       </div>
 
       <div class="flex-grow overflow-y-auto p-3 text-xs" id="wizardScrollContainer">
-        
         <form id="juegoForm" onsubmit="preprocesarGuardadoJuego(event)" class="space-y-3">
           <input type="hidden" id="juegoId">
           <input type="hidden" id="juegoFotoBase64">
@@ -646,18 +645,30 @@
         </form>
       </div>
 
-      <div class="p-2.5 border-t bg-slate-50 shrink-0 flex justify-between gap-2">
-        <button type="button" id="btnWizardPrev" onclick="cambiarPasoWizard(-1)" class="w-1/3 bg-slate-200 text-slate-700 font-bold py-2 rounded-xl text-xs hidden">
-          ⬅ Atrás
-        </button>
-        <button type="button" id="btnWizardNext" onclick="cambiarPasoWizard(1)" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-xl text-xs shadow-md card-zoom">
-          Siguiente ➔
-        </button>
+      <!-- NAVEGACIÓN Y GUARDADO RÁPIDO EN EL FOOTER DEL WIZARD -->
+      <div class="p-2.5 border-t bg-slate-50 shrink-0 flex flex-col gap-2">
+        <div class="flex justify-between items-center gap-1.5" id="wizardQuickSaveBar">
+          <button type="button" onclick="solicitarGuardadoWizard(false)" class="flex-1 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-800 font-bold py-1.5 rounded-xl text-xs transition">
+            💾 Guardar
+          </button>
+          <button type="button" onclick="solicitarGuardadoWizard(true)" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1.5 rounded-xl text-xs shadow-sm transition">
+            💾 Guardar y Salir
+          </button>
+        </div>
+
+        <div class="flex justify-between gap-2">
+          <button type="button" id="btnWizardPrev" onclick="cambiarPasoWizard(-1)" class="w-1/3 bg-slate-200 text-slate-700 font-bold py-2 rounded-xl text-xs hidden">
+            ⬅ Atrás
+          </button>
+          <button type="button" id="btnWizardNext" onclick="cambiarPasoWizard(1)" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-xl text-xs shadow-md card-zoom">
+            Siguiente ➔
+          </button>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- MODAL COMPARADOR IA ADAPTATIVO -->
+  <!-- MODAL COMPARADOR IA ADAPTATIVO CON REGENERACIÓN LIMPIA PARA ADMINS -->
   <div id="modalComparadorIA" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 hidden flex items-center justify-center p-2.5">
     <div class="bg-white rounded-2xl max-w-lg w-full h-[85vh] max-h-[600px] flex flex-col shadow-2xl overflow-hidden relative border border-purple-200">
       <div class="p-2.5 border-b bg-purple-900 text-white flex justify-between items-center shrink-0">
@@ -665,8 +676,13 @@
         <button onclick="cerrarComparadorIA()" class="text-purple-200 font-bold text-lg px-1">✕</button>
       </div>
 
-      <div class="p-2 bg-purple-50 text-purple-900 text-xs font-medium shrink-0 border-b border-purple-100">
-        Revisa las sugerencias de la IA. Si la información actual era correcta, se marcará como verificada.
+      <div class="p-2 bg-purple-50 text-purple-900 text-xs font-medium shrink-0 border-b border-purple-100 space-y-1.5">
+        <p>Revisa las sugerencias de la IA. Si la información actual era correcta, se marcará como verificada.</p>
+        <div id="contenedorRegeneracionLimpiaAdmin" class="hidden">
+          <button onclick="solicitarAuditoriaSeccion(seccionAuditoriaUltima, true)" class="w-full bg-purple-700 hover:bg-purple-800 text-white font-bold py-1 px-2 rounded-lg text-xs flex items-center justify-center gap-1 shadow-sm">
+            ✨ Regenerar desde cero con IA (Forzar limpia)
+          </button>
+        </div>
       </div>
 
       <div class="flex-grow overflow-y-auto p-2.5 space-y-2.5 text-xs" id="contenedorCamposComparador"></div>
@@ -844,6 +860,8 @@
     let modoPartidaActual = '';
     let datosAnalizadosIA = null;
     let seleccionesComparadorIA = {};
+    let seccionAuditoriaUltima = 'clasificacion';
+    let cerrarFormularioTrasGuardar = false;
     let audioCtx = null;
 
     const MAPA_CAMPOS_AUDITORIA_IA = [
@@ -1067,7 +1085,6 @@
       } catch (e) { console.error("Error al cargar catálogos:", e); }
     }
 
-    // --- CLASIFICACIÓN POR CATEGORÍA (niveles 2 y 3) ---
     function configuracionClasificacion(categoria) {
       const esVideo = categoria === 'Videojuego';
       const tipos = (catalogosServidor.tipologias_por_categoria || {})[categoria] || [];
@@ -1082,7 +1099,6 @@
       };
     }
 
-    // "General" es el valor por defecto antiguo: no es una opción válida, así que se ignora
     function leerListaCampo(id) {
       return (document.getElementById(id).value || '')
         .split(',').map(s => s.trim()).filter(s => s && s !== 'General');
@@ -1131,7 +1147,6 @@
       pintarChips('chipsMecanicas', 'mecanicas', cfg.mecs, cfg.maxMec);
     }
 
-    // Al cambiar de categoría se quitan los valores que ya no corresponden
     function alCambiarCategoria() {
       const cat = document.getElementById('categoria').value;
       const cfg = configuracionClasificacion(cat);
@@ -1756,6 +1771,7 @@
 
       const btnPrev = document.getElementById('btnWizardPrev');
       const btnNext = document.getElementById('btnWizardNext');
+      const quickSaveBar = document.getElementById('wizardQuickSaveBar');
 
       if (pasoWizardActual === 1) {
         btnPrev.classList.add('hidden');
@@ -1767,11 +1783,18 @@
 
       if (pasoWizardActual === 4) {
         btnNext.classList.add('hidden');
+        quickSaveBar.classList.add('hidden');
       } else {
         btnNext.classList.remove('hidden');
+        quickSaveBar.classList.remove('hidden');
       }
 
       document.getElementById('wizardScrollContainer').scrollTop = 0;
+    }
+
+    function solicitarGuardadoWizard(cerrarAlTerminar = false) {
+      cerrarFormularioTrasGuardar = cerrarAlTerminar;
+      document.getElementById('juegoForm').requestSubmit();
     }
 
     function cerrarModalFormulario() { document.getElementById('modalForm').classList.add('hidden'); }
@@ -1811,7 +1834,8 @@
       finally { btn.innerText = "🤖 Reconocer por IA (Autocompletar Todo)"; btn.disabled = false; }
     }
 
-    async function solicitarAuditoriaSeccion(tipoSeccion) {
+    async function solicitarAuditoriaSeccion(tipoSeccion, fuerzaLimpieza = false) {
+      seccionAuditoriaUltima = tipoSeccion;
       const datosBasicos = {
         nombre: document.getElementById('nombre').value,
         fabricante: document.getElementById('fabricante').value,
@@ -1852,7 +1876,8 @@
           body: JSON.stringify({
             datos_basicos_confirmados: datosBasicos,
             secciones_solicitadas: secciones,
-            texto_actual: textoActual
+            texto_actual: textoActual,
+            fuerza_limpieza: fuerzaLimpieza
           })
         });
         datosAnalizadosIA = await res.json();
@@ -1871,6 +1896,13 @@
       const contenedor = document.getElementById('contenedorCamposComparador');
       contenedor.innerHTML = '';
       seleccionesComparadorIA = {};
+
+      const contRegenAdmin = document.getElementById('contenedorRegeneracionLimpiaAdmin');
+      if (currentUser && currentUser.rol === 'ADMIN') {
+        contRegenAdmin.classList.remove('hidden');
+      } else {
+        contRegenAdmin.classList.add('hidden');
+      }
 
       MAPA_CAMPOS_AUDITORIA_IA.forEach(campo => {
         const valIA = datosAnalizadosIA[campo.key];
@@ -2083,13 +2115,20 @@
         const json = await res.json();
         if (json.error) throw new Error(json.error);
 
-        cerrarModalFormulario();
+        if (cerrarFormularioTrasGuardar || pasoWizardActual === 4) {
+          cerrarModalFormulario();
+        }
+
         await cargarUbicaciones();
         await cargarMecanicasDinamicas();
-        cargarJuegos();
+        await cargarJuegos();
         mostrarToast("¡Juego guardado correctamente!", "exito");
       } catch (err) { mostrarToast(err.message, "error"); }
-      finally { btn.innerText = "💾 GUARDAR JUEGO EN LA NUBE"; btn.disabled = false; }
+      finally { 
+        btn.innerText = "💾 GUARDAR JUEGO EN LA NUBE"; 
+        btn.disabled = false;
+        cerrarFormularioTrasGuardar = false;
+      }
     }
 
     function confirmarBorradoSeguro() {
